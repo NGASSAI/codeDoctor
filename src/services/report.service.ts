@@ -98,7 +98,6 @@ export async function obtenirSignalementParId(
     },
   });
 }
-
 /**
  * Modifier le statut d'un signalement
  * Utilisé par l'administrateur
@@ -113,6 +112,10 @@ export async function modifierStatutSignalement(
     },
     data: {
       statut,
+      resolvedAt:
+        statut === "RESOLVED"
+          ? new Date()
+          : null,
     },
   });
 }

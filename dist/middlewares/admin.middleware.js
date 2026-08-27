@@ -1,0 +1,40 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.adminMiddleware = adminMiddleware;
+const base_1 = require("../base");
+async function adminMiddleware(req, res, next) {
+    try {
+        const utilisateurId = req.utilisateurId;
+        if (!utilisateurId) {
+            return res.status(401).json({
+                erreur: "Authentification requise.",
+            });
+        }
+        const utilisateur = await base_1.prisma.user.findUnique({
+            where: {
+                id: utilisateurId,
+            },
+            select: {
+                role: true,
+            },
+        });
+        if (!utilisateur) {
+            return res.status(401).json({
+                erreur: "Utilisateur introuvable.",
+            });
+        }
+        if (utilisateur.role !== "ADMIN") {
+            return res.status(403).json({
+                erreur: "Accès réservé aux administrateurs.",
+            });
+        }
+        next();
+    }
+    catch (erreur) {
+        console.error("Erreur vérification ADMIN :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de vérifier les permissions.",
+        });
+    }
+}
+//# sourceMappingURL=admin.middleware.js.map

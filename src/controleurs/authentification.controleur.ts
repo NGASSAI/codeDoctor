@@ -268,9 +268,12 @@ export async function motDePasseOublie(
   
 
   return res.status(200).json({
-    message:
-      "Si un compte correspond à cet email, un lien de réinitialisation sera envoyé.",
-  });
+  message:
+    "Si un compte correspond à cet email, un lien de réinitialisation sera envoyé.",
+
+  // TEMPORAIRE POUR LES TESTS
+  token,
+});
 }
 
 /**

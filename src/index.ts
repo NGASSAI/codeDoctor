@@ -28,7 +28,7 @@ app.use(express.json());
 
 app.use("/api/auth", authentificationRoutes);
 app.use("/api/experiences", experienceRoutes);
-app.use("/api/utilisateur", utilisateurRoutes);
+app.use("/api/utilisateurs", utilisateurRoutes);
 app.use("/api", commentaireRoutes);
 app.use("/api", reactionRoutes);
 app.use("/api", reportRoutes);

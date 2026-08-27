@@ -8,6 +8,7 @@ import {
 } from "../controleurs/report.controleur";
 
 import { authentificationMiddleware } from "../middlewares/authentification.middleware";
+import { adminMiddleware } from "../middlewares/admin.middleware";
 
 const router = Router();
 
@@ -23,31 +24,34 @@ router.post(
 
 /**
  * Lister les signalements
- * Protection ADMIN à ajouter
+ * ADMIN uniquement
  */
 router.get(
   "/signalements",
   authentificationMiddleware,
+  adminMiddleware,
   lister
 );
 
 /**
  * Voir un signalement
- * Protection ADMIN à ajouter
+ * ADMIN uniquement
  */
 router.get(
   "/signalements/:id",
   authentificationMiddleware,
+  adminMiddleware,
   obtenir
 );
 
 /**
  * Modifier le statut d'un signalement
- * Protection ADMIN à ajouter
+ * ADMIN uniquement
  */
 router.patch(
   "/signalements/:id/statut",
   authentificationMiddleware,
+  adminMiddleware,
   modifierStatut
 );
 

@@ -76,22 +76,65 @@ export async function creer(req: RequeteAuthentifiee, res: Response) {
  */
 export async function lister(req: Request, res: Response) {
   try {
-    const categorie = req.query.categorie as Category | undefined;
+    const recherche =
+      typeof req.query.recherche === "string"
+        ? req.query.recherche.trim()
+        : undefined;
 
+    const categorie =
+      typeof req.query.categorie === "string"
+        ? req.query.categorie
+        : undefined;
+
+    const pageParam =
+      typeof req.query.page === "string"
+        ? Number(req.query.page)
+        : 1;
+
+    const limiteParam =
+      typeof req.query.limite === "string"
+        ? Number(req.query.limite)
+        : 10;
+
+    // Validation de la catégorie
     if (
       categorie &&
-      !Object.values(Category).includes(categorie)
+      !Object.values(Category).includes(categorie as Category)
     ) {
       return res.status(400).json({
         erreur: "Catégorie invalide.",
       });
     }
 
-    const experiences = await obtenirExperiences(categorie);
+    // Validation de la page
+    if (
+      !Number.isInteger(pageParam) ||
+      pageParam < 1
+    ) {
+      return res.status(400).json({
+        erreur: "Le numéro de page doit être un entier supérieur ou égal à 1.",
+      });
+    }
 
-    return res.status(200).json({
-      experiences,
-    });
+    // Validation de la limite
+    if (
+      !Number.isInteger(limiteParam) ||
+      limiteParam < 1 ||
+      limiteParam > 50
+    ) {
+      return res.status(400).json({
+        erreur: "La limite doit être comprise entre 1 et 50.",
+      });
+    }
+
+    const resultat = await obtenirExperiences(
+      recherche,
+      categorie as Category | undefined,
+      pageParam,
+      limiteParam
+    );
+
+    return res.status(200).json(resultat);
   } catch (erreur) {
     console.error("Erreur récupération expériences :", erreur);
 

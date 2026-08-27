@@ -63,15 +63,16 @@ export async function trouverCommentaireUtilisateur(
 }
 
 /**
- * Supprimer un commentaire
+ * Supprimer un commentaire appartenant à l'utilisateur
  */
 export async function supprimerCommentaire(
   commentId: string,
   userId: string
 ) {
-  return prisma.comment.delete({
+  return prisma.comment.deleteMany({
     where: {
       id: commentId,
+      userId,
     },
   });
 }

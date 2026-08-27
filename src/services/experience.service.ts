@@ -68,33 +68,100 @@ export async function creerExperience(
  * Récupérer toutes les expériences publiques
  */
 export async function obtenirExperiences(
-  categorie?: Category
+  recherche?: string,
+  categorie?: Category,
+  page: number = 1,
+  limite: number = 10
 ) {
-  return prisma.experience.findMany({
-    where: {
-      statut: ExperienceStatus.PUBLISHED,
-      ...(categorie ? { categorie } : {}),
-    },
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      user: {
-        select: {
-          id: true,
-          displayName: true,
-        },
-      },
-      _count: {
-        select: {
-          comments: true,
-          reactions: true,
-        },
-      },
-    },
-  });
-}
+  const skip = (page - 1) * limite;
 
+  const where = {
+    statut: ExperienceStatus.PUBLISHED,
+
+    ...(categorie
+      ? {
+          categorie,
+        }
+      : {}),
+
+    ...(recherche
+      ? {
+          OR: [
+            {
+              titre: {
+                contains: recherche,
+                mode: "insensitive" as const,
+              },
+            },
+            {
+              probleme: {
+                contains: recherche,
+                mode: "insensitive" as const,
+              },
+            },
+            {
+              cause: {
+                contains: recherche,
+                mode: "insensitive" as const,
+              },
+            },
+            {
+              solution: {
+                contains: recherche,
+                mode: "insensitive" as const,
+              },
+            },
+            {
+              technologie: {
+                contains: recherche,
+                mode: "insensitive" as const,
+              },
+            },
+          ],
+        }
+      : {}),
+  };
+
+  const [experiences, total] = await Promise.all([
+    prisma.experience.findMany({
+      where,
+      orderBy: {
+        createdAt: "desc",
+      },
+      skip,
+      take: limite,
+      include: {
+        user: {
+          select: {
+            id: true,
+            displayName: true,
+          },
+        },
+        _count: {
+          select: {
+            comments: true,
+            reactions: true,
+          },
+        },
+      },
+    }),
+
+    prisma.experience.count({
+      where,
+    }),
+  ]);
+
+  return {
+    experiences,
+    pagination: {
+      page,
+      limite,
+      total,
+      pages: Math.ceil(total / limite),
+    },
+  };
+}
+  
 /**
  * Récupérer une expérience par son ID
  */

@@ -40,8 +40,7 @@ export async function ajouter(
 
     const typesAutorises = [
       "LIKE",
-      "HELPFUL",
-      "INTERESTING",
+      "USEFUL",
     ];
 
     if (
@@ -145,9 +144,8 @@ export async function supprimer(
     }
 
     const typesAutorises = [
-      "LIKE",
-      "HELPFUL",
-      "INTERESTING",
+       "LIKE",
+  "USEFUL",
     ];
 
     if (!typesAutorises.includes(type)) {
