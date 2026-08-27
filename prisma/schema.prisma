@@ -1,0 +1,300 @@
+generator client {
+  provider     = "prisma-client"
+  output       = "../src/generated/prisma"
+  moduleFormat = "cjs"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                   String                   @id @default(uuid())
+  email                String                   @unique
+  passwordHash         String
+  displayName          String?
+  emailVerified        Boolean                  @default(false)
+  createdAt            DateTime                 @default(now())
+  updatedAt            DateTime                 @updatedAt
+  role                 UserRole                 @default(USER)
+  comments             Comment[]
+  conversations        Conversation[]
+  verificationTokens   EmailVerificationToken[]
+  exerciseAttempts     ExerciseAttempt[]
+  moderatedExperiences Experience[]             @relation("ExperienceModerator")
+  experiences          Experience[]
+  historyEntries       HistoryEntry[]
+  notifications        Notification[]
+  resetTokens          PasswordResetToken[]
+  progress             Progress[]
+  reactions            Reaction[]
+  reports              Report[]
+  sessions             Session[]
+}
+
+model Session {
+  id               String   @id @default(uuid())
+  userId           String
+  userAgent        String?
+  createdAt        DateTime @default(now())
+  expiresAt        DateTime
+  refreshTokenHash String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PasswordResetToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  used      Boolean  @default(false)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model EmailVerificationToken {
+  id        String   @id @default(uuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Rule {
+  id             String         @id @default(uuid())
+  code           String         @unique
+  title          String
+  category       Category
+  severity       Severity       @default(MOYENNE)
+  explanation    String
+  cause          String
+  howToFind      String
+  fixHint        String
+  beforeCode     String
+  afterCode      String
+  createdAt      DateTime       @default(now())
+  historyEntries HistoryEntry[]
+}
+
+model HistoryEntry {
+  id           String        @id @default(uuid())
+  userId       String
+  ruleId       String?
+  categorie    Category
+  titre        String
+  severite     Severity?
+  extrait      String?
+  createdAt    DateTime      @default(now())
+  conversation Conversation?
+  rule         Rule?         @relation(fields: [ruleId], references: [id])
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Conversation {
+  id             String        @id @default(uuid())
+  userId         String
+  historyEntryId String?       @unique
+  title          String
+  createdAt      DateTime      @default(now())
+  historyEntry   HistoryEntry? @relation(fields: [historyEntryId], references: [id])
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages       Message[]
+}
+
+model Message {
+  id             String       @id @default(uuid())
+  conversationId String
+  role           MessageRole
+  content        String
+  createdAt      DateTime     @default(now())
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+}
+
+model Exercise {
+  id         String            @id @default(uuid())
+  title      String
+  category   Category
+  difficulty String
+  buggyCode  String
+  hint1      String
+  hint2      String
+  hint3      String
+  solution   String
+  keywords   String[]
+  createdAt  DateTime          @default(now())
+  attempts   ExerciseAttempt[]
+}
+
+model ExerciseAttempt {
+  id         String   @id @default(uuid())
+  userId     String
+  exerciseId String
+  userAnswer String
+  correct    Boolean
+  hintsUsed  Int      @default(0)
+  createdAt  DateTime @default(now())
+  exercise   Exercise @relation(fields: [exerciseId], references: [id])
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Progress {
+  id        String   @id @default(uuid())
+  userId    String
+  categorie Category
+  compteur  Int      @default(0)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, categorie])
+}
+
+model Experience {
+  id          String           @id @default(uuid())
+  userId      String
+  titre       String
+  probleme    String
+  code        String?
+  cause       String
+  solution    String
+  technologie String?
+  categorie   Category
+  statut      ExperienceStatus @default(PUBLISHED)
+  createdAt   DateTime         @default(now())
+  updatedAt   DateTime         @updatedAt
+  moderatedAt DateTime?
+  moderatedBy String?
+  comments    Comment[]
+  moderator   User?            @relation("ExperienceModerator", fields: [moderatedBy], references: [id])
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reactions   Reaction[]
+  reports     Report[]
+
+  @@index([userId])
+  @@index([categorie])
+  @@index([statut])
+  @@index([createdAt])
+}
+
+model Comment {
+  id           String     @id @default(uuid())
+  experienceId String
+  userId       String
+  contenu      String
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  experience   Experience @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  user         User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([experienceId])
+  @@index([userId])
+}
+
+model Reaction {
+  id           String       @id @default(uuid())
+  experienceId String
+  userId       String
+  type         ReactionType
+  createdAt    DateTime     @default(now())
+  experience   Experience   @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([experienceId, userId, type])
+  @@index([experienceId])
+  @@index([userId])
+}
+
+model Report {
+  id           String       @id @default(uuid())
+  experienceId String
+  userId       String
+  raison       ReportReason
+  description  String?
+  statut       ReportStatus @default(PENDING)
+  createdAt    DateTime     @default(now())
+  resolvedAt   DateTime?
+  experience   Experience   @relation(fields: [experienceId], references: [id], onDelete: Cascade)
+  user         User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([experienceId, userId])
+  @@index([experienceId])
+  @@index([statut])
+}
+
+model Notification {
+  id        String           @id @default(uuid())
+  userId    String
+  type      NotificationType
+  titre     String
+  message   String
+  lien      String?
+  lue       Boolean          @default(false)
+  createdAt DateTime         @default(now())
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([userId, lue])
+  @@index([createdAt])
+}
+
+enum UserRole {
+  USER
+  ADMIN
+}
+
+enum ExperienceStatus {
+  PUBLISHED
+  HIDDEN
+  DELETED
+}
+
+enum ReactionType {
+  LIKE
+  USEFUL
+}
+
+enum ReportReason {
+  SPAM
+  HARCELEMENT
+  CONTENU_INAPPROPRIE
+  CODE_DANGEREUX
+  INFORMATIONS_FAUSSES
+  AUTRE
+}
+
+enum ReportStatus {
+  PENDING
+  REVIEWED
+  RESOLVED
+  REJECTED
+}
+
+enum Category {
+  JAVASCRIPT
+  TYPESCRIPT
+  REACT
+  HTTP
+  API
+  HTML_CSS
+}
+
+enum Severity {
+  FAIBLE
+  MOYENNE
+  CRITIQUE
+}
+
+enum MessageRole {
+  USER
+  SYSTEM
+}
+
+enum NotificationType {
+  NOUVEL_UTILISATEUR
+  NOUVELLE_EXPERIENCE
+  NOUVEAU_COMMENTAIRE
+  NOUVELLE_REACTION
+  NOUVEAU_SIGNALEMENT
+  EXPERIENCE_APPROUVEE
+  EXPERIENCE_REFUSEE
+  EXPERIENCE_SIGNALEE
+}
