@@ -14,6 +14,7 @@ const reaction_routes_1 = __importDefault(require("./routes/reaction.routes"));
 const authentification_routes_1 = __importDefault(require("./routes/authentification.routes"));
 const report_routes_1 = __importDefault(require("./routes/report.routes"));
 const notification_routes_1 = __importDefault(require("./routes/notification.routes"));
+const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
 const socket_1 = require("./socket");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -22,6 +23,7 @@ app.use((0, cors_1.default)({
     credentials: true,
 }));
 app.use(express_1.default.json());
+app.use("/api/admin", admin_routes_1.default);
 app.use("/api/auth", authentification_routes_1.default);
 app.use("/api/experiences", experience_routes_1.default);
 app.use("/api/utilisateurs", utilisateur_routes_1.default);

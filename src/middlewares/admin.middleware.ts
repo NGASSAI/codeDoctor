@@ -1,7 +1,5 @@
 import { Response, NextFunction } from "express";
-
 import { prisma } from "../base";
-
 import { RequeteAuthentifiee } from "./authentification.middleware";
 
 export async function adminMiddleware(
@@ -9,15 +7,15 @@ export async function adminMiddleware(
   res: Response,
   next: NextFunction
 ) {
+  const utilisateurId = req.utilisateurId;
+
+  if (!utilisateurId) {
+    return res.status(401).json({
+      erreur: "Authentification requise.",
+    });
+  }
+
   try {
-    const utilisateurId = req.utilisateurId;
-
-    if (!utilisateurId) {
-      return res.status(401).json({
-        erreur: "Authentification requise.",
-      });
-    }
-
     const utilisateur = await prisma.user.findUnique({
       where: {
         id: utilisateurId,
@@ -41,10 +39,13 @@ export async function adminMiddleware(
 
     next();
   } catch (erreur) {
-    console.error("Erreur vérification ADMIN :", erreur);
+    console.error(
+      "Erreur lors de la vérification du rôle administrateur :",
+      erreur
+    );
 
     return res.status(500).json({
-      erreur: "Impossible de vérifier les permissions.",
+      erreur: "Erreur interne du serveur.",
     });
   }
 }

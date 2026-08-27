@@ -10,6 +10,9 @@ import reactionRoutes from "./routes/reaction.routes";
 import authentificationRoutes from "./routes/authentification.routes";
 import reportRoutes from "./routes/report.routes";
 import notificationRoutes from "./routes/notification.routes";
+import adminRoutes from "./routes/admin.routes";
+
+
 
 import { initialiserSocket } from "./socket";
 
@@ -26,6 +29,7 @@ app.use(
 
 app.use(express.json());
 
+
 app.use("/api/auth", authentificationRoutes);
 app.use("/api/experiences", experienceRoutes);
 app.use("/api/utilisateurs", utilisateurRoutes);
@@ -33,6 +37,7 @@ app.use("/api", commentaireRoutes);
 app.use("/api", reactionRoutes);
 app.use("/api", reportRoutes);
 app.use("/api/notifications", notificationRoutes);
+app.use("/api/admin", adminRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({
