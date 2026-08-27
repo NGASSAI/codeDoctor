@@ -39,8 +39,8 @@ app.get("/api/health", (_req, res) => {
 const server = (0, http_1.createServer)(app);
 // Initialisation de Socket.IO
 (0, socket_1.initialiserSocket)(server);
-const PORT = process.env.PORT || 4000;
-server.listen(PORT, () => {
-    console.log(`Serveur démarré sur http://localhost:${PORT}`);
+const PORT = Number(process.env.PORT) || 4000;
+server.listen(PORT, "0.0.0.0", () => {
+    console.log(`Serveur démarré sur http://0.0.0.0:${PORT}`);
 });
 //# sourceMappingURL=index.js.map
