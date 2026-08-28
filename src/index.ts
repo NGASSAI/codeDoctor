@@ -51,12 +51,7 @@ app.get("/api/health", (_req, res) => {
     message: "CodeDoctor backend en ligne",
   });
 });
-app.get("/api/health", (_req, res) => {
-  res.json({
-    status: "ok",
-    message: "CodeDoctor backend en ligne",
-  });
-});
+
 app.use(gestionnaireErreurs);
 
 // Serveur HTTP partagé entre Express et Socket.IO
