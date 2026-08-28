@@ -10,9 +10,11 @@ import {
   trouverSessionValide,
   renouvelerSession,
   creerTokenReinitialisation,
-   trouverTokenReinitialisation,
+  trouverTokenReinitialisation,
   reinitialiserMotDePasse,
-   
+  creerTokenVerificationEmail,
+  verifierTokenEmail,
+  validerEmailUtilisateur,
 } from "../services/utilisateur.service";
 
 /**
@@ -337,6 +339,115 @@ export async function reinitialiserMotDePasseControleur(
   } catch (erreur) {
     console.error(
       "Erreur lors de la réinitialisation du mot de passe :",
+      erreur
+    );
+
+    return res.status(500).json({
+      erreur: "Erreur interne du serveur.",
+    });
+  }
+}
+/**
+ * Demander la vérification de l'adresse email.
+ */
+export async function demanderVerificationEmail(
+  req: Request,
+  res: Response
+) {
+  const { email } = req.body;
+
+  if (!email || typeof email !== "string") {
+    return res.status(400).json({
+      erreur: "Email requis.",
+    });
+  }
+
+  const emailNormalise = email.trim().toLowerCase();
+
+  const utilisateur =
+    await trouverUtilisateurParEmail(emailNormalise);
+
+  /*
+   * Même réponse que l'utilisateur existe ou non.
+   * Cela évite de révéler les comptes existants.
+   */
+  if (!utilisateur) {
+    return res.status(200).json({
+      message:
+        "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
+    });
+  }
+
+  if (utilisateur.emailVerified) {
+    return res.status(200).json({
+      message: "Cette adresse email est déjà vérifiée.",
+    });
+  }
+
+  const token = await creerTokenVerificationEmail(
+    utilisateur.id
+  );
+
+  /*
+   * TEMPORAIRE :
+   * Le token est retourné pour permettre les tests
+   * avant branchement du service d'envoi d'emails.
+   */
+  return res.status(200).json({
+    message:
+      "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
+    token,
+  });
+}
+
+/**
+ * Vérifier l'adresse email avec le token reçu.
+ */
+export async function verifierEmail(
+  req: Request,
+  res: Response
+) {
+  const token =
+    typeof req.query.token === "string"
+      ? req.query.token
+      : undefined;
+
+  if (!token) {
+    return res.status(400).json({
+      erreur: "Token de vérification requis.",
+    });
+  }
+
+  try {
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
+
+    const verificationToken =
+      await verifierTokenEmail(tokenHash);
+
+    if (!verificationToken) {
+      return res.status(401).json({
+        erreur:
+          "Token invalide ou expiré.",
+      });
+    }
+
+    const utilisateur =
+      await validerEmailUtilisateur(
+        verificationToken.userId,
+        verificationToken.id
+      );
+
+    return res.status(200).json({
+      message:
+        "Adresse email vérifiée avec succès.",
+      utilisateur,
+    });
+  } catch (erreur) {
+    console.error(
+      "Erreur lors de la vérification de l'email :",
       erreur
     );
 

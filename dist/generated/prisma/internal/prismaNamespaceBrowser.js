@@ -48,7 +48,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.AIUsageScalarFieldEnum = exports.SubscriptionScalarFieldEnum = exports.NotificationScalarFieldEnum = exports.ReportScalarFieldEnum = exports.ReactionScalarFieldEnum = exports.CommentScalarFieldEnum = exports.ExperienceScalarFieldEnum = exports.ProgressScalarFieldEnum = exports.ExerciseAttemptScalarFieldEnum = exports.ExerciseScalarFieldEnum = exports.MessageScalarFieldEnum = exports.ConversationScalarFieldEnum = exports.HistoryEntryScalarFieldEnum = exports.RuleScalarFieldEnum = exports.EmailVerificationTokenScalarFieldEnum = exports.PasswordResetTokenScalarFieldEnum = exports.SessionScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
+exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.PaymentScalarFieldEnum = exports.AIUsageScalarFieldEnum = exports.SubscriptionScalarFieldEnum = exports.NotificationScalarFieldEnum = exports.ReportScalarFieldEnum = exports.ReactionScalarFieldEnum = exports.CommentScalarFieldEnum = exports.ExperienceScalarFieldEnum = exports.ProgressScalarFieldEnum = exports.ExerciseAttemptScalarFieldEnum = exports.ExerciseScalarFieldEnum = exports.MessageScalarFieldEnum = exports.ConversationScalarFieldEnum = exports.HistoryEntryScalarFieldEnum = exports.RuleScalarFieldEnum = exports.EmailVerificationTokenScalarFieldEnum = exports.PasswordResetTokenScalarFieldEnum = exports.SessionScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.Decimal = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/index-browser"));
 exports.Decimal = runtime.Decimal;
 exports.NullTypes = {
@@ -92,7 +92,8 @@ exports.ModelName = {
     Report: 'Report',
     Notification: 'Notification',
     Subscription: 'Subscription',
-    AIUsage: 'AIUsage'
+    AIUsage: 'AIUsage',
+    Payment: 'Payment'
 };
 /*
  * Enums
@@ -269,6 +270,15 @@ exports.AIUsageScalarFieldEnum = {
     dateJour: 'dateJour',
     requetes: 'requetes',
     tokensUtilises: 'tokensUtilises'
+};
+exports.PaymentScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    montant: 'montant',
+    methode: 'methode',
+    statut: 'statut',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
 };
 exports.SortOrder = {
     asc: 'asc',

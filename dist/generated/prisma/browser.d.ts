@@ -92,4 +92,9 @@ export type Subscription = Prisma.SubscriptionModel;
  *
  */
 export type AIUsage = Prisma.AIUsageModel;
+/**
+ * Model Payment
+ *
+ */
+export type Payment = Prisma.PaymentModel;
 //# sourceMappingURL=browser.d.ts.map

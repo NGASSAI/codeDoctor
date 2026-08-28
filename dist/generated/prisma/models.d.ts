@@ -16,5 +16,6 @@ export type * from './models/Report';
 export type * from './models/Notification';
 export type * from './models/Subscription';
 export type * from './models/AIUsage';
+export type * from './models/Payment';
 export type * from './commonInputTypes';
 //# sourceMappingURL=models.d.ts.map

@@ -44,6 +44,7 @@ export declare const ModelName: {
     readonly Notification: 'Notification';
     readonly Subscription: 'Subscription';
     readonly AIUsage: 'AIUsage';
+    readonly Payment: 'Payment';
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export declare const TransactionIsolationLevel: {
@@ -238,6 +239,16 @@ export declare const AIUsageScalarFieldEnum: {
     readonly tokensUtilises: 'tokensUtilises';
 };
 export type AIUsageScalarFieldEnum = (typeof AIUsageScalarFieldEnum)[keyof typeof AIUsageScalarFieldEnum];
+export declare const PaymentScalarFieldEnum: {
+    readonly id: 'id';
+    readonly userId: 'userId';
+    readonly montant: 'montant';
+    readonly methode: 'methode';
+    readonly statut: 'statut';
+    readonly createdAt: 'createdAt';
+    readonly updatedAt: 'updatedAt';
+};
+export type PaymentScalarFieldEnum = (typeof PaymentScalarFieldEnum)[keyof typeof PaymentScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: 'asc';
     readonly desc: 'desc';

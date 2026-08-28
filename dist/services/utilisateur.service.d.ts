@@ -129,4 +129,27 @@ export declare function modifierProfilUtilisateur(userId: string, displayName: s
     emailVerified: boolean;
     id: string;
 }>;
+/**
+ * Créer un token de vérification d'email.
+ */
+export declare function creerTokenVerificationEmail(userId: string): Promise<string>;
+/**
+ * Vérifier un token d'email.
+ */
+export declare function verifierTokenEmail(tokenHash: string): Promise<{
+    id: string;
+    userId: string;
+    token: string;
+    expiresAt: Date;
+    createdAt: Date;
+} | null>;
+/**
+ * Valider définitivement l'adresse email.
+ */
+export declare function validerEmailUtilisateur(userId: string, tokenId: string): Promise<{
+    displayName: string | null;
+    email: string;
+    emailVerified: boolean;
+    id: string;
+}>;
 //# sourceMappingURL=utilisateur.service.d.ts.map

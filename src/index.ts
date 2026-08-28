@@ -14,6 +14,11 @@ import adminRoutes from "./routes/admin.routes";
 import iaRoutes from "./routes/ia.routes";
 import exerciceRoutes from "./routes/exercice.routes";
 import { gestionnaireErreurs } from "./middlewares/gestionnaireErreurs";
+import historiqueRoutes from "./routes/historique.routes";
+import abonnementRoutes from "./routes/abonnement.routes";
+import paiementRoutes from "./routes/paiement.routes";
+import paiementAdminRoutes from "./routes/paiement-admin.routes";
+
 
 
 
@@ -44,6 +49,11 @@ app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/ia", iaRoutes);
 app.use("/api/exercices", exerciceRoutes);
+app.use("/api/historique", historiqueRoutes);
+app.use("/api/abonnement", abonnementRoutes);
+app.use("/api/paiements", paiementRoutes);
+app.use("/api/admin/paiements", paiementAdminRoutes);
+
 
 app.get("/api/health", (_req, res) => {
   res.json({

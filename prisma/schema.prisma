@@ -32,6 +32,7 @@ model User {
   reports              Report[]
   sessions             Session[]
   subscriptions        Subscription?
+  payments Payment[]
 }
 
 model Session {
@@ -328,4 +329,21 @@ enum NotificationType {
   EXPERIENCE_APPROUVEE
   EXPERIENCE_REFUSEE
   EXPERIENCE_SIGNALEE
+  PAIEMENT_APPROUVE
+  PAIEMENT_REJETE
+}
+model Payment {
+  id        String   @id @default(uuid())
+  userId    String
+  montant   Int
+  methode   String   @default("WHATSAPP")
+  statut    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([statut])
+  @@index([createdAt])
 }

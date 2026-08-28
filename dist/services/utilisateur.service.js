@@ -16,6 +16,9 @@ exports.trouverTokenReinitialisation = trouverTokenReinitialisation;
 exports.reinitialiserMotDePasse = reinitialiserMotDePasse;
 exports.trouverUtilisateurParId = trouverUtilisateurParId;
 exports.modifierProfilUtilisateur = modifierProfilUtilisateur;
+exports.creerTokenVerificationEmail = creerTokenVerificationEmail;
+exports.verifierTokenEmail = verifierTokenEmail;
+exports.validerEmailUtilisateur = validerEmailUtilisateur;
 const base_1 = require("../base");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
@@ -237,6 +240,81 @@ async function modifierProfilUtilisateur(userId, displayName) {
             emailVerified: true,
             createdAt: true,
         },
+    });
+}
+/**
+ * Créer un token de vérification d'email.
+ */
+async function creerTokenVerificationEmail(userId) {
+    const token = crypto_1.default.randomBytes(32).toString("hex");
+    const tokenHash = crypto_1.default
+        .createHash("sha256")
+        .update(token)
+        .digest("hex");
+    // Validité : 24 heures
+    const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    // Supprimer les anciens tokens de cet utilisateur
+    await base_1.prisma.emailVerificationToken.deleteMany({
+        where: {
+            userId,
+        },
+    });
+    await base_1.prisma.emailVerificationToken.create({
+        data: {
+            userId,
+            token: tokenHash,
+            expiresAt,
+        },
+    });
+    return token;
+}
+/**
+ * Vérifier un token d'email.
+ */
+async function verifierTokenEmail(tokenHash) {
+    const verificationToken = await base_1.prisma.emailVerificationToken.findUnique({
+        where: {
+            token: tokenHash,
+        },
+    });
+    if (!verificationToken) {
+        return null;
+    }
+    if (verificationToken.expiresAt <= new Date()) {
+        await base_1.prisma.emailVerificationToken.delete({
+            where: {
+                id: verificationToken.id,
+            },
+        });
+        return null;
+    }
+    return verificationToken;
+}
+/**
+ * Valider définitivement l'adresse email.
+ */
+async function validerEmailUtilisateur(userId, tokenId) {
+    return base_1.prisma.$transaction(async (tx) => {
+        const utilisateur = await tx.user.update({
+            where: {
+                id: userId,
+            },
+            data: {
+                emailVerified: true,
+            },
+            select: {
+                id: true,
+                email: true,
+                displayName: true,
+                emailVerified: true,
+            },
+        });
+        await tx.emailVerificationToken.delete({
+            where: {
+                id: tokenId,
+            },
+        });
+        return utilisateur;
     });
 }
 //# sourceMappingURL=utilisateur.service.js.map

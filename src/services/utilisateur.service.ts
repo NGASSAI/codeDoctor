@@ -284,3 +284,101 @@ export async function modifierProfilUtilisateur(
     },
   });
 }
+/**
+ * Créer un token de vérification d'email.
+ */
+export async function creerTokenVerificationEmail(
+  userId: string
+) {
+  const token = crypto.randomBytes(32).toString("hex");
+
+  const tokenHash = crypto
+    .createHash("sha256")
+    .update(token)
+    .digest("hex");
+
+  // Validité : 24 heures
+  const expiresAt = new Date(
+    Date.now() + 24 * 60 * 60 * 1000
+  );
+
+  // Supprimer les anciens tokens de cet utilisateur
+  await prisma.emailVerificationToken.deleteMany({
+    where: {
+      userId,
+    },
+  });
+
+  await prisma.emailVerificationToken.create({
+    data: {
+      userId,
+      token: tokenHash,
+      expiresAt,
+    },
+  });
+
+  return token;
+}
+
+/**
+ * Vérifier un token d'email.
+ */
+export async function verifierTokenEmail(
+  tokenHash: string
+) {
+  const verificationToken =
+    await prisma.emailVerificationToken.findUnique({
+      where: {
+        token: tokenHash,
+      },
+    });
+
+  if (!verificationToken) {
+    return null;
+  }
+
+  if (verificationToken.expiresAt <= new Date()) {
+    await prisma.emailVerificationToken.delete({
+      where: {
+        id: verificationToken.id,
+      },
+    });
+
+    return null;
+  }
+
+  return verificationToken;
+}
+
+/**
+ * Valider définitivement l'adresse email.
+ */
+export async function validerEmailUtilisateur(
+  userId: string,
+  tokenId: string
+) {
+  return prisma.$transaction(async (tx) => {
+    const utilisateur = await tx.user.update({
+      where: {
+        id: userId,
+      },
+      data: {
+        emailVerified: true,
+      },
+      select: {
+        id: true,
+        email: true,
+        displayName: true,
+        emailVerified: true,
+      },
+    });
+
+    await tx.emailVerificationToken.delete({
+      where: {
+        id: tokenId,
+      },
+    });
+
+    return utilisateur;
+  });
+}

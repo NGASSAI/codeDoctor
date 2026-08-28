@@ -18,6 +18,10 @@ const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
 const ia_routes_1 = __importDefault(require("./routes/ia.routes"));
 const exercice_routes_1 = __importDefault(require("./routes/exercice.routes"));
 const gestionnaireErreurs_1 = require("./middlewares/gestionnaireErreurs");
+const historique_routes_1 = __importDefault(require("./routes/historique.routes"));
+const abonnement_routes_1 = __importDefault(require("./routes/abonnement.routes"));
+const paiement_routes_1 = __importDefault(require("./routes/paiement.routes"));
+const paiement_admin_routes_1 = __importDefault(require("./routes/paiement-admin.routes"));
 const socket_1 = require("./socket");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -36,12 +40,10 @@ app.use("/api/notifications", notification_routes_1.default);
 app.use("/api/admin", admin_routes_1.default);
 app.use("/api/ia", ia_routes_1.default);
 app.use("/api/exercices", exercice_routes_1.default);
-app.get("/api/health", (_req, res) => {
-    res.json({
-        status: "ok",
-        message: "CodeDoctor backend en ligne",
-    });
-});
+app.use("/api/historique", historique_routes_1.default);
+app.use("/api/abonnement", abonnement_routes_1.default);
+app.use("/api/paiements", paiement_routes_1.default);
+app.use("/api/admin/paiements", paiement_admin_routes_1.default);
 app.get("/api/health", (_req, res) => {
     res.json({
         status: "ok",

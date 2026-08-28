@@ -4,9 +4,11 @@ import {
   inscription,
   connexion,
   deconnexion,
-    rafraichir,
- motDePasseOublie,
-   reinitialiserMotDePasseControleur,
+  rafraichir,
+  motDePasseOublie,
+  reinitialiserMotDePasseControleur,
+  demanderVerificationEmail,
+  verifierEmail,
 } from "../controleurs/authentification.controleur";
 
 import {
@@ -36,5 +38,13 @@ routeur.get(
     });
   }
 );
+routeur.post(
+  "/verification-email",
+  demanderVerificationEmail
+);
 
+routeur.get(
+  "/verifier-email",
+  verifierEmail
+);
 export default routeur;

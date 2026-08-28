@@ -16,5 +16,7 @@ routeur.get("/moi", authentification_middleware_1.authentificationMiddleware, (r
         utilisateurId: req.utilisateurId,
     });
 });
+routeur.post("/verification-email", authentification_controleur_1.demanderVerificationEmail);
+routeur.get("/verifier-email", authentification_controleur_1.verifierEmail);
 exports.default = routeur;
 //# sourceMappingURL=authentification.routes.js.map
