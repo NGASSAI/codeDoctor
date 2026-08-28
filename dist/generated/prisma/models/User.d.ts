@@ -163,6 +163,7 @@ export type UserWhereInput = {
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageListRelationFilter;
     comments?: Prisma.CommentListRelationFilter;
     conversations?: Prisma.ConversationListRelationFilter;
     verificationTokens?: Prisma.EmailVerificationTokenListRelationFilter;
@@ -176,6 +177,7 @@ export type UserWhereInput = {
     reactions?: Prisma.ReactionListRelationFilter;
     reports?: Prisma.ReportListRelationFilter;
     sessions?: Prisma.SessionListRelationFilter;
+    subscriptions?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null;
 };
 export type UserOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -186,6 +188,7 @@ export type UserOrderByWithRelationInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     role?: Prisma.SortOrder;
+    aiUsages?: Prisma.AIUsageOrderByRelationAggregateInput;
     comments?: Prisma.CommentOrderByRelationAggregateInput;
     conversations?: Prisma.ConversationOrderByRelationAggregateInput;
     verificationTokens?: Prisma.EmailVerificationTokenOrderByRelationAggregateInput;
@@ -199,6 +202,7 @@ export type UserOrderByWithRelationInput = {
     reactions?: Prisma.ReactionOrderByRelationAggregateInput;
     reports?: Prisma.ReportOrderByRelationAggregateInput;
     sessions?: Prisma.SessionOrderByRelationAggregateInput;
+    subscriptions?: Prisma.SubscriptionOrderByWithRelationInput;
 };
 export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -212,6 +216,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageListRelationFilter;
     comments?: Prisma.CommentListRelationFilter;
     conversations?: Prisma.ConversationListRelationFilter;
     verificationTokens?: Prisma.EmailVerificationTokenListRelationFilter;
@@ -225,6 +230,7 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
     reactions?: Prisma.ReactionListRelationFilter;
     reports?: Prisma.ReportListRelationFilter;
     sessions?: Prisma.SessionListRelationFilter;
+    subscriptions?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null;
 }, "id" | "email">;
 export type UserOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -261,6 +267,7 @@ export type UserCreateInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -274,6 +281,7 @@ export type UserCreateInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateInput = {
     id?: string;
@@ -284,6 +292,7 @@ export type UserUncheckedCreateInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -297,6 +306,7 @@ export type UserUncheckedCreateInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -307,6 +317,7 @@ export type UserUpdateInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -320,6 +331,7 @@ export type UserUpdateInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -330,6 +342,7 @@ export type UserUncheckedUpdateInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -343,6 +356,7 @@ export type UserUncheckedUpdateInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateManyInput = {
     id?: string;
@@ -585,6 +599,30 @@ export type UserUpdateOneRequiredWithoutNotificationsNestedInput = {
     connect?: Prisma.UserWhereUniqueInput;
     update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutNotificationsInput, Prisma.UserUpdateWithoutNotificationsInput>, Prisma.UserUncheckedUpdateWithoutNotificationsInput>;
 };
+export type UserCreateNestedOneWithoutSubscriptionsInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionsInput, Prisma.UserUncheckedCreateWithoutSubscriptionsInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubscriptionsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+export type UserUpdateOneRequiredWithoutSubscriptionsNestedInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionsInput, Prisma.UserUncheckedCreateWithoutSubscriptionsInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutSubscriptionsInput;
+    upsert?: Prisma.UserUpsertWithoutSubscriptionsInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutSubscriptionsInput, Prisma.UserUpdateWithoutSubscriptionsInput>, Prisma.UserUncheckedUpdateWithoutSubscriptionsInput>;
+};
+export type UserCreateNestedOneWithoutAiUsagesInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutAiUsagesInput, Prisma.UserUncheckedCreateWithoutAiUsagesInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutAiUsagesInput;
+    connect?: Prisma.UserWhereUniqueInput;
+};
+export type UserUpdateOneRequiredWithoutAiUsagesNestedInput = {
+    create?: Prisma.XOR<Prisma.UserCreateWithoutAiUsagesInput, Prisma.UserUncheckedCreateWithoutAiUsagesInput>;
+    connectOrCreate?: Prisma.UserCreateOrConnectWithoutAiUsagesInput;
+    upsert?: Prisma.UserUpsertWithoutAiUsagesInput;
+    connect?: Prisma.UserWhereUniqueInput;
+    update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutAiUsagesInput, Prisma.UserUpdateWithoutAiUsagesInput>, Prisma.UserUncheckedUpdateWithoutAiUsagesInput>;
+};
 export type UserCreateWithoutSessionsInput = {
     id?: string;
     email: string;
@@ -594,6 +632,7 @@ export type UserCreateWithoutSessionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -606,6 +645,7 @@ export type UserCreateWithoutSessionsInput = {
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutSessionsInput = {
     id?: string;
@@ -616,6 +656,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -628,6 +669,7 @@ export type UserUncheckedCreateWithoutSessionsInput = {
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutSessionsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -651,6 +693,7 @@ export type UserUpdateWithoutSessionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -663,6 +706,7 @@ export type UserUpdateWithoutSessionsInput = {
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutSessionsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -673,6 +717,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -685,6 +730,7 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutResetTokensInput = {
     id?: string;
@@ -695,6 +741,7 @@ export type UserCreateWithoutResetTokensInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -707,6 +754,7 @@ export type UserCreateWithoutResetTokensInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutResetTokensInput = {
     id?: string;
@@ -717,6 +765,7 @@ export type UserUncheckedCreateWithoutResetTokensInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -729,6 +778,7 @@ export type UserUncheckedCreateWithoutResetTokensInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutResetTokensInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -752,6 +802,7 @@ export type UserUpdateWithoutResetTokensInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -764,6 +815,7 @@ export type UserUpdateWithoutResetTokensInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutResetTokensInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -774,6 +826,7 @@ export type UserUncheckedUpdateWithoutResetTokensInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -786,6 +839,7 @@ export type UserUncheckedUpdateWithoutResetTokensInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutVerificationTokensInput = {
     id?: string;
@@ -796,6 +850,7 @@ export type UserCreateWithoutVerificationTokensInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     exerciseAttempts?: Prisma.ExerciseAttemptCreateNestedManyWithoutUserInput;
@@ -808,6 +863,7 @@ export type UserCreateWithoutVerificationTokensInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutVerificationTokensInput = {
     id?: string;
@@ -818,6 +874,7 @@ export type UserUncheckedCreateWithoutVerificationTokensInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     exerciseAttempts?: Prisma.ExerciseAttemptUncheckedCreateNestedManyWithoutUserInput;
@@ -830,6 +887,7 @@ export type UserUncheckedCreateWithoutVerificationTokensInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutVerificationTokensInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -853,6 +911,7 @@ export type UserUpdateWithoutVerificationTokensInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     exerciseAttempts?: Prisma.ExerciseAttemptUpdateManyWithoutUserNestedInput;
@@ -865,6 +924,7 @@ export type UserUpdateWithoutVerificationTokensInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutVerificationTokensInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -875,6 +935,7 @@ export type UserUncheckedUpdateWithoutVerificationTokensInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     exerciseAttempts?: Prisma.ExerciseAttemptUncheckedUpdateManyWithoutUserNestedInput;
@@ -887,6 +948,7 @@ export type UserUncheckedUpdateWithoutVerificationTokensInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutHistoryEntriesInput = {
     id?: string;
@@ -897,6 +959,7 @@ export type UserCreateWithoutHistoryEntriesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -909,6 +972,7 @@ export type UserCreateWithoutHistoryEntriesInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutHistoryEntriesInput = {
     id?: string;
@@ -919,6 +983,7 @@ export type UserUncheckedCreateWithoutHistoryEntriesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -931,6 +996,7 @@ export type UserUncheckedCreateWithoutHistoryEntriesInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutHistoryEntriesInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -954,6 +1020,7 @@ export type UserUpdateWithoutHistoryEntriesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -966,6 +1033,7 @@ export type UserUpdateWithoutHistoryEntriesInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutHistoryEntriesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -976,6 +1044,7 @@ export type UserUncheckedUpdateWithoutHistoryEntriesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -988,6 +1057,7 @@ export type UserUncheckedUpdateWithoutHistoryEntriesInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutConversationsInput = {
     id?: string;
@@ -998,6 +1068,7 @@ export type UserCreateWithoutConversationsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
     exerciseAttempts?: Prisma.ExerciseAttemptCreateNestedManyWithoutUserInput;
@@ -1010,6 +1081,7 @@ export type UserCreateWithoutConversationsInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutConversationsInput = {
     id?: string;
@@ -1020,6 +1092,7 @@ export type UserUncheckedCreateWithoutConversationsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
     exerciseAttempts?: Prisma.ExerciseAttemptUncheckedCreateNestedManyWithoutUserInput;
@@ -1032,6 +1105,7 @@ export type UserUncheckedCreateWithoutConversationsInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutConversationsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1055,6 +1129,7 @@ export type UserUpdateWithoutConversationsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
     exerciseAttempts?: Prisma.ExerciseAttemptUpdateManyWithoutUserNestedInput;
@@ -1067,6 +1142,7 @@ export type UserUpdateWithoutConversationsInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutConversationsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1077,6 +1153,7 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
     exerciseAttempts?: Prisma.ExerciseAttemptUncheckedUpdateManyWithoutUserNestedInput;
@@ -1089,6 +1166,7 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutExerciseAttemptsInput = {
     id?: string;
@@ -1099,6 +1177,7 @@ export type UserCreateWithoutExerciseAttemptsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -1111,6 +1190,7 @@ export type UserCreateWithoutExerciseAttemptsInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutExerciseAttemptsInput = {
     id?: string;
@@ -1121,6 +1201,7 @@ export type UserUncheckedCreateWithoutExerciseAttemptsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -1133,6 +1214,7 @@ export type UserUncheckedCreateWithoutExerciseAttemptsInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutExerciseAttemptsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1156,6 +1238,7 @@ export type UserUpdateWithoutExerciseAttemptsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -1168,6 +1251,7 @@ export type UserUpdateWithoutExerciseAttemptsInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutExerciseAttemptsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1178,6 +1262,7 @@ export type UserUncheckedUpdateWithoutExerciseAttemptsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -1190,6 +1275,7 @@ export type UserUncheckedUpdateWithoutExerciseAttemptsInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutProgressInput = {
     id?: string;
@@ -1200,6 +1286,7 @@ export type UserCreateWithoutProgressInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -1212,6 +1299,7 @@ export type UserCreateWithoutProgressInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutProgressInput = {
     id?: string;
@@ -1222,6 +1310,7 @@ export type UserUncheckedCreateWithoutProgressInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -1234,6 +1323,7 @@ export type UserUncheckedCreateWithoutProgressInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutProgressInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1257,6 +1347,7 @@ export type UserUpdateWithoutProgressInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -1269,6 +1360,7 @@ export type UserUpdateWithoutProgressInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutProgressInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1279,6 +1371,7 @@ export type UserUncheckedUpdateWithoutProgressInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -1291,6 +1384,7 @@ export type UserUncheckedUpdateWithoutProgressInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutModeratedExperiencesInput = {
     id?: string;
@@ -1301,6 +1395,7 @@ export type UserCreateWithoutModeratedExperiencesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -1313,6 +1408,7 @@ export type UserCreateWithoutModeratedExperiencesInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutModeratedExperiencesInput = {
     id?: string;
@@ -1323,6 +1419,7 @@ export type UserUncheckedCreateWithoutModeratedExperiencesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -1335,6 +1432,7 @@ export type UserUncheckedCreateWithoutModeratedExperiencesInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutModeratedExperiencesInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1349,6 +1447,7 @@ export type UserCreateWithoutExperiencesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -1361,6 +1460,7 @@ export type UserCreateWithoutExperiencesInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutExperiencesInput = {
     id?: string;
@@ -1371,6 +1471,7 @@ export type UserUncheckedCreateWithoutExperiencesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -1383,6 +1484,7 @@ export type UserUncheckedCreateWithoutExperiencesInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutExperiencesInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1406,6 +1508,7 @@ export type UserUpdateWithoutModeratedExperiencesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -1418,6 +1521,7 @@ export type UserUpdateWithoutModeratedExperiencesInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutModeratedExperiencesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1428,6 +1532,7 @@ export type UserUncheckedUpdateWithoutModeratedExperiencesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -1440,6 +1545,7 @@ export type UserUncheckedUpdateWithoutModeratedExperiencesInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserUpsertWithoutExperiencesInput = {
     update: Prisma.XOR<Prisma.UserUpdateWithoutExperiencesInput, Prisma.UserUncheckedUpdateWithoutExperiencesInput>;
@@ -1459,6 +1565,7 @@ export type UserUpdateWithoutExperiencesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -1471,6 +1578,7 @@ export type UserUpdateWithoutExperiencesInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutExperiencesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1481,6 +1589,7 @@ export type UserUncheckedUpdateWithoutExperiencesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -1493,6 +1602,7 @@ export type UserUncheckedUpdateWithoutExperiencesInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutCommentsInput = {
     id?: string;
@@ -1503,6 +1613,7 @@ export type UserCreateWithoutCommentsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
     exerciseAttempts?: Prisma.ExerciseAttemptCreateNestedManyWithoutUserInput;
@@ -1515,6 +1626,7 @@ export type UserCreateWithoutCommentsInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutCommentsInput = {
     id?: string;
@@ -1525,6 +1637,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
     exerciseAttempts?: Prisma.ExerciseAttemptUncheckedCreateNestedManyWithoutUserInput;
@@ -1537,6 +1650,7 @@ export type UserUncheckedCreateWithoutCommentsInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutCommentsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1560,6 +1674,7 @@ export type UserUpdateWithoutCommentsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
     exerciseAttempts?: Prisma.ExerciseAttemptUpdateManyWithoutUserNestedInput;
@@ -1572,6 +1687,7 @@ export type UserUpdateWithoutCommentsInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutCommentsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1582,6 +1698,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
     exerciseAttempts?: Prisma.ExerciseAttemptUncheckedUpdateManyWithoutUserNestedInput;
@@ -1594,6 +1711,7 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutReactionsInput = {
     id?: string;
@@ -1604,6 +1722,7 @@ export type UserCreateWithoutReactionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -1616,6 +1735,7 @@ export type UserCreateWithoutReactionsInput = {
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutReactionsInput = {
     id?: string;
@@ -1626,6 +1746,7 @@ export type UserUncheckedCreateWithoutReactionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -1638,6 +1759,7 @@ export type UserUncheckedCreateWithoutReactionsInput = {
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutReactionsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1661,6 +1783,7 @@ export type UserUpdateWithoutReactionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -1673,6 +1796,7 @@ export type UserUpdateWithoutReactionsInput = {
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutReactionsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1683,6 +1807,7 @@ export type UserUncheckedUpdateWithoutReactionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -1695,6 +1820,7 @@ export type UserUncheckedUpdateWithoutReactionsInput = {
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutReportsInput = {
     id?: string;
@@ -1705,6 +1831,7 @@ export type UserCreateWithoutReportsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -1717,6 +1844,7 @@ export type UserCreateWithoutReportsInput = {
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutReportsInput = {
     id?: string;
@@ -1727,6 +1855,7 @@ export type UserUncheckedCreateWithoutReportsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -1739,6 +1868,7 @@ export type UserUncheckedCreateWithoutReportsInput = {
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutReportsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1762,6 +1892,7 @@ export type UserUpdateWithoutReportsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -1774,6 +1905,7 @@ export type UserUpdateWithoutReportsInput = {
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutReportsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1784,6 +1916,7 @@ export type UserUncheckedUpdateWithoutReportsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -1796,6 +1929,7 @@ export type UserUncheckedUpdateWithoutReportsInput = {
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 export type UserCreateWithoutNotificationsInput = {
     id?: string;
@@ -1806,6 +1940,7 @@ export type UserCreateWithoutNotificationsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -1818,6 +1953,7 @@ export type UserCreateWithoutNotificationsInput = {
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutNotificationsInput = {
     id?: string;
@@ -1828,6 +1964,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -1840,6 +1977,7 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutNotificationsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1863,6 +2001,7 @@ export type UserUpdateWithoutNotificationsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -1875,8 +2014,227 @@ export type UserUpdateWithoutNotificationsInput = {
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutNotificationsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
+    comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
+    conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
+    verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
+    exerciseAttempts?: Prisma.ExerciseAttemptUncheckedUpdateManyWithoutUserNestedInput;
+    moderatedExperiences?: Prisma.ExperienceUncheckedUpdateManyWithoutModeratorNestedInput;
+    experiences?: Prisma.ExperienceUncheckedUpdateManyWithoutUserNestedInput;
+    historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
+    resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
+    reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
+    reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
+    sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
+};
+export type UserCreateWithoutSubscriptionsInput = {
+    id?: string;
+    email: string;
+    passwordHash: string;
+    displayName?: string | null;
+    emailVerified?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
+    comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
+    conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
+    verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
+    exerciseAttempts?: Prisma.ExerciseAttemptCreateNestedManyWithoutUserInput;
+    moderatedExperiences?: Prisma.ExperienceCreateNestedManyWithoutModeratorInput;
+    experiences?: Prisma.ExperienceCreateNestedManyWithoutUserInput;
+    historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
+    notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
+    resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
+    reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
+    reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
+    sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+};
+export type UserUncheckedCreateWithoutSubscriptionsInput = {
+    id?: string;
+    email: string;
+    passwordHash: string;
+    displayName?: string | null;
+    emailVerified?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    role?: $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
+    comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
+    conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
+    verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
+    exerciseAttempts?: Prisma.ExerciseAttemptUncheckedCreateNestedManyWithoutUserInput;
+    moderatedExperiences?: Prisma.ExperienceUncheckedCreateNestedManyWithoutModeratorInput;
+    experiences?: Prisma.ExperienceUncheckedCreateNestedManyWithoutUserInput;
+    historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
+    notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
+    resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
+    reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
+    reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
+    sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+};
+export type UserCreateOrConnectWithoutSubscriptionsInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionsInput, Prisma.UserUncheckedCreateWithoutSubscriptionsInput>;
+};
+export type UserUpsertWithoutSubscriptionsInput = {
+    update: Prisma.XOR<Prisma.UserUpdateWithoutSubscriptionsInput, Prisma.UserUncheckedUpdateWithoutSubscriptionsInput>;
+    create: Prisma.XOR<Prisma.UserCreateWithoutSubscriptionsInput, Prisma.UserUncheckedCreateWithoutSubscriptionsInput>;
+    where?: Prisma.UserWhereInput;
+};
+export type UserUpdateToOneWithWhereWithoutSubscriptionsInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<Prisma.UserUpdateWithoutSubscriptionsInput, Prisma.UserUncheckedUpdateWithoutSubscriptionsInput>;
+};
+export type UserUpdateWithoutSubscriptionsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
+    comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
+    conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
+    verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
+    exerciseAttempts?: Prisma.ExerciseAttemptUpdateManyWithoutUserNestedInput;
+    moderatedExperiences?: Prisma.ExperienceUpdateManyWithoutModeratorNestedInput;
+    experiences?: Prisma.ExperienceUpdateManyWithoutUserNestedInput;
+    historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
+    notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
+    resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
+    reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
+    reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
+    sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+};
+export type UserUncheckedUpdateWithoutSubscriptionsInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
+    comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
+    conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
+    verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
+    exerciseAttempts?: Prisma.ExerciseAttemptUncheckedUpdateManyWithoutUserNestedInput;
+    moderatedExperiences?: Prisma.ExperienceUncheckedUpdateManyWithoutModeratorNestedInput;
+    experiences?: Prisma.ExperienceUncheckedUpdateManyWithoutUserNestedInput;
+    historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
+    notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
+    resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
+    reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
+    reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
+    sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+};
+export type UserCreateWithoutAiUsagesInput = {
+    id?: string;
+    email: string;
+    passwordHash: string;
+    displayName?: string | null;
+    emailVerified?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    role?: $Enums.UserRole;
+    comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
+    conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
+    verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
+    exerciseAttempts?: Prisma.ExerciseAttemptCreateNestedManyWithoutUserInput;
+    moderatedExperiences?: Prisma.ExperienceCreateNestedManyWithoutModeratorInput;
+    experiences?: Prisma.ExperienceCreateNestedManyWithoutUserInput;
+    historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
+    notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
+    resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
+    reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
+    reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
+    sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
+};
+export type UserUncheckedCreateWithoutAiUsagesInput = {
+    id?: string;
+    email: string;
+    passwordHash: string;
+    displayName?: string | null;
+    emailVerified?: boolean;
+    createdAt?: Date | string;
+    updatedAt?: Date | string;
+    role?: $Enums.UserRole;
+    comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
+    conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
+    verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
+    exerciseAttempts?: Prisma.ExerciseAttemptUncheckedCreateNestedManyWithoutUserInput;
+    moderatedExperiences?: Prisma.ExperienceUncheckedCreateNestedManyWithoutModeratorInput;
+    experiences?: Prisma.ExperienceUncheckedCreateNestedManyWithoutUserInput;
+    historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
+    notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
+    resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
+    reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
+    reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
+    sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
+    subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
+};
+export type UserCreateOrConnectWithoutAiUsagesInput = {
+    where: Prisma.UserWhereUniqueInput;
+    create: Prisma.XOR<Prisma.UserCreateWithoutAiUsagesInput, Prisma.UserUncheckedCreateWithoutAiUsagesInput>;
+};
+export type UserUpsertWithoutAiUsagesInput = {
+    update: Prisma.XOR<Prisma.UserUpdateWithoutAiUsagesInput, Prisma.UserUncheckedUpdateWithoutAiUsagesInput>;
+    create: Prisma.XOR<Prisma.UserCreateWithoutAiUsagesInput, Prisma.UserUncheckedCreateWithoutAiUsagesInput>;
+    where?: Prisma.UserWhereInput;
+};
+export type UserUpdateToOneWithWhereWithoutAiUsagesInput = {
+    where?: Prisma.UserWhereInput;
+    data: Prisma.XOR<Prisma.UserUpdateWithoutAiUsagesInput, Prisma.UserUncheckedUpdateWithoutAiUsagesInput>;
+};
+export type UserUpdateWithoutAiUsagesInput = {
+    id?: Prisma.StringFieldUpdateOperationsInput | string;
+    email?: Prisma.StringFieldUpdateOperationsInput | string;
+    passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
+    displayName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    emailVerified?: Prisma.BoolFieldUpdateOperationsInput | boolean;
+    createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
+    role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
+    conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
+    verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
+    exerciseAttempts?: Prisma.ExerciseAttemptUpdateManyWithoutUserNestedInput;
+    moderatedExperiences?: Prisma.ExperienceUpdateManyWithoutModeratorNestedInput;
+    experiences?: Prisma.ExperienceUpdateManyWithoutUserNestedInput;
+    historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
+    notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
+    resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
+    reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
+    reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
+    sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
+};
+export type UserUncheckedUpdateWithoutAiUsagesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
     email?: Prisma.StringFieldUpdateOperationsInput | string;
     passwordHash?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1892,16 +2250,19 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
     moderatedExperiences?: Prisma.ExperienceUncheckedUpdateManyWithoutModeratorNestedInput;
     experiences?: Prisma.ExperienceUncheckedUpdateManyWithoutUserNestedInput;
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
+    notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
+    subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
 };
 /**
  * Count Type UserCountOutputType
  */
 export type UserCountOutputType = {
+    aiUsages: number;
     comments: number;
     conversations: number;
     verificationTokens: number;
@@ -1917,6 +2278,7 @@ export type UserCountOutputType = {
     sessions: number;
 };
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    aiUsages?: boolean | UserCountOutputTypeCountAiUsagesArgs;
     comments?: boolean | UserCountOutputTypeCountCommentsArgs;
     conversations?: boolean | UserCountOutputTypeCountConversationsArgs;
     verificationTokens?: boolean | UserCountOutputTypeCountVerificationTokensArgs;
@@ -1939,6 +2301,12 @@ export type UserCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensi
      * Select specific fields to fetch from the UserCountOutputType
      */
     select?: Prisma.UserCountOutputTypeSelect<ExtArgs> | null;
+};
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountAiUsagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.AIUsageWhereInput;
 };
 /**
  * UserCountOutputType without action
@@ -2027,6 +2395,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
     createdAt?: boolean;
     updatedAt?: boolean;
     role?: boolean;
+    aiUsages?: boolean | Prisma.User$aiUsagesArgs<ExtArgs>;
     comments?: boolean | Prisma.User$commentsArgs<ExtArgs>;
     conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>;
     verificationTokens?: boolean | Prisma.User$verificationTokensArgs<ExtArgs>;
@@ -2040,6 +2409,7 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
     reactions?: boolean | Prisma.User$reactionsArgs<ExtArgs>;
     reports?: boolean | Prisma.User$reportsArgs<ExtArgs>;
     sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>;
+    subscriptions?: boolean | Prisma.User$subscriptionsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["user"]>;
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2074,6 +2444,7 @@ export type UserSelectScalar = {
 };
 export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "displayName" | "emailVerified" | "createdAt" | "updatedAt" | "role", ExtArgs["result"]["user"]>;
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    aiUsages?: boolean | Prisma.User$aiUsagesArgs<ExtArgs>;
     comments?: boolean | Prisma.User$commentsArgs<ExtArgs>;
     conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>;
     verificationTokens?: boolean | Prisma.User$verificationTokensArgs<ExtArgs>;
@@ -2087,6 +2458,7 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     reactions?: boolean | Prisma.User$reactionsArgs<ExtArgs>;
     reports?: boolean | Prisma.User$reportsArgs<ExtArgs>;
     sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>;
+    subscriptions?: boolean | Prisma.User$subscriptionsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {};
@@ -2094,6 +2466,7 @@ export type UserIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
 export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     name: "User";
     objects: {
+        aiUsages: Prisma.$AIUsagePayload<ExtArgs>[];
         comments: Prisma.$CommentPayload<ExtArgs>[];
         conversations: Prisma.$ConversationPayload<ExtArgs>[];
         verificationTokens: Prisma.$EmailVerificationTokenPayload<ExtArgs>[];
@@ -2107,6 +2480,7 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
         reactions: Prisma.$ReactionPayload<ExtArgs>[];
         reports: Prisma.$ReportPayload<ExtArgs>[];
         sessions: Prisma.$SessionPayload<ExtArgs>[];
+        subscriptions: Prisma.$SubscriptionPayload<ExtArgs> | null;
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -2446,6 +2820,7 @@ export interface UserDelegate<ExtArgs extends runtime.Types.Extensions.InternalA
  */
 export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise";
+    aiUsages<T extends Prisma.User$aiUsagesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$aiUsagesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AIUsagePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     comments<T extends Prisma.User$commentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$commentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CommentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     conversations<T extends Prisma.User$conversationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$conversationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ConversationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     verificationTokens<T extends Prisma.User$verificationTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$verificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$EmailVerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
@@ -2459,6 +2834,7 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
     reactions<T extends Prisma.User$reactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     reports<T extends Prisma.User$reportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    subscriptions<T extends Prisma.User$subscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$subscriptionsArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -2868,6 +3244,29 @@ export type UserDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
     limit?: number;
 };
 /**
+ * User.aiUsages
+ */
+export type User$aiUsagesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AIUsage
+     */
+    select?: Prisma.AIUsageSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the AIUsage
+     */
+    omit?: Prisma.AIUsageOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.AIUsageInclude<ExtArgs> | null;
+    where?: Prisma.AIUsageWhereInput;
+    orderBy?: Prisma.AIUsageOrderByWithRelationInput | Prisma.AIUsageOrderByWithRelationInput[];
+    cursor?: Prisma.AIUsageWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.AIUsageScalarFieldEnum | Prisma.AIUsageScalarFieldEnum[];
+};
+/**
  * User.comments
  */
 export type User$commentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3165,6 +3564,24 @@ export type User$sessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalA
     take?: number;
     skip?: number;
     distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[];
+};
+/**
+ * User.subscriptions
+ */
+export type User$subscriptionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Subscription
+     */
+    select?: Prisma.SubscriptionSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Subscription
+     */
+    omit?: Prisma.SubscriptionOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.SubscriptionInclude<ExtArgs> | null;
+    where?: Prisma.SubscriptionWhereInput;
 };
 /**
  * User without action

@@ -293,6 +293,28 @@ export interface PrismaClient<in LogOpts extends Prisma.LogLevel = never, in out
     get notification(): Prisma.NotificationDelegate<ExtArgs, {
         omit: OmitOpts;
     }>;
+    /**
+     * `prisma.subscription`: Exposes CRUD operations for the **Subscription** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more Subscriptions
+      * const subscriptions = await prisma.subscription.findMany()
+      * ```
+      */
+    get subscription(): Prisma.SubscriptionDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
+    /**
+     * `prisma.aIUsage`: Exposes CRUD operations for the **AIUsage** model.
+      * Example usage:
+      * ```ts
+      * // Fetch zero or more AIUsages
+      * const aIUsages = await prisma.aIUsage.findMany()
+      * ```
+      */
+    get aIUsage(): Prisma.AIUsageDelegate<ExtArgs, {
+        omit: OmitOpts;
+    }>;
 }
 export declare function getPrismaClientClass(): PrismaClientConstructor;
 //# sourceMappingURL=class.d.ts.map

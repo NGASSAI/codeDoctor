@@ -260,6 +260,8 @@ export declare const ModelName: {
     readonly Reaction: 'Reaction';
     readonly Report: 'Report';
     readonly Notification: 'Notification';
+    readonly Subscription: 'Subscription';
+    readonly AIUsage: 'AIUsage';
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export interface TypeMapCb<GlobalOmitOptions = {}> extends runtime.Types.Utils.Fn<{
@@ -272,7 +274,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         omit: GlobalOmitOptions;
     };
     meta: {
-        modelProps: "user" | "session" | "passwordResetToken" | "emailVerificationToken" | "rule" | "historyEntry" | "conversation" | "message" | "exercise" | "exerciseAttempt" | "progress" | "experience" | "comment" | "reaction" | "report" | "notification";
+        modelProps: "user" | "session" | "passwordResetToken" | "emailVerificationToken" | "rule" | "historyEntry" | "conversation" | "message" | "exercise" | "exerciseAttempt" | "progress" | "experience" | "comment" | "reaction" | "report" | "notification" | "subscription" | "aIUsage";
         txIsolationLevel: TransactionIsolationLevel;
     };
     model: {
@@ -1460,6 +1462,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
                 };
             };
         };
+        Subscription: {
+            payload: Prisma.$SubscriptionPayload<ExtArgs>;
+            fields: Prisma.SubscriptionFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.SubscriptionFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.SubscriptionFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>;
+                };
+                findFirst: {
+                    args: Prisma.SubscriptionFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.SubscriptionFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>;
+                };
+                findMany: {
+                    args: Prisma.SubscriptionFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>[];
+                };
+                create: {
+                    args: Prisma.SubscriptionCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>;
+                };
+                createMany: {
+                    args: Prisma.SubscriptionCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.SubscriptionCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>[];
+                };
+                delete: {
+                    args: Prisma.SubscriptionDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>;
+                };
+                update: {
+                    args: Prisma.SubscriptionUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>;
+                };
+                deleteMany: {
+                    args: Prisma.SubscriptionDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.SubscriptionUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.SubscriptionUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>[];
+                };
+                upsert: {
+                    args: Prisma.SubscriptionUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$SubscriptionPayload>;
+                };
+                aggregate: {
+                    args: Prisma.SubscriptionAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateSubscription>;
+                };
+                groupBy: {
+                    args: Prisma.SubscriptionGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.SubscriptionGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.SubscriptionCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.SubscriptionCountAggregateOutputType> | number;
+                };
+            };
+        };
+        AIUsage: {
+            payload: Prisma.$AIUsagePayload<ExtArgs>;
+            fields: Prisma.AIUsageFieldRefs;
+            operations: {
+                findUnique: {
+                    args: Prisma.AIUsageFindUniqueArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload> | null;
+                };
+                findUniqueOrThrow: {
+                    args: Prisma.AIUsageFindUniqueOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload>;
+                };
+                findFirst: {
+                    args: Prisma.AIUsageFindFirstArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload> | null;
+                };
+                findFirstOrThrow: {
+                    args: Prisma.AIUsageFindFirstOrThrowArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload>;
+                };
+                findMany: {
+                    args: Prisma.AIUsageFindManyArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload>[];
+                };
+                create: {
+                    args: Prisma.AIUsageCreateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload>;
+                };
+                createMany: {
+                    args: Prisma.AIUsageCreateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                createManyAndReturn: {
+                    args: Prisma.AIUsageCreateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload>[];
+                };
+                delete: {
+                    args: Prisma.AIUsageDeleteArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload>;
+                };
+                update: {
+                    args: Prisma.AIUsageUpdateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload>;
+                };
+                deleteMany: {
+                    args: Prisma.AIUsageDeleteManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateMany: {
+                    args: Prisma.AIUsageUpdateManyArgs<ExtArgs>;
+                    result: BatchPayload;
+                };
+                updateManyAndReturn: {
+                    args: Prisma.AIUsageUpdateManyAndReturnArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload>[];
+                };
+                upsert: {
+                    args: Prisma.AIUsageUpsertArgs<ExtArgs>;
+                    result: runtime.Types.Utils.PayloadToResult<Prisma.$AIUsagePayload>;
+                };
+                aggregate: {
+                    args: Prisma.AIUsageAggregateArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AggregateAIUsage>;
+                };
+                groupBy: {
+                    args: Prisma.AIUsageGroupByArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AIUsageGroupByOutputType>[];
+                };
+                count: {
+                    args: Prisma.AIUsageCountArgs<ExtArgs>;
+                    result: runtime.Types.Utils.Optional<Prisma.AIUsageCountAggregateOutputType> | number;
+                };
+            };
+        };
     };
 } & {
     other: {
@@ -1660,6 +1810,25 @@ export declare const NotificationScalarFieldEnum: {
     readonly createdAt: 'createdAt';
 };
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum];
+export declare const SubscriptionScalarFieldEnum: {
+    readonly id: 'id';
+    readonly userId: 'userId';
+    readonly plan: 'plan';
+    readonly statut: 'statut';
+    readonly dateDebut: 'dateDebut';
+    readonly dateRenouvellement: 'dateRenouvellement';
+    readonly createdAt: 'createdAt';
+    readonly updatedAt: 'updatedAt';
+};
+export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum];
+export declare const AIUsageScalarFieldEnum: {
+    readonly id: 'id';
+    readonly userId: 'userId';
+    readonly dateJour: 'dateJour';
+    readonly requetes: 'requetes';
+    readonly tokensUtilises: 'tokensUtilises';
+};
+export type AIUsageScalarFieldEnum = (typeof AIUsageScalarFieldEnum)[keyof typeof AIUsageScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: 'asc';
     readonly desc: 'desc';
@@ -1949,6 +2118,8 @@ export type GlobalOmitConfig = {
     reaction?: Prisma.ReactionOmit;
     report?: Prisma.ReportOmit;
     notification?: Prisma.NotificationOmit;
+    subscription?: Prisma.SubscriptionOmit;
+    aIUsage?: Prisma.AIUsageOmit;
 };
 export type LogLevel = 'info' | 'query' | 'warn' | 'error';
 export type LogDefinition = {

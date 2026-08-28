@@ -101,4 +101,14 @@ export type Report = Prisma.ReportModel;
  *
  */
 export type Notification = Prisma.NotificationModel;
+/**
+ * Model Subscription
+ *
+ */
+export type Subscription = Prisma.SubscriptionModel;
+/**
+ * Model AIUsage
+ *
+ */
+export type AIUsage = Prisma.AIUsageModel;
 //# sourceMappingURL=client.d.ts.map

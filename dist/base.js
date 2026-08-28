@@ -4,11 +4,14 @@ exports.prisma = void 0;
 require("dotenv/config");
 const client_1 = require("./generated/prisma/client");
 const adapter_pg_1 = require("@prisma/adapter-pg");
+const connectionString = process.env.DATABASE_URL;
+if (!connectionString) {
+    throw new Error("DATABASE_URL n'est pas définie");
+}
 const adapter = new adapter_pg_1.PrismaPg({
-    connectionString: process.env.DATABASE_URL,
-    ssl: {
-        rejectUnauthorized: false,
-    },
+    connectionString,
 });
-exports.prisma = new client_1.PrismaClient({ adapter });
+exports.prisma = new client_1.PrismaClient({
+    adapter,
+});
 //# sourceMappingURL=base.js.map

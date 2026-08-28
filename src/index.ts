@@ -12,6 +12,9 @@ import reportRoutes from "./routes/report.routes";
 import notificationRoutes from "./routes/notification.routes";
 import adminRoutes from "./routes/admin.routes";
 import iaRoutes from "./routes/ia.routes";
+import exerciceRoutes from "./routes/exercice.routes";
+import { gestionnaireErreurs } from "./middlewares/gestionnaireErreurs";
+
 
 
 
@@ -40,6 +43,7 @@ app.use("/api", reportRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/ia", iaRoutes);
+app.use("/api/exercices", exerciceRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({
@@ -47,6 +51,13 @@ app.get("/api/health", (_req, res) => {
     message: "CodeDoctor backend en ligne",
   });
 });
+app.get("/api/health", (_req, res) => {
+  res.json({
+    status: "ok",
+    message: "CodeDoctor backend en ligne",
+  });
+});
+app.use(gestionnaireErreurs);
 
 // Serveur HTTP partagé entre Express et Socket.IO
 const server = createServer(app);

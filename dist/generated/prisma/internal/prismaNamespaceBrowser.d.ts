@@ -42,6 +42,8 @@ export declare const ModelName: {
     readonly Reaction: 'Reaction';
     readonly Report: 'Report';
     readonly Notification: 'Notification';
+    readonly Subscription: 'Subscription';
+    readonly AIUsage: 'AIUsage';
 };
 export type ModelName = (typeof ModelName)[keyof typeof ModelName];
 export declare const TransactionIsolationLevel: {
@@ -217,6 +219,25 @@ export declare const NotificationScalarFieldEnum: {
     readonly createdAt: 'createdAt';
 };
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum];
+export declare const SubscriptionScalarFieldEnum: {
+    readonly id: 'id';
+    readonly userId: 'userId';
+    readonly plan: 'plan';
+    readonly statut: 'statut';
+    readonly dateDebut: 'dateDebut';
+    readonly dateRenouvellement: 'dateRenouvellement';
+    readonly createdAt: 'createdAt';
+    readonly updatedAt: 'updatedAt';
+};
+export type SubscriptionScalarFieldEnum = (typeof SubscriptionScalarFieldEnum)[keyof typeof SubscriptionScalarFieldEnum];
+export declare const AIUsageScalarFieldEnum: {
+    readonly id: 'id';
+    readonly userId: 'userId';
+    readonly dateJour: 'dateJour';
+    readonly requetes: 'requetes';
+    readonly tokensUtilises: 'tokensUtilises';
+};
+export type AIUsageScalarFieldEnum = (typeof AIUsageScalarFieldEnum)[keyof typeof AIUsageScalarFieldEnum];
 export declare const SortOrder: {
     readonly asc: 'asc';
     readonly desc: 'desc';

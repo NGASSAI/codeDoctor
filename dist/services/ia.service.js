@@ -5,10 +5,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.analyserCode = analyserCode;
 const groq_sdk_1 = __importDefault(require("groq-sdk"));
+const quota_service_1 = require("./quota.service");
 const groq = new groq_sdk_1.default({
     apiKey: process.env.GROQ_API_KEY,
 });
-async function analyserCode({ code, langage, erreur, }) {
+async function analyserCode({ code, langage, erreur, utilisateurId, dateJour, }) {
     const prompt = `
 Tu es CodeDoctor, un assistant expert en développement logiciel.
 
@@ -66,6 +67,8 @@ Règles importantes :
             },
         ],
     });
+    const tokensUtilises = completion.usage?.total_tokens ?? 0;
+    await (0, quota_service_1.enregistrerTokensIA)(utilisateurId, dateJour, tokensUtilises);
     return (completion.choices[0]?.message?.content ??
         "Aucune analyse n'a été générée.");
 }

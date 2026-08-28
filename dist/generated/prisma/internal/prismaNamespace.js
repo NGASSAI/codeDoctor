@@ -48,7 +48,7 @@ var __importStar = (this && this.__importStar) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineExtension = exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.NotificationScalarFieldEnum = exports.ReportScalarFieldEnum = exports.ReactionScalarFieldEnum = exports.CommentScalarFieldEnum = exports.ExperienceScalarFieldEnum = exports.ProgressScalarFieldEnum = exports.ExerciseAttemptScalarFieldEnum = exports.ExerciseScalarFieldEnum = exports.MessageScalarFieldEnum = exports.ConversationScalarFieldEnum = exports.HistoryEntryScalarFieldEnum = exports.RuleScalarFieldEnum = exports.EmailVerificationTokenScalarFieldEnum = exports.PasswordResetTokenScalarFieldEnum = exports.SessionScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
+exports.defineExtension = exports.NullsOrder = exports.QueryMode = exports.SortOrder = exports.AIUsageScalarFieldEnum = exports.SubscriptionScalarFieldEnum = exports.NotificationScalarFieldEnum = exports.ReportScalarFieldEnum = exports.ReactionScalarFieldEnum = exports.CommentScalarFieldEnum = exports.ExperienceScalarFieldEnum = exports.ProgressScalarFieldEnum = exports.ExerciseAttemptScalarFieldEnum = exports.ExerciseScalarFieldEnum = exports.MessageScalarFieldEnum = exports.ConversationScalarFieldEnum = exports.HistoryEntryScalarFieldEnum = exports.RuleScalarFieldEnum = exports.EmailVerificationTokenScalarFieldEnum = exports.PasswordResetTokenScalarFieldEnum = exports.SessionScalarFieldEnum = exports.UserScalarFieldEnum = exports.TransactionIsolationLevel = exports.ModelName = exports.AnyNull = exports.JsonNull = exports.DbNull = exports.NullTypes = exports.prismaVersion = exports.getExtensionContext = exports.Decimal = exports.Sql = exports.raw = exports.join = exports.empty = exports.sql = exports.PrismaClientValidationError = exports.PrismaClientInitializationError = exports.PrismaClientRustPanicError = exports.PrismaClientUnknownRequestError = exports.PrismaClientKnownRequestError = void 0;
 const runtime = __importStar(require("@prisma/client/runtime/client"));
 /**
  * Prisma Errors
@@ -118,7 +118,9 @@ exports.ModelName = {
     Comment: 'Comment',
     Reaction: 'Reaction',
     Report: 'Report',
-    Notification: 'Notification'
+    Notification: 'Notification',
+    Subscription: 'Subscription',
+    AIUsage: 'AIUsage'
 };
 /**
  * Enums
@@ -278,6 +280,23 @@ exports.NotificationScalarFieldEnum = {
     lien: 'lien',
     lue: 'lue',
     createdAt: 'createdAt'
+};
+exports.SubscriptionScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    plan: 'plan',
+    statut: 'statut',
+    dateDebut: 'dateDebut',
+    dateRenouvellement: 'dateRenouvellement',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+};
+exports.AIUsageScalarFieldEnum = {
+    id: 'id',
+    userId: 'userId',
+    dateJour: 'dateJour',
+    requetes: 'requetes',
+    tokensUtilises: 'tokensUtilises'
 };
 exports.SortOrder = {
     asc: 'asc',
