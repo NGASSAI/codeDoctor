@@ -1,3 +1,4 @@
+
 import { prisma } from "../base";
 
 const QUOTA_FREE = 5;
@@ -62,9 +63,36 @@ export async function verifierEtConsommerQuotaIA(
     },
   });
 
+  // DEBUG TEMPORAIRE : vérification de l'abonnement PREMIUM
+  console.log("========== DEBUG PREMIUM ==========");
+  console.log("Utilisateur :", utilisateurId);
+  console.log("Abonnement :", abonnement);
+  console.log("Date actuelle :", new Date());
+
+  if (abonnement) {
+    console.log(
+      "PLAN PREMIUM :",
+      abonnement.plan === "PREMIUM"
+    );
+
+    console.log(
+      "STATUT ACTIVE :",
+      abonnement.statut.trim() === "ACTIVE"
+    );
+
+    console.log(
+      "DATE FUTURE :",
+      abonnement.dateRenouvellement > new Date()
+    );
+  } else {
+    console.log("AUCUN ABONNEMENT TROUVÉ");
+  }
+
+  console.log("===================================");
+
   const premiumActif =
     abonnement?.plan === "PREMIUM" &&
-    abonnement.statut === "ACTIVE" &&
+    abonnement.statut.trim() === "ACTIVE"&&
     abonnement.dateRenouvellement > new Date();
 
   const plan = premiumActif ? "PREMIUM" : "FREE";
@@ -218,9 +246,13 @@ export async function obtenirEtatQuotaIA(
     },
   });
 
+ 
+   
+
+
   const premiumActif =
     abonnement?.plan === "PREMIUM" &&
-    abonnement.statut === "ACTIVE" &&
+    abonnement.statut.trim() === "ACTIVE"&&
     abonnement.dateRenouvellement > new Date();
 
   const plan = premiumActif ? "PREMIUM" : "FREE";
