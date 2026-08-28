@@ -1,4 +1,5 @@
 import Groq from "groq-sdk";
+import { enregistrerTokensIA } from "./quota.service";
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -8,12 +9,16 @@ interface AnalyserCodeParams {
   code: string;
   langage: string;
   erreur?: string;
+  utilisateurId: string;
+  dateJour: string;
 }
 
 export async function analyserCode({
   code,
   langage,
   erreur,
+  utilisateurId,
+  dateJour,
 }: AnalyserCodeParams) {
   const prompt = `
 Tu es CodeDoctor, un assistant expert en développement logiciel.
@@ -74,6 +79,14 @@ Règles importantes :
       },
     ],
   });
+
+  const tokensUtilises = completion.usage?.total_tokens ?? 0;
+
+  await enregistrerTokensIA(
+    utilisateurId,
+    dateJour,
+    tokensUtilises
+  );
 
   return (
     completion.choices[0]?.message?.content ??
