@@ -59,6 +59,8 @@ export declare const NotificationType: {
     readonly EXPERIENCE_APPROUVEE: 'EXPERIENCE_APPROUVEE';
     readonly EXPERIENCE_REFUSEE: 'EXPERIENCE_REFUSEE';
     readonly EXPERIENCE_SIGNALEE: 'EXPERIENCE_SIGNALEE';
+    readonly PAIEMENT_APPROUVE: 'PAIEMENT_APPROUVE';
+    readonly PAIEMENT_REJETE: 'PAIEMENT_REJETE';
 };
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType];
 //# sourceMappingURL=enums.d.ts.map

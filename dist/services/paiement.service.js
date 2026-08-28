@@ -151,7 +151,7 @@ async function approuverPaiement(paiementId) {
         });
         return paiementApprouve;
     });
-    await (0, notification_service_1.creerNotification)(paiement.userId, "EXPERIENCE_APPROUVEE", "Abonnement Premium activé", "Votre paiement a été approuvé. Votre abonnement Premium est maintenant actif pour 30 jours.");
+    await (0, notification_service_1.creerNotification)(paiement.userId, "PAIEMENT_APPROUVE", "Abonnement Premium activé", "Votre paiement a été approuvé. Votre abonnement Premium est maintenant actif pour 30 jours.");
     return resultat;
 }
 /**
@@ -174,7 +174,7 @@ async function rejeterPaiement(paiementId) {
             statut: "REJECTED",
         },
     });
-    await (0, notification_service_1.creerNotification)(paiement.userId, "EXPERIENCE_REFUSEE", "Paiement rejeté", "Votre demande de paiement Premium a été rejetée.");
+    await (0, notification_service_1.creerNotification)(paiement.userId, "PAIEMENT_REJETE", "Paiement rejeté", "Votre demande de paiement Premium a été rejetée.");
     return resultat;
 }
 //# sourceMappingURL=paiement.service.js.map

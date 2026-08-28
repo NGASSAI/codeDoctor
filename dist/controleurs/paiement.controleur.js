@@ -1,11 +1,11 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.creerPaiement = creerPaiement;
-exports.mesPaiements = mesPaiements;
 exports.obtenirPaiement = obtenirPaiement;
 exports.paiementsAdmin = paiementsAdmin;
 exports.approuverPaiementAdmin = approuverPaiementAdmin;
 exports.rejeterPaiementAdmin = rejeterPaiementAdmin;
+exports.mesPaiements = mesPaiements;
 const paiement_service_1 = require("../services/paiement.service");
 /**
  * Créer une demande de paiement Premium.
@@ -42,29 +42,6 @@ async function creerPaiement(req, res) {
 /**
  * Lister les paiements de l'utilisateur connecté.
  */
-async function mesPaiements(req, res) {
-    const utilisateurId = req.utilisateurId;
-    if (!utilisateurId) {
-        return res.status(401).json({
-            erreur: "Authentification requise.",
-        });
-    }
-    try {
-        const paiements = await (0, paiement_service_1.listerPaiementsUtilisateur)(utilisateurId);
-        return res.status(200).json({
-            paiements,
-        });
-    }
-    catch (erreur) {
-        console.error("Erreur lors de la récupération des paiements :", erreur);
-        return res.status(500).json({
-            erreur: "Erreur interne du serveur.",
-        });
-    }
-}
-/**
- * Récupérer un paiement précis.
- */
 async function obtenirPaiement(req, res) {
     const utilisateurId = req.utilisateurId;
     if (!utilisateurId) {
@@ -72,20 +49,14 @@ async function obtenirPaiement(req, res) {
             erreur: "Authentification requise.",
         });
     }
-    const { paiementId } = req.params;
+    const paiementId = String(req.params.paiementId ?? "");
     if (!paiementId) {
         return res.status(400).json({
             erreur: "Identifiant du paiement requis.",
         });
     }
     try {
-        const { paiementId } = req.params;
-        if (!paiementId) {
-            return res.status(400).json({
-                erreur: "Identifiant du paiement requis.",
-            });
-        }
-        const paiement = await (0, paiement_service_1.obtenirPaiementUtilisateur)(String(paiementId), utilisateurId);
+        const paiement = await (0, paiement_service_1.obtenirPaiementUtilisateur)(paiementId, utilisateurId);
         if (!paiement) {
             return res.status(404).json({
                 erreur: "Paiement introuvable.",
@@ -172,6 +143,26 @@ async function rejeterPaiementAdmin(req, res) {
             });
         }
         console.error("Erreur lors du rejet du paiement :", erreur);
+        return res.status(500).json({
+            erreur: "Erreur interne du serveur.",
+        });
+    }
+}
+async function mesPaiements(req, res) {
+    const utilisateurId = req.utilisateurId;
+    if (!utilisateurId) {
+        return res.status(401).json({
+            erreur: "Authentification requise.",
+        });
+    }
+    try {
+        const paiements = await (0, paiement_service_1.listerPaiementsUtilisateur)(utilisateurId);
+        return res.status(200).json({
+            paiements,
+        });
+    }
+    catch (erreur) {
+        console.error("Erreur lors de la récupération des paiements :", erreur);
         return res.status(500).json({
             erreur: "Erreur interne du serveur.",
         });
