@@ -1,4 +1,9 @@
 import { Router } from "express";
+import {
+  paiementsAdmin,
+  approuverPaiementAdmin,
+  rejeterPaiementAdmin,
+} from "../controleurs/paiement-admin.controleur";
 
 import { dashboardAdmin,utilisateursAdmin,experiencesAdmin,
   modifierStatutExperience,signalementsAdmin,
@@ -47,5 +52,25 @@ routeur.patch(
   authentificationMiddleware,
   adminMiddleware,
   modifierStatutSignalementAdmin
+);
+routeur.get(
+  "/paiements",
+  authentificationMiddleware,
+  adminMiddleware,
+  paiementsAdmin
+);
+
+routeur.patch(
+  "/paiements/:id/approuver",
+  authentificationMiddleware,
+  adminMiddleware,
+  approuverPaiementAdmin
+);
+
+routeur.patch(
+  "/paiements/:id/rejeter",
+  authentificationMiddleware,
+  adminMiddleware,
+  rejeterPaiementAdmin
 );
 export default routeur;
