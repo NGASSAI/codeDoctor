@@ -11,6 +11,7 @@ import authentificationRoutes from "./routes/authentification.routes";
 import reportRoutes from "./routes/report.routes";
 import notificationRoutes from "./routes/notification.routes";
 import adminRoutes from "./routes/admin.routes";
+import iaRoutes from "./routes/ia.routes";
 
 
 
@@ -38,6 +39,7 @@ app.use("/api", reactionRoutes);
 app.use("/api", reportRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/ia", iaRoutes);
 
 app.get("/api/health", (_req, res) => {
   res.json({

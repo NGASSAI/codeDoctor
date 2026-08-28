@@ -15,6 +15,7 @@ const authentification_routes_1 = __importDefault(require("./routes/authentifica
 const report_routes_1 = __importDefault(require("./routes/report.routes"));
 const notification_routes_1 = __importDefault(require("./routes/notification.routes"));
 const admin_routes_1 = __importDefault(require("./routes/admin.routes"));
+const ia_routes_1 = __importDefault(require("./routes/ia.routes"));
 const socket_1 = require("./socket");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
@@ -23,7 +24,6 @@ app.use((0, cors_1.default)({
     credentials: true,
 }));
 app.use(express_1.default.json());
-app.use("/api/admin", admin_routes_1.default);
 app.use("/api/auth", authentification_routes_1.default);
 app.use("/api/experiences", experience_routes_1.default);
 app.use("/api/utilisateurs", utilisateur_routes_1.default);
@@ -31,6 +31,8 @@ app.use("/api", commentaire_routes_1.default);
 app.use("/api", reaction_routes_1.default);
 app.use("/api", report_routes_1.default);
 app.use("/api/notifications", notification_routes_1.default);
+app.use("/api/admin", admin_routes_1.default);
+app.use("/api/ia", ia_routes_1.default);
 app.get("/api/health", (_req, res) => {
     res.json({
         status: "ok",
