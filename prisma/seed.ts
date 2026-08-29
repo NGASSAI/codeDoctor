@@ -1,4 +1,4 @@
-
+import bcrypt from "bcrypt";
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../src/generated/prisma/client";
@@ -56,6 +56,54 @@ for (const exercise of ALL_EXERCISES) {
   }
    console.log(
     `✅ ${ALL_EXERCISES.length} exercices insérés dans la base de données.`
+  );
+    const adminEmail =
+    process.env.ADMIN_EMAIL?.trim().toLowerCase();
+
+  const adminPassword =
+    process.env.ADMIN_PASSWORD;
+
+  if (!adminEmail || !adminPassword) {
+    throw new Error(
+      "ADMIN_EMAIL et ADMIN_PASSWORD doivent être définis dans les variables d'environnement."
+    );
+  }
+
+  if (adminPassword.length < 8) {
+    throw new Error(
+      "ADMIN_PASSWORD doit contenir au moins 8 caractères."
+    );
+  }
+
+  const adminPasswordHash =
+    await bcrypt.hash(adminPassword, 12);
+
+  const admin = await prisma.user.upsert({
+    where: {
+      email: adminEmail,
+    },
+    update: {
+      passwordHash: adminPasswordHash,
+      role: "ADMIN",
+      emailVerified: true,
+    },
+    create: {
+      email: adminEmail,
+      passwordHash: adminPasswordHash,
+      displayName: "Administrateur",
+      role: "ADMIN",
+      emailVerified: true,
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      emailVerified: true,
+    },
+  });
+
+  console.log(
+    `✅ Administrateur configuré : ${admin.email}`
   );
   for (const rule of CODE_DOCTOR_RULES) {
     await prisma.rule.upsert({
