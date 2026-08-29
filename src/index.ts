@@ -18,6 +18,7 @@ import historiqueRoutes from "./routes/historique.routes";
 import abonnementRoutes from "./routes/abonnement.routes";
 import paiementRoutes from "./routes/paiement.routes";
 import paiementAdminRoutes from "./routes/paiement-admin.routes";
+import diagnosticRoutes from "./routes/diagnostic.routes";
 
 
 
@@ -53,6 +54,7 @@ app.use("/api/historique", historiqueRoutes);
 app.use("/api/abonnement", abonnementRoutes);
 app.use("/api/paiements", paiementRoutes);
 app.use("/api/admin/paiements", paiementAdminRoutes);
+app.use("/api/diagnostic", diagnosticRoutes);
 
 
 app.get("/api/health", (_req, res) => {
