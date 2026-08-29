@@ -7,14 +7,19 @@ import crypto from "crypto";
  */
 export async function creerUtilisateur(
   email: string,
-  motDePasse: string
+  motDePasse: string,
+  displayName?: string
 ) {
-  const motDePasseHache = await bcrypt.hash(motDePasse, 10);
+  const motDePasseHache = await bcrypt.hash(
+    motDePasse,
+    10
+  );
 
   return prisma.user.create({
     data: {
       email,
       passwordHash: motDePasseHache,
+      displayName: displayName?.trim() || null,
     },
   });
 }

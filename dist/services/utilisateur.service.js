@@ -25,12 +25,13 @@ const crypto_1 = __importDefault(require("crypto"));
 /**
  * Crée un nouvel utilisateur.
  */
-async function creerUtilisateur(email, motDePasse) {
+async function creerUtilisateur(email, motDePasse, displayName) {
     const motDePasseHache = await bcrypt_1.default.hash(motDePasse, 10);
     return base_1.prisma.user.create({
         data: {
             email,
             passwordHash: motDePasseHache,
+            displayName: displayName?.trim() || null,
         },
     });
 }

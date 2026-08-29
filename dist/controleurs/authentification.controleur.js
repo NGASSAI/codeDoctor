@@ -11,99 +11,206 @@ exports.motDePasseOublie = motDePasseOublie;
 exports.reinitialiserMotDePasseControleur = reinitialiserMotDePasseControleur;
 exports.demanderVerificationEmail = demanderVerificationEmail;
 exports.verifierEmail = verifierEmail;
+exports.moi = moi;
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const crypto_1 = __importDefault(require("crypto"));
 const utilisateur_service_1 = require("../services/utilisateur.service");
 /**
- * Inscription
+ * =========================================================
+ * INSCRIPTION
+ * =========================================================
  */
 async function inscription(req, res) {
-    const { email, motDePasse } = req.body;
-    if (!email || !motDePasse) {
-        return res.status(400).json({
-            erreur: "Email et mot de passe requis.",
-        });
-    }
-    if (motDePasse.length < 8) {
-        return res.status(400).json({
-            erreur: "Le mot de passe doit contenir au moins 8 caractères.",
-        });
-    }
-    const utilisateurExistant = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(email);
-    if (utilisateurExistant) {
-        return res.status(409).json({
-            erreur: "Un compte existe déjà avec cet email.",
-        });
-    }
-    const utilisateur = await (0, utilisateur_service_1.creerUtilisateur)(email, motDePasse);
-    const jeton = jsonwebtoken_1.default.sign({ id: utilisateur.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    return res.status(201).json({
-        utilisateur: {
+    try {
+        const { email, motDePasse, displayName, } = req.body;
+        if (!email || !motDePasse) {
+            return res.status(400).json({
+                erreur: "Email et mot de passe requis.",
+            });
+        }
+        if (typeof email !== "string") {
+            return res.status(400).json({
+                erreur: "Email invalide.",
+            });
+        }
+        if (typeof motDePasse !== "string") {
+            return res.status(400).json({
+                erreur: "Mot de passe invalide.",
+            });
+        }
+        if (displayName !== undefined &&
+            typeof displayName !== "string") {
+            return res.status(400).json({
+                erreur: "Nom invalide.",
+            });
+        }
+        const emailNormalise = email
+            .trim()
+            .toLowerCase();
+        const nomNormalise = typeof displayName === "string"
+            ? displayName.trim()
+            : "";
+        if (!emailNormalise) {
+            return res.status(400).json({
+                erreur: "Email requis.",
+            });
+        }
+        if (nomNormalise.length < 2) {
+            return res.status(400).json({
+                erreur: "Le nom doit contenir au moins 2 caractères.",
+            });
+        }
+        if (motDePasse.length < 8) {
+            return res.status(400).json({
+                erreur: "Le mot de passe doit contenir au moins 8 caractères.",
+            });
+        }
+        const utilisateurExistant = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
+        if (utilisateurExistant) {
+            return res.status(409).json({
+                erreur: "Un compte existe déjà avec cet email.",
+            });
+        }
+        const utilisateur = await (0, utilisateur_service_1.creerUtilisateur)(emailNormalise, motDePasse, nomNormalise);
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            console.error("JWT_SECRET n'est pas configuré.");
+            return res.status(500).json({
+                erreur: "Configuration serveur invalide.",
+            });
+        }
+        /*
+         * Création automatique du token de vérification
+         * après l'inscription.
+         */
+        const tokenVerification = await (0, utilisateur_service_1.creerTokenVerificationEmail)(utilisateur.id);
+        /*
+         * JWT conservé pour compatibilité avec
+         * le fonctionnement actuel du frontend.
+         */
+        const jeton = jsonwebtoken_1.default.sign({
             id: utilisateur.id,
-            email: utilisateur.email,
-        },
-        jeton,
-    });
+        }, secret, {
+            expiresIn: "7d",
+        });
+        return res.status(201).json({
+            utilisateur: {
+                id: utilisateur.id,
+                email: utilisateur.email,
+                displayName: utilisateur.displayName,
+                emailVerified: utilisateur.emailVerified,
+            },
+            jeton,
+            /*
+             * TEMPORAIRE POUR LES TESTS.
+             * À supprimer lorsque l'envoi d'email
+             * sera réellement branché.
+             */
+            tokenVerification,
+            message: "Compte créé avec succès. Veuillez vérifier votre adresse email.",
+        });
+    }
+    catch (erreur) {
+        console.error("Erreur lors de l'inscription :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de créer le compte.",
+        });
+    }
 }
 /**
- * Connexion
+ * =========================================================
+ * CONNEXION
+ * =========================================================
  */
 async function connexion(req, res) {
-    const { email, motDePasse } = req.body;
-    // Vérification des données reçues
-    if (!email || !motDePasse) {
-        return res.status(400).json({
-            erreur: "Email et mot de passe requis.",
-        });
-    }
-    // Recherche de l'utilisateur
-    const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(email);
-    // Message volontairement générique
-    // pour ne pas révéler si l'email existe.
-    if (!utilisateur) {
-        return res.status(401).json({
-            erreur: "Email ou mot de passe incorrect.",
-        });
-    }
-    // Vérification du mot de passe avec bcrypt
-    const motDePasseValide = await (0, utilisateur_service_1.verifierMotDePasse)(motDePasse, utilisateur.passwordHash);
-    if (!motDePasseValide) {
-        return res.status(401).json({
-            erreur: "Email ou mot de passe incorrect.",
-        });
-    }
-    // Récupération du User-Agent de l'appareil
-    const userAgent = req.get("user-agent") ?? undefined;
-    // Création de la session
-    const { refreshToken } = await (0, utilisateur_service_1.creerSession)(utilisateur.id, userAgent);
-    // Création du JWT    
-    const jeton = jsonwebtoken_1.default.sign({ id: utilisateur.id }, process.env.JWT_SECRET, { expiresIn: "7d" });
-    return res.status(200).json({
-        utilisateur: {
+    try {
+        const { email, motDePasse, } = req.body;
+        if (!email || !motDePasse) {
+            return res.status(400).json({
+                erreur: "Email et mot de passe requis.",
+            });
+        }
+        if (typeof email !== "string" ||
+            typeof motDePasse !== "string") {
+            return res.status(400).json({
+                erreur: "Données invalides.",
+            });
+        }
+        const emailNormalise = email
+            .trim()
+            .toLowerCase();
+        const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
+        if (!utilisateur) {
+            return res.status(401).json({
+                erreur: "Email ou mot de passe incorrect.",
+            });
+        }
+        const motDePasseValide = await (0, utilisateur_service_1.verifierMotDePasse)(motDePasse, utilisateur.passwordHash);
+        if (!motDePasseValide) {
+            return res.status(401).json({
+                erreur: "Email ou mot de passe incorrect.",
+            });
+        }
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            console.error("JWT_SECRET n'est pas configuré.");
+            return res.status(500).json({
+                erreur: "Configuration serveur invalide.",
+            });
+        }
+        /*
+         * Création du JWT d'accès.
+         */
+        const jeton = jsonwebtoken_1.default.sign({
             id: utilisateur.id,
-            email: utilisateur.email,
-            displayName: utilisateur.displayName,
-        },
-        jeton,
-        refreshToken,
-    });
+        }, secret, {
+            expiresIn: "7d",
+        });
+        /*
+         * Création de la session et du refresh token.
+         */
+        const userAgent = typeof req.headers["user-agent"] ===
+            "string"
+            ? req.headers["user-agent"]
+            : undefined;
+        const { refreshToken } = await (0, utilisateur_service_1.creerSession)(utilisateur.id, userAgent);
+        return res.status(200).json({
+            utilisateur: {
+                id: utilisateur.id,
+                email: utilisateur.email,
+                displayName: utilisateur.displayName,
+                role: utilisateur.role,
+                emailVerified: utilisateur.emailVerified,
+            },
+            jeton,
+            refreshToken,
+        });
+    }
+    catch (erreur) {
+        console.error("Erreur lors de la connexion :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de se connecter.",
+        });
+    }
 }
 /**
- * Déconnexion
- */
-/**
- * Déconnexion
+ * =========================================================
+ * DÉCONNEXION
+ * =========================================================
  */
 async function deconnexion(req, res) {
-    const { refreshToken } = req.body;
-    if (!refreshToken || typeof refreshToken !== "string") {
-        return res.status(400).json({
-            erreur: "Refresh token requis.",
-        });
-    }
     try {
-        // Le refresh token n'est jamais recherché en clair en base.
-        // On calcule son hash pour retrouver la session.
+        const { refreshToken } = req.body;
+        if (!refreshToken ||
+            typeof refreshToken !== "string") {
+            return res.status(400).json({
+                erreur: "Refresh token requis.",
+            });
+        }
+        /*
+         * Le refresh token original n'est jamais
+         * recherché directement en base.
+         */
         const refreshTokenHash = crypto_1.default
             .createHash("sha256")
             .update(refreshToken)
@@ -114,105 +221,123 @@ async function deconnexion(req, res) {
         });
     }
     catch (erreur) {
-        // La session n'existe déjà plus :
-        // l'utilisateur est malgré tout considéré comme déconnecté.
-        if (erreur?.code === "P2025") {
-            return res.status(200).json({
-                message: "Déconnexion réussie.",
-            });
-        }
         console.error("Erreur lors de la déconnexion :", erreur);
         return res.status(500).json({
-            erreur: "Erreur interne du serveur.",
+            erreur: "Impossible de se déconnecter.",
         });
     }
 }
 /**
- * Rafraîchissement du JWT
+ * =========================================================
+ * RAFRAÎCHIR LE JWT
+ * =========================================================
  */
 async function rafraichir(req, res) {
-    const { refreshToken } = req.body;
-    if (!refreshToken || typeof refreshToken !== "string") {
-        return res.status(400).json({
-            erreur: "Refresh token requis.",
-        });
-    }
     try {
-        // On hash le refresh token reçu.
-        // Le token original n'est jamais stocké en clair en base.
+        const { refreshToken } = req.body;
+        if (!refreshToken ||
+            typeof refreshToken !== "string") {
+            return res.status(400).json({
+                erreur: "Refresh token requis.",
+            });
+        }
         const refreshTokenHash = crypto_1.default
             .createHash("sha256")
             .update(refreshToken)
             .digest("hex");
-        // Recherche d'une session existante et non expirée
+        /*
+         * Recherche d'une session valide.
+         */
         const session = await (0, utilisateur_service_1.trouverSessionValide)(refreshTokenHash);
         if (!session) {
             return res.status(401).json({
                 erreur: "Refresh token invalide ou expiré.",
             });
         }
-        // Rotation du refresh token
-        const { refreshToken: nouveauRefreshToken } = await (0, utilisateur_service_1.renouvelerSession)(session.id);
-        // Création d'un nouveau JWT
-        const nouveauJeton = jsonwebtoken_1.default.sign({ id: session.userId }, process.env.JWT_SECRET, { expiresIn: "7d" });
+        /*
+         * Rotation du refresh token.
+         */
+        const { refreshToken: nouveauRefreshToken, } = await (0, utilisateur_service_1.renouvelerSession)(session.id);
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            console.error("JWT_SECRET n'est pas configuré.");
+            return res.status(500).json({
+                erreur: "Configuration serveur invalide.",
+            });
+        }
+        /*
+         * Nouveau JWT.
+         */
+        const jeton = jsonwebtoken_1.default.sign({
+            id: session.userId,
+        }, secret, {
+            expiresIn: "7d",
+        });
         return res.status(200).json({
-            jeton: nouveauJeton,
+            jeton,
             refreshToken: nouveauRefreshToken,
         });
     }
     catch (erreur) {
         console.error("Erreur lors du rafraîchissement :", erreur);
         return res.status(500).json({
+            erreur: "Impossible de rafraîchir la session.",
+        });
+    }
+}
+/**
+ * =========================================================
+ * MOT DE PASSE OUBLIÉ
+ * =========================================================
+ */
+async function motDePasseOublie(req, res) {
+    try {
+        const { email } = req.body;
+        if (!email ||
+            typeof email !== "string") {
+            return res.status(400).json({
+                erreur: "Email requis.",
+            });
+        }
+        const emailNormalise = email
+            .trim()
+            .toLowerCase();
+        const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
+        /*
+         * Même réponse que le compte existe
+         * ou non pour éviter l'énumération
+         * des comptes.
+         */
+        if (!utilisateur) {
+            return res.status(200).json({
+                message: "Si un compte correspond à cet email, un lien de réinitialisation sera envoyé.",
+            });
+        }
+        const token = await (0, utilisateur_service_1.creerTokenReinitialisation)(utilisateur.id);
+        /*
+         * TEMPORAIRE POUR LES TESTS.
+         * Ne plus retourner le token lorsque
+         * l'envoi d'emails sera configuré.
+         */
+        return res.status(200).json({
+            message: "Si un compte correspond à cet email, un lien de réinitialisation sera envoyé.",
+            token,
+        });
+    }
+    catch (erreur) {
+        console.error("Erreur lors de la demande de réinitialisation :", erreur);
+        return res.status(500).json({
             erreur: "Erreur interne du serveur.",
         });
     }
 }
 /**
- * Demande de réinitialisation du mot de passe
- */
-async function motDePasseOublie(req, res) {
-    const { email } = req.body;
-    if (!email || typeof email !== "string") {
-        return res.status(400).json({
-            erreur: "Email requis.",
-        });
-    }
-    // Normalisation
-    const emailNormalise = email.trim().toLowerCase();
-    const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
-    /*
-     * IMPORTANT :
-     * On retourne exactement la même réponse
-     * que l'utilisateur existe ou non.
-     *
-     * Cela empêche un attaquant de savoir
-     * quels emails possèdent un compte.
-     */
-    if (!utilisateur) {
-        return res.status(200).json({
-            message: "Si un compte correspond à cet email, un lien de réinitialisation sera envoyé.",
-        });
-    }
-    const token = await (0, utilisateur_service_1.creerTokenReinitialisation)(utilisateur.id);
-    /*
-     * TEMPORAIRE :
-     * On affiche le token uniquement pour pouvoir
-     * tester le système avant de brancher l'envoi d'email.
-     *
-     * À supprimer lorsque l'envoi d'email sera configuré.
-     */
-    return res.status(200).json({
-        message: "Si un compte correspond à cet email, un lien de réinitialisation sera envoyé.",
-        // TEMPORAIRE POUR LES TESTS
-        token,
-    });
-}
-/**
- * Réinitialisation du mot de passe
+ * =========================================================
+ * RÉINITIALISATION DU MOT DE PASSE
+ * =========================================================
  */
 async function reinitialiserMotDePasseControleur(req, res) {
-    const { token, nouveauMotDePasse } = req.body;
-    // Vérification des données
+    const { token, nouveauMotDePasse, } = req.body;
     if (!token ||
         typeof token !== "string" ||
         !nouveauMotDePasse ||
@@ -221,29 +346,28 @@ async function reinitialiserMotDePasseControleur(req, res) {
             erreur: "Token et nouveau mot de passe requis.",
         });
     }
-    // Politique minimale du mot de passe
     if (nouveauMotDePasse.length < 8) {
         return res.status(400).json({
             erreur: "Le mot de passe doit contenir au moins 8 caractères.",
         });
     }
     try {
-        // On ne recherche jamais le token en clair.
+        /*
+         * Le token n'est jamais stocké en clair.
+         */
         const tokenHash = crypto_1.default
             .createHash("sha256")
             .update(token)
             .digest("hex");
-        // Vérification du token
         const resetToken = await (0, utilisateur_service_1.trouverTokenReinitialisation)(tokenHash);
         if (!resetToken) {
             return res.status(401).json({
                 erreur: "Token invalide, expiré ou déjà utilisé.",
             });
         }
-        // Modification du mot de passe
         await (0, utilisateur_service_1.reinitialiserMotDePasse)(resetToken.userId, resetToken.id, nouveauMotDePasse);
         return res.status(200).json({
-            message: "Mot de passe réinitialisé avec succès. Vous pouvez maintenant vous connecter.",
+            message: "Mot de passe réinitialisé avec succès.",
         });
     }
     catch (erreur) {
@@ -254,44 +378,57 @@ async function reinitialiserMotDePasseControleur(req, res) {
     }
 }
 /**
- * Demander la vérification de l'adresse email.
+ * =========================================================
+ * DEMANDER LA VÉRIFICATION EMAIL
+ * =========================================================
  */
 async function demanderVerificationEmail(req, res) {
-    const { email } = req.body;
-    if (!email || typeof email !== "string") {
-        return res.status(400).json({
-            erreur: "Email requis.",
-        });
-    }
-    const emailNormalise = email.trim().toLowerCase();
-    const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
-    /*
-     * Même réponse que l'utilisateur existe ou non.
-     * Cela évite de révéler les comptes existants.
-     */
-    if (!utilisateur) {
+    try {
+        const { email } = req.body;
+        if (!email ||
+            typeof email !== "string") {
+            return res.status(400).json({
+                erreur: "Email requis.",
+            });
+        }
+        const emailNormalise = email
+            .trim()
+            .toLowerCase();
+        const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
+        /*
+         * Même réponse si le compte existe
+         * ou non.
+         */
+        if (!utilisateur) {
+            return res.status(200).json({
+                message: "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
+            });
+        }
+        if (utilisateur.emailVerified) {
+            return res.status(200).json({
+                message: "Cette adresse email est déjà vérifiée.",
+            });
+        }
+        const token = await (0, utilisateur_service_1.creerTokenVerificationEmail)(utilisateur.id);
+        /*
+         * TEMPORAIRE POUR LES TESTS.
+         */
         return res.status(200).json({
             message: "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
+            token,
         });
     }
-    if (utilisateur.emailVerified) {
-        return res.status(200).json({
-            message: "Cette adresse email est déjà vérifiée.",
+    catch (erreur) {
+        console.error("Erreur lors de la demande de vérification email :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de demander la vérification email.",
         });
     }
-    const token = await (0, utilisateur_service_1.creerTokenVerificationEmail)(utilisateur.id);
-    /*
-     * TEMPORAIRE :
-     * Le token est retourné pour permettre les tests
-     * avant branchement du service d'envoi d'emails.
-     */
-    return res.status(200).json({
-        message: "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
-        token,
-    });
 }
 /**
- * Vérifier l'adresse email avec le token reçu.
+ * =========================================================
+ * VÉRIFIER L'ADRESSE EMAIL
+ * =========================================================
  */
 async function verifierEmail(req, res) {
     const token = typeof req.query.token === "string"
@@ -322,8 +459,24 @@ async function verifierEmail(req, res) {
     catch (erreur) {
         console.error("Erreur lors de la vérification de l'email :", erreur);
         return res.status(500).json({
-            erreur: "Erreur interne du serveur.",
+            erreur: "Impossible de vérifier l'adresse email.",
         });
     }
+}
+/**
+ * =========================================================
+ * VÉRIFICATION DE LA SESSION COURANTE
+ * =========================================================
+ */
+async function moi(req, res) {
+    if (!req.utilisateurId) {
+        return res.status(401).json({
+            erreur: "Authentification requise.",
+        });
+    }
+    return res.status(200).json({
+        message: "Authentification réussie.",
+        utilisateurId: req.utilisateurId,
+    });
 }
 //# sourceMappingURL=authentification.controleur.js.map

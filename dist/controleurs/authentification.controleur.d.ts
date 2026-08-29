@@ -1,37 +1,57 @@
 import { Request, Response } from "express";
+import { RequeteAuthentifiee } from "../middlewares/authentification.middleware";
 /**
- * Inscription
+ * =========================================================
+ * INSCRIPTION
+ * =========================================================
  */
 export declare function inscription(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
- * Connexion
+ * =========================================================
+ * CONNEXION
+ * =========================================================
  */
 export declare function connexion(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
- * Déconnexion
- */
-/**
- * Déconnexion
+ * =========================================================
+ * DÉCONNEXION
+ * =========================================================
  */
 export declare function deconnexion(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
- * Rafraîchissement du JWT
+ * =========================================================
+ * RAFRAÎCHIR LE JWT
+ * =========================================================
  */
 export declare function rafraichir(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
- * Demande de réinitialisation du mot de passe
+ * =========================================================
+ * MOT DE PASSE OUBLIÉ
+ * =========================================================
  */
 export declare function motDePasseOublie(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
- * Réinitialisation du mot de passe
+ * =========================================================
+ * RÉINITIALISATION DU MOT DE PASSE
+ * =========================================================
  */
 export declare function reinitialiserMotDePasseControleur(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
- * Demander la vérification de l'adresse email.
+ * =========================================================
+ * DEMANDER LA VÉRIFICATION EMAIL
+ * =========================================================
  */
 export declare function demanderVerificationEmail(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
- * Vérifier l'adresse email avec le token reçu.
+ * =========================================================
+ * VÉRIFIER L'ADRESSE EMAIL
+ * =========================================================
  */
 export declare function verifierEmail(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
+/**
+ * =========================================================
+ * VÉRIFICATION DE LA SESSION COURANTE
+ * =========================================================
+ */
+export declare function moi(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
 //# sourceMappingURL=authentification.controleur.d.ts.map

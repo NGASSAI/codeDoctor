@@ -1,7 +1,7 @@
 /**
  * Crée un nouvel utilisateur.
  */
-export declare function creerUtilisateur(email: string, motDePasse: string): Promise<{
+export declare function creerUtilisateur(email: string, motDePasse: string, displayName?: string): Promise<{
     id: string;
     email: string;
     passwordHash: string;
