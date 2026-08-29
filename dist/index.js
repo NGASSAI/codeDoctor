@@ -22,11 +22,16 @@ const historique_routes_1 = __importDefault(require("./routes/historique.routes"
 const abonnement_routes_1 = __importDefault(require("./routes/abonnement.routes"));
 const paiement_routes_1 = __importDefault(require("./routes/paiement.routes"));
 const paiement_admin_routes_1 = __importDefault(require("./routes/paiement-admin.routes"));
+const diagnostic_routes_1 = __importDefault(require("./routes/diagnostic.routes"));
 const socket_1 = require("./socket");
 dotenv_1.default.config();
 const app = (0, express_1.default)();
+const ORIGINES_AUTORISEES = [
+    "http://localhost:5173",
+    "https://code-doctor-front.vercel.app",
+];
 app.use((0, cors_1.default)({
-    origin: "http://localhost:5173",
+    origin: ORIGINES_AUTORISEES,
     credentials: true,
 }));
 app.use(express_1.default.json());
@@ -44,6 +49,7 @@ app.use("/api/historique", historique_routes_1.default);
 app.use("/api/abonnement", abonnement_routes_1.default);
 app.use("/api/paiements", paiement_routes_1.default);
 app.use("/api/admin/paiements", paiement_admin_routes_1.default);
+app.use("/api/diagnostic", diagnostic_routes_1.default);
 app.get("/api/health", (_req, res) => {
     res.json({
         status: "ok",

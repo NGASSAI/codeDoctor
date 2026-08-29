@@ -1,3 +1,4 @@
+
 import { Server } from "socket.io";
 import type { Server as HttpServer } from "http";
 import jwt from "jsonwebtoken";
@@ -9,12 +10,26 @@ interface PayloadJWT {
 let io: Server | null = null;
 
 /**
+ * Origines autorisées pour Socket.IO.
+ *
+ * Développement :
+ *   http://localhost:5173
+ *
+ * Production :
+ *   https://code-doctor-front.vercel.app
+ */
+const ORIGINES_AUTORISEES = [
+  "http://localhost:5173",
+  "https://code-doctor-front.vercel.app",
+];
+
+/**
  * Initialise Socket.IO sur le serveur HTTP Express.
  */
 export function initialiserSocket(server: HttpServer) {
   io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: ORIGINES_AUTORISEES,
       credentials: true,
     },
   });
@@ -23,40 +38,59 @@ export function initialiserSocket(server: HttpServer) {
     try {
       const token = socket.handshake.auth?.token;
 
-      if (!token) {
-        return next(new Error("Authentification requise."));
+      if (!token || typeof token !== "string") {
+        return next(
+          new Error("Authentification requise.")
+        );
       }
 
       const secret = process.env.JWT_SECRET;
 
       if (!secret) {
-        return next(new Error("JWT_SECRET non configuré."));
+        return next(
+          new Error("JWT_SECRET non configuré.")
+        );
       }
 
-      const payload = jwt.verify(token, secret) as PayloadJWT;
+      const payload = jwt.verify(
+        token,
+        secret
+      ) as PayloadJWT;
 
-      if (!payload.id || typeof payload.id !== "string") {
-        return next(new Error("Token invalide."));
+      if (
+        !payload.id ||
+        typeof payload.id !== "string"
+      ) {
+        return next(
+          new Error("Token invalide.")
+        );
       }
 
       socket.data.userId = payload.id;
 
       next();
     } catch {
-      next(new Error("Token invalide ou expiré."));
+      next(
+        new Error("Token invalide ou expiré.")
+      );
     }
   });
 
   io.on("connection", (socket) => {
-    const userId = socket.data.userId as string;
+    const userId =
+      socket.data.userId as string;
 
-    console.log(`🔌 Socket connecté : ${userId}`);
+    console.log(
+      `🔌 Socket connecté : ${userId}`
+    );
 
     // Chaque utilisateur rejoint sa propre salle.
     socket.join(`user:${userId}`);
 
-    socket.on("disconnect", () => {
-      console.log(`🔌 Socket déconnecté : ${userId}`);
+    socket.on("disconnect", (raison) => {
+      console.log(
+        `🔌 Socket déconnecté : ${userId} (${raison})`
+      );
     });
   });
 
@@ -70,7 +104,9 @@ export function initialiserSocket(server: HttpServer) {
  */
 export function obtenirSocket() {
   if (!io) {
-    throw new Error("Socket.IO n'est pas initialisé.");
+    throw new Error(
+      "Socket.IO n'est pas initialisé."
+    );
   }
 
   return io;
@@ -96,4 +132,3 @@ export function envoyerNotificationTempsReel(
     notification
   );
 }
-

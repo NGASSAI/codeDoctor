@@ -30,13 +30,17 @@ dotenv.config();
 
 const app = express();
 
+const ORIGINES_AUTORISEES = [
+  "http://localhost:5173",
+  "https://code-doctor-front.vercel.app",
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ORIGINES_AUTORISEES,
     credentials: true,
   })
 );
-
 app.use(express.json());
 
 

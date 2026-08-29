@@ -10,19 +10,32 @@ const socket_io_1 = require("socket.io");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 let io = null;
 /**
+ * Origines autorisées pour Socket.IO.
+ *
+ * Développement :
+ *   http://localhost:5173
+ *
+ * Production :
+ *   https://code-doctor-front.vercel.app
+ */
+const ORIGINES_AUTORISEES = [
+    "http://localhost:5173",
+    "https://code-doctor-front.vercel.app",
+];
+/**
  * Initialise Socket.IO sur le serveur HTTP Express.
  */
 function initialiserSocket(server) {
     io = new socket_io_1.Server(server, {
         cors: {
-            origin: "http://localhost:5173",
+            origin: ORIGINES_AUTORISEES,
             credentials: true,
         },
     });
     io.use((socket, next) => {
         try {
             const token = socket.handshake.auth?.token;
-            if (!token) {
+            if (!token || typeof token !== "string") {
                 return next(new Error("Authentification requise."));
             }
             const secret = process.env.JWT_SECRET;
@@ -30,7 +43,8 @@ function initialiserSocket(server) {
                 return next(new Error("JWT_SECRET non configuré."));
             }
             const payload = jsonwebtoken_1.default.verify(token, secret);
-            if (!payload.id || typeof payload.id !== "string") {
+            if (!payload.id ||
+                typeof payload.id !== "string") {
                 return next(new Error("Token invalide."));
             }
             socket.data.userId = payload.id;
@@ -45,8 +59,8 @@ function initialiserSocket(server) {
         console.log(`🔌 Socket connecté : ${userId}`);
         // Chaque utilisateur rejoint sa propre salle.
         socket.join(`user:${userId}`);
-        socket.on("disconnect", () => {
-            console.log(`🔌 Socket déconnecté : ${userId}`);
+        socket.on("disconnect", (raison) => {
+            console.log(`🔌 Socket déconnecté : ${userId} (${raison})`);
         });
     });
     console.log("⚡ Socket.IO démarré");
