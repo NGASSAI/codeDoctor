@@ -140,7 +140,9 @@ exports.UserScalarFieldEnum = {
     emailVerified: 'emailVerified',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt',
-    role: 'role'
+    role: 'role',
+    recoveryAnswerHash: 'recoveryAnswerHash',
+    recoveryHint: 'recoveryHint'
 };
 exports.SessionScalarFieldEnum = {
     id: 'id',

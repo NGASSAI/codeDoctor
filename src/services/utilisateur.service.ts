@@ -2,26 +2,68 @@ import { prisma } from "../base";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
 
-/**
- * Crée un nouvel utilisateur.
- */
 export async function creerUtilisateur(
   email: string,
   motDePasse: string,
-  displayName?: string
+  displayName?: string,
+  recoveryAnswer?: string,
+  recoveryHint?: string
 ) {
   const motDePasseHache = await bcrypt.hash(
     motDePasse,
     10
   );
 
+  const recoveryAnswerHash =
+    recoveryAnswer?.trim()
+      ? await bcrypt.hash(
+          recoveryAnswer.trim().toLowerCase(),
+          10
+        )
+      : null;
+
   return prisma.user.create({
     data: {
       email,
       passwordHash: motDePasseHache,
-      displayName: displayName?.trim() || null,
+      displayName:
+        displayName?.trim() || null,
+      recoveryAnswerHash,
+      recoveryHint:
+        recoveryHint?.trim() || null,
     },
   });
+}
+/**
+ * Crée un nouvel utilisateur.
+ */
+
+
+export async function verifierPhraseRecuperation(
+  userId: string,
+  phrase: string
+) {
+  const utilisateur =
+    await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        recoveryAnswerHash: true,
+      },
+    });
+
+  if (
+    !utilisateur ||
+    !utilisateur.recoveryAnswerHash
+  ) {
+    return false;
+  }
+
+  return bcrypt.compare(
+    phrase.trim().toLowerCase(),
+    utilisateur.recoveryAnswerHash
+  );
 }
 
 /**
@@ -166,8 +208,8 @@ export async function creerTokenReinitialisation(
     .update(token)
     .digest("hex");
 
-  // Validité : 15 minutes
-  const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+  // Validité :   5 minutes
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
 
   await prisma.passwordResetToken.create({
     data: {
@@ -323,6 +365,86 @@ export async function creerTokenVerificationEmail(
   });
 
   return token;
+}
+
+export async function modifierSecuriteRecuperation(
+  userId: string,
+  recoveryAnswer: string,
+  recoveryHint: string,
+  motDePasseActuel?: string
+) {
+  const utilisateur =
+    await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        passwordHash: true,
+        recoveryAnswerHash: true,
+      },
+    });
+
+  if (!utilisateur) {
+    throw new Error(
+      "UTILISATEUR_INTRouvable"
+    );
+  }
+
+  /*
+   * Si une phrase secrète existe déjà,
+   * le mot de passe actuel est obligatoire
+   * pour pouvoir la modifier.
+   */
+  if (utilisateur.recoveryAnswerHash) {
+    if (
+      !motDePasseActuel ||
+      typeof motDePasseActuel !== "string"
+    ) {
+      throw new Error(
+        "MOT_DE_PASSE_ACTUEL_INVALIDE"
+      );
+    }
+
+    const motDePasseValide =
+      await bcrypt.compare(
+        motDePasseActuel,
+        utilisateur.passwordHash
+      );
+
+    if (!motDePasseValide) {
+      throw new Error(
+        "MOT_DE_PASSE_ACTUEL_INVALIDE"
+      );
+    }
+  }
+
+  /*
+   * Toujours hacher la phrase secrète.
+   */
+  const recoveryAnswerHash =
+    await bcrypt.hash(
+      recoveryAnswer.trim().toLowerCase(),
+      10
+    );
+
+  return prisma.user.update({
+    where: {
+      id: userId,
+    },
+    data: {
+      recoveryAnswerHash,
+      recoveryHint:
+        recoveryHint.trim(),
+    },
+    select: {
+      id: true,
+      email: true,
+      displayName: true,
+      emailVerified: true,
+      createdAt: true,
+      recoveryHint: true,
+    },
+  });
 }
 
 /**

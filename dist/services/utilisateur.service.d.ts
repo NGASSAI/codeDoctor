@@ -1,7 +1,4 @@
-/**
- * Crée un nouvel utilisateur.
- */
-export declare function creerUtilisateur(email: string, motDePasse: string, displayName?: string): Promise<{
+export declare function creerUtilisateur(email: string, motDePasse: string, displayName?: string, recoveryAnswer?: string, recoveryHint?: string): Promise<{
     id: string;
     email: string;
     passwordHash: string;
@@ -10,7 +7,13 @@ export declare function creerUtilisateur(email: string, motDePasse: string, disp
     createdAt: Date;
     updatedAt: Date;
     role: import("../generated/prisma/enums").UserRole;
+    recoveryAnswerHash: string | null;
+    recoveryHint: string | null;
 }>;
+/**
+ * Crée un nouvel utilisateur.
+ */
+export declare function verifierPhraseRecuperation(userId: string, phrase: string): Promise<boolean>;
 /**
  * Recherche un utilisateur à partir de son adresse email.
  */
@@ -23,6 +26,8 @@ export declare function trouverUtilisateurParEmail(email: string): Promise<{
     createdAt: Date;
     updatedAt: Date;
     role: import("../generated/prisma/enums").UserRole;
+    recoveryAnswerHash: string | null;
+    recoveryHint: string | null;
 } | null>;
 /**
  * Vérifie qu'un mot de passe correspond au hash enregistré.
@@ -73,6 +78,8 @@ export declare function trouverSessionValide(refreshTokenHash: string): Promise<
         createdAt: Date;
         updatedAt: Date;
         role: import("../generated/prisma/enums").UserRole;
+        recoveryAnswerHash: string | null;
+        recoveryHint: string | null;
     };
 } & {
     id: string;
@@ -96,6 +103,8 @@ export declare function trouverTokenReinitialisation(tokenHash: string): Promise
         createdAt: Date;
         updatedAt: Date;
         role: import("../generated/prisma/enums").UserRole;
+        recoveryAnswerHash: string | null;
+        recoveryHint: string | null;
     };
 } & {
     id: string;
@@ -114,6 +123,8 @@ export declare function reinitialiserMotDePasse(userId: string, tokenId: string,
     createdAt: Date;
     updatedAt: Date;
     role: import("../generated/prisma/enums").UserRole;
+    recoveryAnswerHash: string | null;
+    recoveryHint: string | null;
 }>;
 export declare function trouverUtilisateurParId(userId: string): Promise<{
     createdAt: Date;
@@ -133,6 +144,14 @@ export declare function modifierProfilUtilisateur(userId: string, displayName: s
  * Créer un token de vérification d'email.
  */
 export declare function creerTokenVerificationEmail(userId: string): Promise<string>;
+export declare function modifierSecuriteRecuperation(userId: string, recoveryAnswer: string, recoveryHint: string, motDePasseActuel?: string): Promise<{
+    createdAt: Date;
+    displayName: string | null;
+    email: string;
+    emailVerified: boolean;
+    id: string;
+    recoveryHint: string | null;
+}>;
 /**
  * Vérifier un token d'email.
  */

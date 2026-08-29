@@ -1,11 +1,19 @@
-import { Response } from "express";
+
+import { Request, Response } from "express";
 
 import {
   trouverUtilisateurParId,
-    modifierProfilUtilisateur,
+  modifierProfilUtilisateur,
+  modifierSecuriteRecuperation,
 } from "../services/utilisateur.service";
 
 import { RequeteAuthentifiee } from "../middlewares/authentification.middleware";
+
+/**
+ * =========================================================
+ * MODIFIER LE PROFIL
+ * =========================================================
+ */
 export async function modifierProfil(
   req: RequeteAuthentifiee,
   res: Response
@@ -26,7 +34,8 @@ export async function modifierProfil(
     typeof displayName !== "string"
   ) {
     return res.status(400).json({
-      erreur: "Le nom affiché doit être une chaîne de caractères.",
+      erreur:
+        "Le nom affiché doit être une chaîne de caractères.",
     });
   }
 
@@ -35,22 +44,27 @@ export async function modifierProfil(
       ? undefined
       : displayName.trim() || null;
 
-  if (nomAffiche !== undefined && nomAffiche !== null) {
-    if (nomAffiche.length > 50) {
-      return res.status(400).json({
-        erreur: "Le nom affiché ne peut pas dépasser 50 caractères.",
-      });
-    }
+  if (
+    nomAffiche !== undefined &&
+    nomAffiche !== null &&
+    nomAffiche.length > 50
+  ) {
+    return res.status(400).json({
+      erreur:
+        "Le nom affiché ne peut pas dépasser 50 caractères.",
+    });
   }
 
   try {
-    const utilisateur = await modifierProfilUtilisateur(
-      utilisateurId,
-      nomAffiche ?? null
-    );
+    const utilisateur =
+      await modifierProfilUtilisateur(
+        utilisateurId,
+        nomAffiche ?? null
+      );
 
     return res.status(200).json({
-      message: "Profil mis à jour avec succès.",
+      message:
+        "Profil mis à jour avec succès.",
       utilisateur,
     });
   } catch (erreur) {
@@ -60,13 +74,16 @@ export async function modifierProfil(
     );
 
     return res.status(500).json({
-      erreur: "Erreur interne du serveur.",
+      erreur:
+        "Erreur interne du serveur.",
     });
   }
 }
 
 /**
- * Récupérer le profil de l'utilisateur connecté
+ * =========================================================
+ * RÉCUPÉRER LE PROFIL
+ * =========================================================
  */
 export async function profil(
   req: RequeteAuthentifiee,
@@ -76,18 +93,21 @@ export async function profil(
 
   if (!utilisateurId) {
     return res.status(401).json({
-      erreur: "Authentification requise.",
+      erreur:
+        "Authentification requise.",
     });
   }
 
   try {
-    const utilisateur = await trouverUtilisateurParId(
-      utilisateurId
-    );
+    const utilisateur =
+      await trouverUtilisateurParId(
+        utilisateurId
+      );
 
     if (!utilisateur) {
       return res.status(404).json({
-        erreur: "Utilisateur introuvable.",
+        erreur:
+          "Utilisateur introuvable.",
       });
     }
 
@@ -101,7 +121,135 @@ export async function profil(
     );
 
     return res.status(500).json({
-      erreur: "Erreur interne du serveur.",
+      erreur:
+        "Erreur interne du serveur.",
+    });
+  }
+}
+
+/**
+ * =========================================================
+ * MODIFIER LA SÉCURITÉ DE RÉCUPÉRATION
+ * =========================================================
+ *
+ * Permet à l'utilisateur connecté de définir ou modifier :
+ *
+ * - sa phrase secrète ;
+ * - son indice de récupération.
+ *
+ * La phrase secrète n'est jamais stockée en clair.
+ */
+export async function modifierSecuriteRecuperationControleur(
+  req: RequeteAuthentifiee,
+  res: Response
+) {
+  const utilisateurId =
+    req.utilisateurId;
+
+  if (!utilisateurId) {
+    return res.status(401).json({
+      erreur:
+        "Authentification requise.",
+    });
+  }
+
+  const {
+    recoveryAnswer,
+    recoveryHint,
+    motDePasseActuel,
+  } = req.body;
+
+  if (
+    typeof recoveryAnswer !== "string" ||
+    typeof recoveryHint !== "string"
+  ) {
+    return res.status(400).json({
+      erreur:
+        "Phrase secrète et indice requis.",
+    });
+  }
+
+  const phraseRecuperation =
+    recoveryAnswer.trim();
+
+  const indiceRecuperation =
+    recoveryHint.trim();
+
+  if (phraseRecuperation.length < 8) {
+    return res.status(400).json({
+      erreur:
+        "La phrase secrète doit contenir au moins 8 caractères.",
+    });
+  }
+
+  if (indiceRecuperation.length < 3) {
+    return res.status(400).json({
+      erreur:
+        "L'indice doit contenir au moins 3 caractères.",
+    });
+  }
+
+  if (
+    phraseRecuperation.toLowerCase() ===
+    indiceRecuperation.toLowerCase()
+  ) {
+    return res.status(400).json({
+      erreur:
+        "L'indice ne doit pas révéler directement la phrase secrète.",
+    });
+  }
+
+  /*
+   * Pour modifier une phrase existante depuis un espace
+   * connecté, nous demandons le mot de passe actuel.
+   *
+   * Lors de la première configuration, il peut être
+   * absent si aucune phrase n'existe encore.
+   */
+  if (
+    motDePasseActuel !== undefined &&
+    typeof motDePasseActuel !== "string"
+  ) {
+    return res.status(400).json({
+      erreur:
+        "Le mot de passe actuel est invalide.",
+    });
+  }
+
+  try {
+    const utilisateur =
+      await modifierSecuriteRecuperation(
+        utilisateurId,
+        phraseRecuperation,
+        indiceRecuperation,
+        motDePasseActuel
+      );
+
+    return res.status(200).json({
+      message:
+        "Les informations de récupération ont été mises à jour avec succès.",
+      utilisateur,
+    });
+  } catch (erreur) {
+    if (
+      erreur instanceof Error &&
+      erreur.message ===
+        "MOT_DE_PASSE_ACTUEL_INVALIDE"
+    ) {
+      return res.status(401).json({
+        erreur:
+          "Votre mot de passe actuel est incorrect.",
+      });
+    }
+
+    console.error(
+      "Erreur lors de la modification des informations de récupération :",
+      erreur
+    );
+
+    return res.status(500).json({
+      erreur:
+        "Erreur interne du serveur.",
     });
   }
 }

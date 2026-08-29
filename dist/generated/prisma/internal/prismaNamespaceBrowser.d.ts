@@ -63,6 +63,8 @@ export declare const UserScalarFieldEnum: {
     readonly createdAt: 'createdAt';
     readonly updatedAt: 'updatedAt';
     readonly role: 'role';
+    readonly recoveryAnswerHash: 'recoveryAnswerHash';
+    readonly recoveryHint: 'recoveryHint';
 };
 export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum];
 export declare const SessionScalarFieldEnum: {

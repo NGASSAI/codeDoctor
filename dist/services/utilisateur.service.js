@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.creerUtilisateur = creerUtilisateur;
+exports.verifierPhraseRecuperation = verifierPhraseRecuperation;
 exports.trouverUtilisateurParEmail = trouverUtilisateurParEmail;
 exports.verifierMotDePasse = verifierMotDePasse;
 exports.creerSession = creerSession;
@@ -17,23 +18,44 @@ exports.reinitialiserMotDePasse = reinitialiserMotDePasse;
 exports.trouverUtilisateurParId = trouverUtilisateurParId;
 exports.modifierProfilUtilisateur = modifierProfilUtilisateur;
 exports.creerTokenVerificationEmail = creerTokenVerificationEmail;
+exports.modifierSecuriteRecuperation = modifierSecuriteRecuperation;
 exports.verifierTokenEmail = verifierTokenEmail;
 exports.validerEmailUtilisateur = validerEmailUtilisateur;
 const base_1 = require("../base");
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const crypto_1 = __importDefault(require("crypto"));
-/**
- * Crée un nouvel utilisateur.
- */
-async function creerUtilisateur(email, motDePasse, displayName) {
+async function creerUtilisateur(email, motDePasse, displayName, recoveryAnswer, recoveryHint) {
     const motDePasseHache = await bcrypt_1.default.hash(motDePasse, 10);
+    const recoveryAnswerHash = recoveryAnswer?.trim()
+        ? await bcrypt_1.default.hash(recoveryAnswer.trim().toLowerCase(), 10)
+        : null;
     return base_1.prisma.user.create({
         data: {
             email,
             passwordHash: motDePasseHache,
             displayName: displayName?.trim() || null,
+            recoveryAnswerHash,
+            recoveryHint: recoveryHint?.trim() || null,
         },
     });
+}
+/**
+ * Crée un nouvel utilisateur.
+ */
+async function verifierPhraseRecuperation(userId, phrase) {
+    const utilisateur = await base_1.prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+        select: {
+            recoveryAnswerHash: true,
+        },
+    });
+    if (!utilisateur ||
+        !utilisateur.recoveryAnswerHash) {
+        return false;
+    }
+    return bcrypt_1.default.compare(phrase.trim().toLowerCase(), utilisateur.recoveryAnswerHash);
 }
 /**
  * Recherche un utilisateur à partir de son adresse email.
@@ -146,8 +168,8 @@ async function creerTokenReinitialisation(userId) {
         .createHash("sha256")
         .update(token)
         .digest("hex");
-    // Validité : 15 minutes
-    const expiresAt = new Date(Date.now() + 15 * 60 * 1000);
+    // Validité :   5 minutes
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
     await base_1.prisma.passwordResetToken.create({
         data: {
             userId,
@@ -268,6 +290,56 @@ async function creerTokenVerificationEmail(userId) {
         },
     });
     return token;
+}
+async function modifierSecuriteRecuperation(userId, recoveryAnswer, recoveryHint, motDePasseActuel) {
+    const utilisateur = await base_1.prisma.user.findUnique({
+        where: {
+            id: userId,
+        },
+        select: {
+            passwordHash: true,
+            recoveryAnswerHash: true,
+        },
+    });
+    if (!utilisateur) {
+        throw new Error("UTILISATEUR_INTRouvable");
+    }
+    /*
+     * Si une phrase secrète existe déjà,
+     * le mot de passe actuel est obligatoire
+     * pour pouvoir la modifier.
+     */
+    if (utilisateur.recoveryAnswerHash) {
+        if (!motDePasseActuel ||
+            typeof motDePasseActuel !== "string") {
+            throw new Error("MOT_DE_PASSE_ACTUEL_INVALIDE");
+        }
+        const motDePasseValide = await bcrypt_1.default.compare(motDePasseActuel, utilisateur.passwordHash);
+        if (!motDePasseValide) {
+            throw new Error("MOT_DE_PASSE_ACTUEL_INVALIDE");
+        }
+    }
+    /*
+     * Toujours hacher la phrase secrète.
+     */
+    const recoveryAnswerHash = await bcrypt_1.default.hash(recoveryAnswer.trim().toLowerCase(), 10);
+    return base_1.prisma.user.update({
+        where: {
+            id: userId,
+        },
+        data: {
+            recoveryAnswerHash,
+            recoveryHint: recoveryHint.trim(),
+        },
+        select: {
+            id: true,
+            email: true,
+            displayName: true,
+            emailVerified: true,
+            createdAt: true,
+            recoveryHint: true,
+        },
+    });
 }
 /**
  * Vérifier un token d'email.

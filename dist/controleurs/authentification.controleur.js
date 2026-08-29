@@ -12,8 +12,8 @@ exports.reinitialiserMotDePasseControleur = reinitialiserMotDePasseControleur;
 exports.demanderVerificationEmail = demanderVerificationEmail;
 exports.verifierEmail = verifierEmail;
 exports.moi = moi;
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const crypto_1 = __importDefault(require("crypto"));
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const utilisateur_service_1 = require("../services/utilisateur.service");
 /**
  * =========================================================
@@ -22,34 +22,29 @@ const utilisateur_service_1 = require("../services/utilisateur.service");
  */
 async function inscription(req, res) {
     try {
-        const { email, motDePasse, displayName, } = req.body;
+        const { email, motDePasse, displayName, recoveryAnswer, recoveryHint, } = req.body;
         if (!email || !motDePasse) {
             return res.status(400).json({
                 erreur: "Email et mot de passe requis.",
             });
         }
-        if (typeof email !== "string") {
+        if (typeof email !== "string" ||
+            typeof motDePasse !== "string") {
             return res.status(400).json({
-                erreur: "Email invalide.",
+                erreur: "Données invalides.",
             });
         }
-        if (typeof motDePasse !== "string") {
+        if (typeof displayName !== "string" ||
+            typeof recoveryAnswer !== "string" ||
+            typeof recoveryHint !== "string") {
             return res.status(400).json({
-                erreur: "Mot de passe invalide.",
+                erreur: "Nom, phrase secrète et indice sont requis.",
             });
         }
-        if (displayName !== undefined &&
-            typeof displayName !== "string") {
-            return res.status(400).json({
-                erreur: "Nom invalide.",
-            });
-        }
-        const emailNormalise = email
-            .trim()
-            .toLowerCase();
-        const nomNormalise = typeof displayName === "string"
-            ? displayName.trim()
-            : "";
+        const emailNormalise = email.trim().toLowerCase();
+        const nomNormalise = displayName.trim();
+        const phraseRecuperation = recoveryAnswer.trim();
+        const indiceRecuperation = recoveryHint.trim();
         if (!emailNormalise) {
             return res.status(400).json({
                 erreur: "Email requis.",
@@ -65,24 +60,51 @@ async function inscription(req, res) {
                 erreur: "Le mot de passe doit contenir au moins 8 caractères.",
             });
         }
+        if (phraseRecuperation.length < 8) {
+            return res.status(400).json({
+                erreur: "La phrase secrète doit contenir au moins 8 caractères.",
+            });
+        }
+        if (indiceRecuperation.length < 3) {
+            return res.status(400).json({
+                erreur: "L'indice de récupération doit contenir au moins 3 caractères.",
+            });
+        }
+        /*
+         * La phrase secrète doit être différente
+         * du mot de passe.
+         */
+        if (phraseRecuperation.toLowerCase() ===
+            motDePasse.toLowerCase()) {
+            return res.status(400).json({
+                erreur: "La phrase secrète doit être différente du mot de passe.",
+            });
+        }
+        /*
+         * L'indice ne doit pas être identique
+         * à la phrase secrète.
+         */
+        if (indiceRecuperation.toLowerCase() ===
+            phraseRecuperation.toLowerCase()) {
+            return res.status(400).json({
+                erreur: "L'indice doit aider à retrouver la phrase sans la révéler.",
+            });
+        }
         const utilisateurExistant = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
         if (utilisateurExistant) {
             return res.status(409).json({
                 erreur: "Un compte existe déjà avec cet email.",
             });
         }
-        const utilisateur = await (0, utilisateur_service_1.creerUtilisateur)(emailNormalise, motDePasse, nomNormalise);
+        const utilisateur = await (0, utilisateur_service_1.creerUtilisateur)(emailNormalise, motDePasse, nomNormalise, phraseRecuperation, indiceRecuperation);
         /*
-         * Génération automatique du token de
-         * vérification après création du compte.
+         * Création automatique du token
+         * de vérification email.
          */
         const tokenVerification = await (0, utilisateur_service_1.creerTokenVerificationEmail)(utilisateur.id);
         /*
-         * IMPORTANT :
-         * Aucun JWT de session n'est créé ici.
-         *
-         * L'utilisateur doit d'abord vérifier
-         * son adresse email.
+         * Aucun JWT de session n'est créé avant
+         * la vérification de l'adresse email.
          */
         return res.status(201).json({
             utilisateur: {
@@ -93,8 +115,9 @@ async function inscription(req, res) {
             },
             /*
              * TEMPORAIRE POUR LES TESTS.
-             * À supprimer lorsque l'envoi email
-             * sera configuré.
+             *
+             * À remplacer par un envoi email
+             * avant une véritable mise en production.
              */
             tokenVerification,
             message: "Compte créé avec succès. Veuillez vérifier votre adresse email avant de vous connecter.",
@@ -126,9 +149,7 @@ async function connexion(req, res) {
                 erreur: "Données invalides.",
             });
         }
-        const emailNormalise = email
-            .trim()
-            .toLowerCase();
+        const emailNormalise = email.trim().toLowerCase();
         const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
         if (!utilisateur) {
             return res.status(401).json({
@@ -142,10 +163,21 @@ async function connexion(req, res) {
             });
         }
         /*
-         * Un compte non vérifié ne peut pas ouvrir
-         * de session.
+         * L'administrateur configuré dans EMAIL_ADMIN
+         * peut se connecter même si emailVerified
+         * est encore false.
+         *
+         * Le rôle ADMIN doit déjà être présent en base.
          */
-        if (!utilisateur.emailVerified) {
+        const emailAdmin = (process.env.EMAIL_ADMIN ?? "")
+            .trim()
+            .toLowerCase();
+        const estAdminConfigure = emailAdmin !== "" &&
+            utilisateur.email.toLowerCase() ===
+                emailAdmin &&
+            utilisateur.role === "ADMIN";
+        if (!utilisateur.emailVerified &&
+            !estAdminConfigure) {
             return res.status(403).json({
                 erreur: "Votre adresse email n'est pas encore vérifiée. Veuillez vérifier votre email avant de vous connecter.",
             });
@@ -173,7 +205,8 @@ async function connexion(req, res) {
                 email: utilisateur.email,
                 displayName: utilisateur.displayName,
                 role: utilisateur.role,
-                emailVerified: utilisateur.emailVerified,
+                emailVerified: utilisateur.emailVerified ||
+                    estAdminConfigure,
             },
             jeton,
             refreshToken,
@@ -193,7 +226,7 @@ async function connexion(req, res) {
  */
 async function deconnexion(req, res) {
     try {
-        const { refreshToken } = req.body;
+        const { refreshToken, } = req.body;
         if (!refreshToken ||
             typeof refreshToken !== "string") {
             return res.status(400).json({
@@ -218,12 +251,12 @@ async function deconnexion(req, res) {
 }
 /**
  * =========================================================
- * RAFRAÎCHIR LE JWT
+ * RAFRAÎCHISSEMENT DU JWT
  * =========================================================
  */
 async function rafraichir(req, res) {
     try {
-        const { refreshToken } = req.body;
+        const { refreshToken, } = req.body;
         if (!refreshToken ||
             typeof refreshToken !== "string") {
             return res.status(400).json({
@@ -240,9 +273,6 @@ async function rafraichir(req, res) {
                 erreur: "Refresh token invalide ou expiré.",
             });
         }
-        /*
-         * Rotation du refresh token.
-         */
         const { refreshToken: nouveauRefreshToken, } = await (0, utilisateur_service_1.renouvelerSession)(session.id);
         const secret = process.env.JWT_SECRET;
         if (!secret) {
@@ -270,43 +300,97 @@ async function rafraichir(req, res) {
 }
 /**
  * =========================================================
- * MOT DE PASSE OUBLIÉ
+ * MOT DE PASSE OUBLIÉ — ÉTAPE 1 ET 2
  * =========================================================
+ *
+ * Étape 1 :
+ *   email uniquement
+ *   → retourne l'indice de récupération
+ *
+ * Étape 2 :
+ *   email + phrase secrète
+ *   → vérifie la phrase
+ *   → génère un token valable 5 minutes
  */
 async function motDePasseOublie(req, res) {
     try {
-        const { email } = req.body;
+        const { email, recoveryAnswer, } = req.body;
         if (!email ||
             typeof email !== "string") {
             return res.status(400).json({
                 erreur: "Email requis.",
             });
         }
-        const emailNormalise = email
-            .trim()
-            .toLowerCase();
+        const emailNormalise = email.trim().toLowerCase();
         const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
         /*
-         * Même réponse si le compte existe
-         * ou non afin d'éviter l'énumération.
+         * -------------------------------------------------------
+         * ÉTAPE 1 : récupérer l'indice
+         * -------------------------------------------------------
          */
-        if (!utilisateur) {
+        if (recoveryAnswer === undefined) {
+            if (!utilisateur) {
+                /*
+                 * Réponse volontairement générique.
+                 */
+                return res.status(200).json({
+                    message: "Si un compte correspond à cet email, vous pouvez poursuivre la récupération.",
+                });
+            }
+            if (!utilisateur.recoveryAnswerHash) {
+                return res.status(403).json({
+                    erreur: "Aucune phrase secrète de récupération n'est configurée pour ce compte.",
+                });
+            }
             return res.status(200).json({
-                message: "Si un compte correspond à cet email, un lien de réinitialisation sera envoyé.",
+                message: "Veuillez utiliser votre phrase secrète de récupération.",
+                recoveryHint: utilisateur.recoveryHint,
             });
         }
-        const token = await (0, utilisateur_service_1.creerTokenReinitialisation)(utilisateur.id);
         /*
-         * TEMPORAIRE POUR LES TESTS.
-         * À supprimer lorsque l'envoi email sera configuré.
+         * -------------------------------------------------------
+         * ÉTAPE 2 : vérifier la phrase secrète
+         * -------------------------------------------------------
          */
+        if (typeof recoveryAnswer !== "string") {
+            return res.status(400).json({
+                erreur: "Phrase secrète invalide.",
+            });
+        }
+        if (!utilisateur) {
+            return res.status(401).json({
+                erreur: "Les informations de récupération sont incorrectes.",
+            });
+        }
+        if (!utilisateur.recoveryAnswerHash) {
+            return res.status(403).json({
+                erreur: "Aucune phrase secrète de récupération n'est configurée pour ce compte.",
+            });
+        }
+        const phraseCorrecte = await (0, utilisateur_service_1.verifierPhraseRecuperation)(utilisateur.id, recoveryAnswer);
+        if (!phraseCorrecte) {
+            return res.status(401).json({
+                erreur: "Les informations de récupération sont incorrectes.",
+            });
+        }
+        /*
+         * Phrase correcte :
+         * création d'un token de réinitialisation.
+         *
+         * Sa durée de vie est de 5 minutes
+         * dans creerTokenReinitialisation().
+         */
+        const token = await (0, utilisateur_service_1.creerTokenReinitialisation)(utilisateur.id);
+        const frontendUrl = (process.env.FRONTEND_URL ??
+            "https://code-doctor-front.vercel.app").replace(/\/+$/, "");
+        const resetUrl = `${frontendUrl}/reinitialiser-mot-de-passe?token=${encodeURIComponent(token)}`;
         return res.status(200).json({
-            message: "Si un compte correspond à cet email, un lien de réinitialisation sera envoyé.",
-            token,
+            message: "Phrase secrète correcte. Vous pouvez réinitialiser votre mot de passe.",
+            resetUrl,
         });
     }
     catch (erreur) {
-        console.error("Erreur lors de la demande de réinitialisation :", erreur);
+        console.error("Erreur lors de la récupération du compte :", erreur);
         return res.status(500).json({
             erreur: "Erreur interne du serveur.",
         });
@@ -369,10 +453,12 @@ async function demanderVerificationEmail(req, res) {
                 erreur: "Email requis.",
             });
         }
-        const emailNormalise = email
-            .trim()
-            .toLowerCase();
+        const emailNormalise = email.trim().toLowerCase();
         const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
+        /*
+         * Même réponse si le compte existe
+         * ou non.
+         */
         if (!utilisateur) {
             return res.status(200).json({
                 message: "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
@@ -441,9 +527,6 @@ async function verifierEmail(req, res) {
  * =========================================================
  * UTILISATEUR COURANT
  * =========================================================
- *
- * Cette fonction peut être utilisée comme contrôleur
- * si elle est appelée directement dans les routes.
  */
 async function moi(req, res) {
     if (!req.utilisateurId) {

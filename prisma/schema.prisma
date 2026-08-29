@@ -17,6 +17,8 @@ model User {
   createdAt            DateTime                 @default(now())
   updatedAt            DateTime                 @updatedAt
   role                 UserRole                 @default(USER)
+  recoveryAnswerHash   String?
+  recoveryHint         String?
   aiUsages             AIUsage[]
   comments             Comment[]
   conversations        Conversation[]
@@ -27,12 +29,12 @@ model User {
   historyEntries       HistoryEntry[]
   notifications        Notification[]
   resetTokens          PasswordResetToken[]
+  payments             Payment[]
   progress             Progress[]
   reactions            Reaction[]
   reports              Report[]
   sessions             Session[]
   subscriptions        Subscription?
-  payments Payment[]
 }
 
 model Session {
@@ -268,6 +270,21 @@ model AIUsage {
   @@index([dateJour])
 }
 
+model Payment {
+  id        String   @id @default(uuid())
+  userId    String
+  montant   Int
+  methode   String   @default("WHATSAPP")
+  statut    String   @default("PENDING")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([statut])
+  @@index([createdAt])
+}
+
 enum UserRole {
   USER
   ADMIN
@@ -331,19 +348,4 @@ enum NotificationType {
   EXPERIENCE_SIGNALEE
   PAIEMENT_APPROUVE
   PAIEMENT_REJETE
-}
-model Payment {
-  id        String   @id @default(uuid())
-  userId    String
-  montant   Int
-  methode   String   @default("WHATSAPP")
-  statut    String   @default("PENDING")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId])
-  @@index([statut])
-  @@index([createdAt])
 }

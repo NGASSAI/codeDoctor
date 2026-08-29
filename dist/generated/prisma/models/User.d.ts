@@ -20,6 +20,8 @@ export type UserMinAggregateOutputType = {
     createdAt: Date | null;
     updatedAt: Date | null;
     role: $Enums.UserRole | null;
+    recoveryAnswerHash: string | null;
+    recoveryHint: string | null;
 };
 export type UserMaxAggregateOutputType = {
     id: string | null;
@@ -30,6 +32,8 @@ export type UserMaxAggregateOutputType = {
     createdAt: Date | null;
     updatedAt: Date | null;
     role: $Enums.UserRole | null;
+    recoveryAnswerHash: string | null;
+    recoveryHint: string | null;
 };
 export type UserCountAggregateOutputType = {
     id: number;
@@ -40,6 +44,8 @@ export type UserCountAggregateOutputType = {
     createdAt: number;
     updatedAt: number;
     role: number;
+    recoveryAnswerHash: number;
+    recoveryHint: number;
     _all: number;
 };
 export type UserMinAggregateInputType = {
@@ -51,6 +57,8 @@ export type UserMinAggregateInputType = {
     createdAt?: true;
     updatedAt?: true;
     role?: true;
+    recoveryAnswerHash?: true;
+    recoveryHint?: true;
 };
 export type UserMaxAggregateInputType = {
     id?: true;
@@ -61,6 +69,8 @@ export type UserMaxAggregateInputType = {
     createdAt?: true;
     updatedAt?: true;
     role?: true;
+    recoveryAnswerHash?: true;
+    recoveryHint?: true;
 };
 export type UserCountAggregateInputType = {
     id?: true;
@@ -71,6 +81,8 @@ export type UserCountAggregateInputType = {
     createdAt?: true;
     updatedAt?: true;
     role?: true;
+    recoveryAnswerHash?: true;
+    recoveryHint?: true;
     _all?: true;
 };
 export type UserAggregateArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -144,6 +156,8 @@ export type UserGroupByOutputType = {
     createdAt: Date;
     updatedAt: Date;
     role: $Enums.UserRole;
+    recoveryAnswerHash: string | null;
+    recoveryHint: string | null;
     _count: UserCountAggregateOutputType | null;
     _min: UserMinAggregateOutputType | null;
     _max: UserMaxAggregateOutputType | null;
@@ -163,6 +177,8 @@ export type UserWhereInput = {
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.StringNullableFilter<"User"> | string | null;
+    recoveryHint?: Prisma.StringNullableFilter<"User"> | string | null;
     aiUsages?: Prisma.AIUsageListRelationFilter;
     comments?: Prisma.CommentListRelationFilter;
     conversations?: Prisma.ConversationListRelationFilter;
@@ -173,12 +189,12 @@ export type UserWhereInput = {
     historyEntries?: Prisma.HistoryEntryListRelationFilter;
     notifications?: Prisma.NotificationListRelationFilter;
     resetTokens?: Prisma.PasswordResetTokenListRelationFilter;
+    payments?: Prisma.PaymentListRelationFilter;
     progress?: Prisma.ProgressListRelationFilter;
     reactions?: Prisma.ReactionListRelationFilter;
     reports?: Prisma.ReportListRelationFilter;
     sessions?: Prisma.SessionListRelationFilter;
     subscriptions?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null;
-    payments?: Prisma.PaymentListRelationFilter;
 };
 export type UserOrderByWithRelationInput = {
     id?: Prisma.SortOrder;
@@ -189,6 +205,8 @@ export type UserOrderByWithRelationInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     role?: Prisma.SortOrder;
+    recoveryAnswerHash?: Prisma.SortOrderInput | Prisma.SortOrder;
+    recoveryHint?: Prisma.SortOrderInput | Prisma.SortOrder;
     aiUsages?: Prisma.AIUsageOrderByRelationAggregateInput;
     comments?: Prisma.CommentOrderByRelationAggregateInput;
     conversations?: Prisma.ConversationOrderByRelationAggregateInput;
@@ -199,12 +217,12 @@ export type UserOrderByWithRelationInput = {
     historyEntries?: Prisma.HistoryEntryOrderByRelationAggregateInput;
     notifications?: Prisma.NotificationOrderByRelationAggregateInput;
     resetTokens?: Prisma.PasswordResetTokenOrderByRelationAggregateInput;
+    payments?: Prisma.PaymentOrderByRelationAggregateInput;
     progress?: Prisma.ProgressOrderByRelationAggregateInput;
     reactions?: Prisma.ReactionOrderByRelationAggregateInput;
     reports?: Prisma.ReportOrderByRelationAggregateInput;
     sessions?: Prisma.SessionOrderByRelationAggregateInput;
     subscriptions?: Prisma.SubscriptionOrderByWithRelationInput;
-    payments?: Prisma.PaymentOrderByRelationAggregateInput;
 };
 export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string;
@@ -218,6 +236,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
     createdAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeFilter<"User"> | Date | string;
     role?: Prisma.EnumUserRoleFilter<"User"> | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.StringNullableFilter<"User"> | string | null;
+    recoveryHint?: Prisma.StringNullableFilter<"User"> | string | null;
     aiUsages?: Prisma.AIUsageListRelationFilter;
     comments?: Prisma.CommentListRelationFilter;
     conversations?: Prisma.ConversationListRelationFilter;
@@ -228,12 +248,12 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
     historyEntries?: Prisma.HistoryEntryListRelationFilter;
     notifications?: Prisma.NotificationListRelationFilter;
     resetTokens?: Prisma.PasswordResetTokenListRelationFilter;
+    payments?: Prisma.PaymentListRelationFilter;
     progress?: Prisma.ProgressListRelationFilter;
     reactions?: Prisma.ReactionListRelationFilter;
     reports?: Prisma.ReportListRelationFilter;
     sessions?: Prisma.SessionListRelationFilter;
     subscriptions?: Prisma.XOR<Prisma.SubscriptionNullableScalarRelationFilter, Prisma.SubscriptionWhereInput> | null;
-    payments?: Prisma.PaymentListRelationFilter;
 }, "id" | "email">;
 export type UserOrderByWithAggregationInput = {
     id?: Prisma.SortOrder;
@@ -244,6 +264,8 @@ export type UserOrderByWithAggregationInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     role?: Prisma.SortOrder;
+    recoveryAnswerHash?: Prisma.SortOrderInput | Prisma.SortOrder;
+    recoveryHint?: Prisma.SortOrderInput | Prisma.SortOrder;
     _count?: Prisma.UserCountOrderByAggregateInput;
     _max?: Prisma.UserMaxOrderByAggregateInput;
     _min?: Prisma.UserMinOrderByAggregateInput;
@@ -260,6 +282,8 @@ export type UserScalarWhereWithAggregatesInput = {
     createdAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string;
     updatedAt?: Prisma.DateTimeWithAggregatesFilter<"User"> | Date | string;
     role?: Prisma.EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null;
+    recoveryHint?: Prisma.StringNullableWithAggregatesFilter<"User"> | string | null;
 };
 export type UserCreateInput = {
     id?: string;
@@ -270,6 +294,8 @@ export type UserCreateInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -280,12 +306,12 @@ export type UserCreateInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateInput = {
     id?: string;
@@ -296,6 +322,8 @@ export type UserUncheckedCreateInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -306,12 +334,12 @@ export type UserUncheckedCreateInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -322,6 +350,8 @@ export type UserUpdateInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -332,12 +362,12 @@ export type UserUpdateInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -348,6 +378,8 @@ export type UserUncheckedUpdateInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -358,12 +390,12 @@ export type UserUncheckedUpdateInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateManyInput = {
     id?: string;
@@ -374,6 +406,8 @@ export type UserCreateManyInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
 };
 export type UserUpdateManyMutationInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -384,6 +418,8 @@ export type UserUpdateManyMutationInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type UserUncheckedUpdateManyInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -394,6 +430,8 @@ export type UserUncheckedUpdateManyInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
 };
 export type UserCountOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -404,6 +442,8 @@ export type UserCountOrderByAggregateInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     role?: Prisma.SortOrder;
+    recoveryAnswerHash?: Prisma.SortOrder;
+    recoveryHint?: Prisma.SortOrder;
 };
 export type UserMaxOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -414,6 +454,8 @@ export type UserMaxOrderByAggregateInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     role?: Prisma.SortOrder;
+    recoveryAnswerHash?: Prisma.SortOrder;
+    recoveryHint?: Prisma.SortOrder;
 };
 export type UserMinOrderByAggregateInput = {
     id?: Prisma.SortOrder;
@@ -424,6 +466,8 @@ export type UserMinOrderByAggregateInput = {
     createdAt?: Prisma.SortOrder;
     updatedAt?: Prisma.SortOrder;
     role?: Prisma.SortOrder;
+    recoveryAnswerHash?: Prisma.SortOrder;
+    recoveryHint?: Prisma.SortOrder;
 };
 export type UserScalarRelationFilter = {
     is?: Prisma.UserWhereInput;
@@ -651,6 +695,8 @@ export type UserCreateWithoutSessionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -661,11 +707,11 @@ export type UserCreateWithoutSessionsInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutSessionsInput = {
     id?: string;
@@ -676,6 +722,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -686,11 +734,11 @@ export type UserUncheckedCreateWithoutSessionsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutSessionsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -714,6 +762,8 @@ export type UserUpdateWithoutSessionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -724,11 +774,11 @@ export type UserUpdateWithoutSessionsInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutSessionsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -739,6 +789,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -749,11 +801,11 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutResetTokensInput = {
     id?: string;
@@ -764,6 +816,8 @@ export type UserCreateWithoutResetTokensInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -773,12 +827,12 @@ export type UserCreateWithoutResetTokensInput = {
     experiences?: Prisma.ExperienceCreateNestedManyWithoutUserInput;
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutResetTokensInput = {
     id?: string;
@@ -789,6 +843,8 @@ export type UserUncheckedCreateWithoutResetTokensInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -798,12 +854,12 @@ export type UserUncheckedCreateWithoutResetTokensInput = {
     experiences?: Prisma.ExperienceUncheckedCreateNestedManyWithoutUserInput;
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutResetTokensInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -827,6 +883,8 @@ export type UserUpdateWithoutResetTokensInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -836,12 +894,12 @@ export type UserUpdateWithoutResetTokensInput = {
     experiences?: Prisma.ExperienceUpdateManyWithoutUserNestedInput;
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutResetTokensInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -852,6 +910,8 @@ export type UserUncheckedUpdateWithoutResetTokensInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -861,12 +921,12 @@ export type UserUncheckedUpdateWithoutResetTokensInput = {
     experiences?: Prisma.ExperienceUncheckedUpdateManyWithoutUserNestedInput;
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutVerificationTokensInput = {
     id?: string;
@@ -877,6 +937,8 @@ export type UserCreateWithoutVerificationTokensInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -886,12 +948,12 @@ export type UserCreateWithoutVerificationTokensInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutVerificationTokensInput = {
     id?: string;
@@ -902,6 +964,8 @@ export type UserUncheckedCreateWithoutVerificationTokensInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -911,12 +975,12 @@ export type UserUncheckedCreateWithoutVerificationTokensInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutVerificationTokensInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -940,6 +1004,8 @@ export type UserUpdateWithoutVerificationTokensInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -949,12 +1015,12 @@ export type UserUpdateWithoutVerificationTokensInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutVerificationTokensInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -965,6 +1031,8 @@ export type UserUncheckedUpdateWithoutVerificationTokensInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -974,12 +1042,12 @@ export type UserUncheckedUpdateWithoutVerificationTokensInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutHistoryEntriesInput = {
     id?: string;
@@ -990,6 +1058,8 @@ export type UserCreateWithoutHistoryEntriesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -999,12 +1069,12 @@ export type UserCreateWithoutHistoryEntriesInput = {
     experiences?: Prisma.ExperienceCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutHistoryEntriesInput = {
     id?: string;
@@ -1015,6 +1085,8 @@ export type UserUncheckedCreateWithoutHistoryEntriesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -1024,12 +1096,12 @@ export type UserUncheckedCreateWithoutHistoryEntriesInput = {
     experiences?: Prisma.ExperienceUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutHistoryEntriesInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1053,6 +1125,8 @@ export type UserUpdateWithoutHistoryEntriesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -1062,12 +1136,12 @@ export type UserUpdateWithoutHistoryEntriesInput = {
     experiences?: Prisma.ExperienceUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutHistoryEntriesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1078,6 +1152,8 @@ export type UserUncheckedUpdateWithoutHistoryEntriesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -1087,12 +1163,12 @@ export type UserUncheckedUpdateWithoutHistoryEntriesInput = {
     experiences?: Prisma.ExperienceUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutConversationsInput = {
     id?: string;
@@ -1103,6 +1179,8 @@ export type UserCreateWithoutConversationsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -1112,12 +1190,12 @@ export type UserCreateWithoutConversationsInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutConversationsInput = {
     id?: string;
@@ -1128,6 +1206,8 @@ export type UserUncheckedCreateWithoutConversationsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -1137,12 +1217,12 @@ export type UserUncheckedCreateWithoutConversationsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutConversationsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1166,6 +1246,8 @@ export type UserUpdateWithoutConversationsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -1175,12 +1257,12 @@ export type UserUpdateWithoutConversationsInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutConversationsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1191,6 +1273,8 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -1200,12 +1284,12 @@ export type UserUncheckedUpdateWithoutConversationsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutExerciseAttemptsInput = {
     id?: string;
@@ -1216,6 +1300,8 @@ export type UserCreateWithoutExerciseAttemptsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -1225,12 +1311,12 @@ export type UserCreateWithoutExerciseAttemptsInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutExerciseAttemptsInput = {
     id?: string;
@@ -1241,6 +1327,8 @@ export type UserUncheckedCreateWithoutExerciseAttemptsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -1250,12 +1338,12 @@ export type UserUncheckedCreateWithoutExerciseAttemptsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutExerciseAttemptsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1279,6 +1367,8 @@ export type UserUpdateWithoutExerciseAttemptsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -1288,12 +1378,12 @@ export type UserUpdateWithoutExerciseAttemptsInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutExerciseAttemptsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1304,6 +1394,8 @@ export type UserUncheckedUpdateWithoutExerciseAttemptsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -1313,12 +1405,12 @@ export type UserUncheckedUpdateWithoutExerciseAttemptsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutProgressInput = {
     id?: string;
@@ -1329,6 +1421,8 @@ export type UserCreateWithoutProgressInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -1339,11 +1433,11 @@ export type UserCreateWithoutProgressInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutProgressInput = {
     id?: string;
@@ -1354,6 +1448,8 @@ export type UserUncheckedCreateWithoutProgressInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -1364,11 +1460,11 @@ export type UserUncheckedCreateWithoutProgressInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutProgressInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1392,6 +1488,8 @@ export type UserUpdateWithoutProgressInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -1402,11 +1500,11 @@ export type UserUpdateWithoutProgressInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutProgressInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1417,6 +1515,8 @@ export type UserUncheckedUpdateWithoutProgressInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -1427,11 +1527,11 @@ export type UserUncheckedUpdateWithoutProgressInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutModeratedExperiencesInput = {
     id?: string;
@@ -1442,6 +1542,8 @@ export type UserCreateWithoutModeratedExperiencesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -1451,12 +1553,12 @@ export type UserCreateWithoutModeratedExperiencesInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutModeratedExperiencesInput = {
     id?: string;
@@ -1467,6 +1569,8 @@ export type UserUncheckedCreateWithoutModeratedExperiencesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -1476,12 +1580,12 @@ export type UserUncheckedCreateWithoutModeratedExperiencesInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutModeratedExperiencesInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1496,6 +1600,8 @@ export type UserCreateWithoutExperiencesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -1505,12 +1611,12 @@ export type UserCreateWithoutExperiencesInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutExperiencesInput = {
     id?: string;
@@ -1521,6 +1627,8 @@ export type UserUncheckedCreateWithoutExperiencesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -1530,12 +1638,12 @@ export type UserUncheckedCreateWithoutExperiencesInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutExperiencesInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1559,6 +1667,8 @@ export type UserUpdateWithoutModeratedExperiencesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -1568,12 +1678,12 @@ export type UserUpdateWithoutModeratedExperiencesInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutModeratedExperiencesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1584,6 +1694,8 @@ export type UserUncheckedUpdateWithoutModeratedExperiencesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -1593,12 +1705,12 @@ export type UserUncheckedUpdateWithoutModeratedExperiencesInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserUpsertWithoutExperiencesInput = {
     update: Prisma.XOR<Prisma.UserUpdateWithoutExperiencesInput, Prisma.UserUncheckedUpdateWithoutExperiencesInput>;
@@ -1618,6 +1730,8 @@ export type UserUpdateWithoutExperiencesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -1627,12 +1741,12 @@ export type UserUpdateWithoutExperiencesInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutExperiencesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1643,6 +1757,8 @@ export type UserUncheckedUpdateWithoutExperiencesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -1652,12 +1768,12 @@ export type UserUncheckedUpdateWithoutExperiencesInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutCommentsInput = {
     id?: string;
@@ -1668,6 +1784,8 @@ export type UserCreateWithoutCommentsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -1677,12 +1795,12 @@ export type UserCreateWithoutCommentsInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutCommentsInput = {
     id?: string;
@@ -1693,6 +1811,8 @@ export type UserUncheckedCreateWithoutCommentsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -1702,12 +1822,12 @@ export type UserUncheckedCreateWithoutCommentsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutCommentsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1731,6 +1851,8 @@ export type UserUpdateWithoutCommentsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -1740,12 +1862,12 @@ export type UserUpdateWithoutCommentsInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutCommentsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1756,6 +1878,8 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -1765,12 +1889,12 @@ export type UserUncheckedUpdateWithoutCommentsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutReactionsInput = {
     id?: string;
@@ -1781,6 +1905,8 @@ export type UserCreateWithoutReactionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -1791,11 +1917,11 @@ export type UserCreateWithoutReactionsInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutReactionsInput = {
     id?: string;
@@ -1806,6 +1932,8 @@ export type UserUncheckedCreateWithoutReactionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -1816,11 +1944,11 @@ export type UserUncheckedCreateWithoutReactionsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutReactionsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1844,6 +1972,8 @@ export type UserUpdateWithoutReactionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -1854,11 +1984,11 @@ export type UserUpdateWithoutReactionsInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutReactionsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1869,6 +1999,8 @@ export type UserUncheckedUpdateWithoutReactionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -1879,11 +2011,11 @@ export type UserUncheckedUpdateWithoutReactionsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutReportsInput = {
     id?: string;
@@ -1894,6 +2026,8 @@ export type UserCreateWithoutReportsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -1904,11 +2038,11 @@ export type UserCreateWithoutReportsInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutReportsInput = {
     id?: string;
@@ -1919,6 +2053,8 @@ export type UserUncheckedCreateWithoutReportsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -1929,11 +2065,11 @@ export type UserUncheckedCreateWithoutReportsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutReportsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -1957,6 +2093,8 @@ export type UserUpdateWithoutReportsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -1967,11 +2105,11 @@ export type UserUpdateWithoutReportsInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutReportsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -1982,6 +2120,8 @@ export type UserUncheckedUpdateWithoutReportsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -1992,11 +2132,11 @@ export type UserUncheckedUpdateWithoutReportsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutNotificationsInput = {
     id?: string;
@@ -2007,6 +2147,8 @@ export type UserCreateWithoutNotificationsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -2016,12 +2158,12 @@ export type UserCreateWithoutNotificationsInput = {
     experiences?: Prisma.ExperienceCreateNestedManyWithoutUserInput;
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutNotificationsInput = {
     id?: string;
@@ -2032,6 +2174,8 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -2041,12 +2185,12 @@ export type UserUncheckedCreateWithoutNotificationsInput = {
     experiences?: Prisma.ExperienceUncheckedCreateNestedManyWithoutUserInput;
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutNotificationsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -2070,6 +2214,8 @@ export type UserUpdateWithoutNotificationsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -2079,12 +2225,12 @@ export type UserUpdateWithoutNotificationsInput = {
     experiences?: Prisma.ExperienceUpdateManyWithoutUserNestedInput;
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutNotificationsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2095,6 +2241,8 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -2104,12 +2252,12 @@ export type UserUncheckedUpdateWithoutNotificationsInput = {
     experiences?: Prisma.ExperienceUncheckedUpdateManyWithoutUserNestedInput;
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutSubscriptionsInput = {
     id?: string;
@@ -2120,6 +2268,8 @@ export type UserCreateWithoutSubscriptionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -2130,11 +2280,11 @@ export type UserCreateWithoutSubscriptionsInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutSubscriptionsInput = {
     id?: string;
@@ -2145,6 +2295,8 @@ export type UserUncheckedCreateWithoutSubscriptionsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -2155,11 +2307,11 @@ export type UserUncheckedCreateWithoutSubscriptionsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutSubscriptionsInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -2183,6 +2335,8 @@ export type UserUpdateWithoutSubscriptionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -2193,11 +2347,11 @@ export type UserUpdateWithoutSubscriptionsInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutSubscriptionsInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2208,6 +2362,8 @@ export type UserUncheckedUpdateWithoutSubscriptionsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -2218,11 +2374,11 @@ export type UserUncheckedUpdateWithoutSubscriptionsInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutAiUsagesInput = {
     id?: string;
@@ -2233,6 +2389,8 @@ export type UserCreateWithoutAiUsagesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenCreateNestedManyWithoutUserInput;
@@ -2242,12 +2400,12 @@ export type UserCreateWithoutAiUsagesInput = {
     historyEntries?: Prisma.HistoryEntryCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentCreateNestedManyWithoutUserInput;
 };
 export type UserUncheckedCreateWithoutAiUsagesInput = {
     id?: string;
@@ -2258,6 +2416,8 @@ export type UserUncheckedCreateWithoutAiUsagesInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput;
@@ -2267,12 +2427,12 @@ export type UserUncheckedCreateWithoutAiUsagesInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedCreateNestedManyWithoutUserInput;
     notifications?: Prisma.NotificationUncheckedCreateNestedManyWithoutUserInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput;
+    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
     progress?: Prisma.ProgressUncheckedCreateNestedManyWithoutUserInput;
     reactions?: Prisma.ReactionUncheckedCreateNestedManyWithoutUserInput;
     reports?: Prisma.ReportUncheckedCreateNestedManyWithoutUserInput;
     sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput;
     subscriptions?: Prisma.SubscriptionUncheckedCreateNestedOneWithoutUserInput;
-    payments?: Prisma.PaymentUncheckedCreateNestedManyWithoutUserInput;
 };
 export type UserCreateOrConnectWithoutAiUsagesInput = {
     where: Prisma.UserWhereUniqueInput;
@@ -2296,6 +2456,8 @@ export type UserUpdateWithoutAiUsagesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUpdateManyWithoutUserNestedInput;
@@ -2305,12 +2467,12 @@ export type UserUpdateWithoutAiUsagesInput = {
     historyEntries?: Prisma.HistoryEntryUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUpdateManyWithoutUserNestedInput;
 };
 export type UserUncheckedUpdateWithoutAiUsagesInput = {
     id?: Prisma.StringFieldUpdateOperationsInput | string;
@@ -2321,6 +2483,8 @@ export type UserUncheckedUpdateWithoutAiUsagesInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
     verificationTokens?: Prisma.EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput;
@@ -2330,12 +2494,12 @@ export type UserUncheckedUpdateWithoutAiUsagesInput = {
     historyEntries?: Prisma.HistoryEntryUncheckedUpdateManyWithoutUserNestedInput;
     notifications?: Prisma.NotificationUncheckedUpdateManyWithoutUserNestedInput;
     resetTokens?: Prisma.PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput;
+    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
     progress?: Prisma.ProgressUncheckedUpdateManyWithoutUserNestedInput;
     reactions?: Prisma.ReactionUncheckedUpdateManyWithoutUserNestedInput;
     reports?: Prisma.ReportUncheckedUpdateManyWithoutUserNestedInput;
     sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput;
     subscriptions?: Prisma.SubscriptionUncheckedUpdateOneWithoutUserNestedInput;
-    payments?: Prisma.PaymentUncheckedUpdateManyWithoutUserNestedInput;
 };
 export type UserCreateWithoutPaymentsInput = {
     id?: string;
@@ -2346,6 +2510,8 @@ export type UserCreateWithoutPaymentsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationCreateNestedManyWithoutUserInput;
@@ -2371,6 +2537,8 @@ export type UserUncheckedCreateWithoutPaymentsInput = {
     createdAt?: Date | string;
     updatedAt?: Date | string;
     role?: $Enums.UserRole;
+    recoveryAnswerHash?: string | null;
+    recoveryHint?: string | null;
     aiUsages?: Prisma.AIUsageUncheckedCreateNestedManyWithoutUserInput;
     comments?: Prisma.CommentUncheckedCreateNestedManyWithoutUserInput;
     conversations?: Prisma.ConversationUncheckedCreateNestedManyWithoutUserInput;
@@ -2409,6 +2577,8 @@ export type UserUpdateWithoutPaymentsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUpdateManyWithoutUserNestedInput;
@@ -2434,6 +2604,8 @@ export type UserUncheckedUpdateWithoutPaymentsInput = {
     createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string;
     role?: Prisma.EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole;
+    recoveryAnswerHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
+    recoveryHint?: Prisma.NullableStringFieldUpdateOperationsInput | string | null;
     aiUsages?: Prisma.AIUsageUncheckedUpdateManyWithoutUserNestedInput;
     comments?: Prisma.CommentUncheckedUpdateManyWithoutUserNestedInput;
     conversations?: Prisma.ConversationUncheckedUpdateManyWithoutUserNestedInput;
@@ -2464,11 +2636,11 @@ export type UserCountOutputType = {
     historyEntries: number;
     notifications: number;
     resetTokens: number;
+    payments: number;
     progress: number;
     reactions: number;
     reports: number;
     sessions: number;
-    payments: number;
 };
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     aiUsages?: boolean | UserCountOutputTypeCountAiUsagesArgs;
@@ -2481,11 +2653,11 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
     historyEntries?: boolean | UserCountOutputTypeCountHistoryEntriesArgs;
     notifications?: boolean | UserCountOutputTypeCountNotificationsArgs;
     resetTokens?: boolean | UserCountOutputTypeCountResetTokensArgs;
+    payments?: boolean | UserCountOutputTypeCountPaymentsArgs;
     progress?: boolean | UserCountOutputTypeCountProgressArgs;
     reactions?: boolean | UserCountOutputTypeCountReactionsArgs;
     reports?: boolean | UserCountOutputTypeCountReportsArgs;
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs;
-    payments?: boolean | UserCountOutputTypeCountPaymentsArgs;
 };
 /**
  * UserCountOutputType without action
@@ -2559,6 +2731,12 @@ export type UserCountOutputTypeCountResetTokensArgs<ExtArgs extends runtime.Type
 /**
  * UserCountOutputType without action
  */
+export type UserCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    where?: Prisma.PaymentWhereInput;
+};
+/**
+ * UserCountOutputType without action
+ */
 export type UserCountOutputTypeCountProgressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.ProgressWhereInput;
 };
@@ -2580,12 +2758,6 @@ export type UserCountOutputTypeCountReportsArgs<ExtArgs extends runtime.Types.Ex
 export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     where?: Prisma.SessionWhereInput;
 };
-/**
- * UserCountOutputType without action
- */
-export type UserCountOutputTypeCountPaymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    where?: Prisma.PaymentWhereInput;
-};
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
     email?: boolean;
@@ -2595,6 +2767,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
     createdAt?: boolean;
     updatedAt?: boolean;
     role?: boolean;
+    recoveryAnswerHash?: boolean;
+    recoveryHint?: boolean;
     aiUsages?: boolean | Prisma.User$aiUsagesArgs<ExtArgs>;
     comments?: boolean | Prisma.User$commentsArgs<ExtArgs>;
     conversations?: boolean | Prisma.User$conversationsArgs<ExtArgs>;
@@ -2605,12 +2779,12 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
     historyEntries?: boolean | Prisma.User$historyEntriesArgs<ExtArgs>;
     notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>;
     resetTokens?: boolean | Prisma.User$resetTokensArgs<ExtArgs>;
+    payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>;
     progress?: boolean | Prisma.User$progressArgs<ExtArgs>;
     reactions?: boolean | Prisma.User$reactionsArgs<ExtArgs>;
     reports?: boolean | Prisma.User$reportsArgs<ExtArgs>;
     sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>;
     subscriptions?: boolean | Prisma.User$subscriptionsArgs<ExtArgs>;
-    payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 }, ExtArgs["result"]["user"]>;
 export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -2622,6 +2796,8 @@ export type UserSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
     createdAt?: boolean;
     updatedAt?: boolean;
     role?: boolean;
+    recoveryAnswerHash?: boolean;
+    recoveryHint?: boolean;
 }, ExtArgs["result"]["user"]>;
 export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
     id?: boolean;
@@ -2632,6 +2808,8 @@ export type UserSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
     createdAt?: boolean;
     updatedAt?: boolean;
     role?: boolean;
+    recoveryAnswerHash?: boolean;
+    recoveryHint?: boolean;
 }, ExtArgs["result"]["user"]>;
 export type UserSelectScalar = {
     id?: boolean;
@@ -2642,8 +2820,10 @@ export type UserSelectScalar = {
     createdAt?: boolean;
     updatedAt?: boolean;
     role?: boolean;
+    recoveryAnswerHash?: boolean;
+    recoveryHint?: boolean;
 };
-export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "displayName" | "emailVerified" | "createdAt" | "updatedAt" | "role", ExtArgs["result"]["user"]>;
+export type UserOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "displayName" | "emailVerified" | "createdAt" | "updatedAt" | "role" | "recoveryAnswerHash" | "recoveryHint", ExtArgs["result"]["user"]>;
 export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
     aiUsages?: boolean | Prisma.User$aiUsagesArgs<ExtArgs>;
     comments?: boolean | Prisma.User$commentsArgs<ExtArgs>;
@@ -2655,12 +2835,12 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
     historyEntries?: boolean | Prisma.User$historyEntriesArgs<ExtArgs>;
     notifications?: boolean | Prisma.User$notificationsArgs<ExtArgs>;
     resetTokens?: boolean | Prisma.User$resetTokensArgs<ExtArgs>;
+    payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>;
     progress?: boolean | Prisma.User$progressArgs<ExtArgs>;
     reactions?: boolean | Prisma.User$reactionsArgs<ExtArgs>;
     reports?: boolean | Prisma.User$reportsArgs<ExtArgs>;
     sessions?: boolean | Prisma.User$sessionsArgs<ExtArgs>;
     subscriptions?: boolean | Prisma.User$subscriptionsArgs<ExtArgs>;
-    payments?: boolean | Prisma.User$paymentsArgs<ExtArgs>;
     _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>;
 };
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {};
@@ -2678,12 +2858,12 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
         historyEntries: Prisma.$HistoryEntryPayload<ExtArgs>[];
         notifications: Prisma.$NotificationPayload<ExtArgs>[];
         resetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[];
+        payments: Prisma.$PaymentPayload<ExtArgs>[];
         progress: Prisma.$ProgressPayload<ExtArgs>[];
         reactions: Prisma.$ReactionPayload<ExtArgs>[];
         reports: Prisma.$ReportPayload<ExtArgs>[];
         sessions: Prisma.$SessionPayload<ExtArgs>[];
         subscriptions: Prisma.$SubscriptionPayload<ExtArgs> | null;
-        payments: Prisma.$PaymentPayload<ExtArgs>[];
     };
     scalars: runtime.Types.Extensions.GetPayloadResult<{
         id: string;
@@ -2694,6 +2874,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
         createdAt: Date;
         updatedAt: Date;
         role: $Enums.UserRole;
+        recoveryAnswerHash: string | null;
+        recoveryHint: string | null;
     }, ExtArgs["result"]["user"]>;
     composites: {};
 };
@@ -3033,12 +3215,12 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
     historyEntries<T extends Prisma.User$historyEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$historyEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$HistoryEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     notifications<T extends Prisma.User$notificationsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     resetTokens<T extends Prisma.User$resetTokensArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$resetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
+    payments<T extends Prisma.User$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     progress<T extends Prisma.User$progressArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$progressArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ProgressPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     reactions<T extends Prisma.User$reactionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reactionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     reports<T extends Prisma.User$reportsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$reportsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     sessions<T extends Prisma.User$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     subscriptions<T extends Prisma.User$subscriptionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$subscriptionsArgs<ExtArgs>>): Prisma.Prisma__SubscriptionClient<runtime.Types.Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>;
-    payments<T extends Prisma.User$paymentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$paymentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PaymentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>;
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3072,6 +3254,8 @@ export interface UserFieldRefs {
     readonly createdAt: Prisma.FieldRef<"User", 'DateTime'>;
     readonly updatedAt: Prisma.FieldRef<"User", 'DateTime'>;
     readonly role: Prisma.FieldRef<"User", 'UserRole'>;
+    readonly recoveryAnswerHash: Prisma.FieldRef<"User", 'String'>;
+    readonly recoveryHint: Prisma.FieldRef<"User", 'String'>;
 }
 /**
  * User findUnique
@@ -3678,6 +3862,29 @@ export type User$resetTokensArgs<ExtArgs extends runtime.Types.Extensions.Intern
     distinct?: Prisma.PasswordResetTokenScalarFieldEnum | Prisma.PasswordResetTokenScalarFieldEnum[];
 };
 /**
+ * User.payments
+ */
+export type User$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Payment
+     */
+    select?: Prisma.PaymentSelect<ExtArgs> | null;
+    /**
+     * Omit specific fields from the Payment
+     */
+    omit?: Prisma.PaymentOmit<ExtArgs> | null;
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: Prisma.PaymentInclude<ExtArgs> | null;
+    where?: Prisma.PaymentWhereInput;
+    orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[];
+    cursor?: Prisma.PaymentWhereUniqueInput;
+    take?: number;
+    skip?: number;
+    distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[];
+};
+/**
  * User.progress
  */
 export type User$progressArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3786,29 +3993,6 @@ export type User$subscriptionsArgs<ExtArgs extends runtime.Types.Extensions.Inte
      */
     include?: Prisma.SubscriptionInclude<ExtArgs> | null;
     where?: Prisma.SubscriptionWhereInput;
-};
-/**
- * User.payments
- */
-export type User$paymentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
-    /**
-     * Select specific fields to fetch from the Payment
-     */
-    select?: Prisma.PaymentSelect<ExtArgs> | null;
-    /**
-     * Omit specific fields from the Payment
-     */
-    omit?: Prisma.PaymentOmit<ExtArgs> | null;
-    /**
-     * Choose, which related nodes to fetch as well
-     */
-    include?: Prisma.PaymentInclude<ExtArgs> | null;
-    where?: Prisma.PaymentWhereInput;
-    orderBy?: Prisma.PaymentOrderByWithRelationInput | Prisma.PaymentOrderByWithRelationInput[];
-    cursor?: Prisma.PaymentWhereUniqueInput;
-    take?: number;
-    skip?: number;
-    distinct?: Prisma.PaymentScalarFieldEnum | Prisma.PaymentScalarFieldEnum[];
 };
 /**
  * User without action
