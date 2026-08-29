@@ -10,32 +10,50 @@ const socket_io_1 = require("socket.io");
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 let io = null;
 /**
- * Origines autorisées pour Socket.IO.
- *
- * Développement :
- *   http://localhost:5173
- *
- * Production :
- *   https://code-doctor-front.vercel.app
+ * =========================================================
+ * CORS SOCKET.IO
+ * =========================================================
  */
-const ORIGINES_AUTORISEES = [
+const ORIGINES_FIXES_AUTORISEES = [
     "http://localhost:5173",
+    "http://localhost:5174",
     "https://code-doctor-front.vercel.app",
 ];
+function origineAutorisee(origin) {
+    if (!origin) {
+        return true;
+    }
+    if (ORIGINES_FIXES_AUTORISEES.includes(origin)) {
+        return true;
+    }
+    return /^https:\/\/code-doctor-front-[a-z0-9-]+-ngassais-projects\.vercel\.app$/i.test(origin);
+}
 /**
- * Initialise Socket.IO sur le serveur HTTP Express.
+ * =========================================================
+ * INITIALISATION SOCKET.IO
+ * =========================================================
  */
 function initialiserSocket(server) {
     io = new socket_io_1.Server(server, {
         cors: {
-            origin: ORIGINES_AUTORISEES,
+            origin: (origin, callback) => {
+                if (origineAutorisee(origin)) {
+                    callback(null, true);
+                    return;
+                }
+                callback(new Error(`Origine Socket.IO non autorisée : ${origin ?? "inconnue"}`));
+            },
             credentials: true,
         },
     });
+    /**
+     * Authentification du socket avec le JWT.
+     */
     io.use((socket, next) => {
         try {
             const token = socket.handshake.auth?.token;
-            if (!token || typeof token !== "string") {
+            if (!token ||
+                typeof token !== "string") {
                 return next(new Error("Authentification requise."));
             }
             const secret = process.env.JWT_SECRET;
@@ -47,17 +65,24 @@ function initialiserSocket(server) {
                 typeof payload.id !== "string") {
                 return next(new Error("Token invalide."));
             }
-            socket.data.userId = payload.id;
+            socket.data.userId =
+                payload.id;
             next();
         }
         catch {
             next(new Error("Token invalide ou expiré."));
         }
     });
+    /**
+     * Connexion d'un utilisateur.
+     */
     io.on("connection", (socket) => {
         const userId = socket.data.userId;
         console.log(`🔌 Socket connecté : ${userId}`);
-        // Chaque utilisateur rejoint sa propre salle.
+        /**
+         * Chaque utilisateur possède
+         * sa propre salle.
+         */
         socket.join(`user:${userId}`);
         socket.on("disconnect", (raison) => {
             console.log(`🔌 Socket déconnecté : ${userId} (${raison})`);
@@ -67,7 +92,9 @@ function initialiserSocket(server) {
     return io;
 }
 /**
- * Récupérer l'instance Socket.IO.
+ * =========================================================
+ * RÉCUPÉRER SOCKET.IO
+ * =========================================================
  */
 function obtenirSocket() {
     if (!io) {
@@ -76,7 +103,9 @@ function obtenirSocket() {
     return io;
 }
 /**
- * Envoyer une notification en temps réel à un utilisateur.
+ * =========================================================
+ * NOTIFICATION TEMPS RÉEL
+ * =========================================================
  */
 function envoyerNotificationTempsReel(userId, notification) {
     if (!io) {

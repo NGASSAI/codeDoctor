@@ -50,8 +50,11 @@ export declare function demanderVerificationEmail(req: Request, res: Response): 
 export declare function verifierEmail(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
  * =========================================================
- * VÉRIFICATION DE LA SESSION COURANTE
+ * UTILISATEUR COURANT
  * =========================================================
+ *
+ * Cette fonction peut être utilisée comme contrôleur
+ * si elle est appelée directement dans les routes.
  */
 export declare function moi(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
 //# sourceMappingURL=authentification.controleur.d.ts.map

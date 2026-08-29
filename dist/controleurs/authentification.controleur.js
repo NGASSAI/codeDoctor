@@ -72,27 +72,18 @@ async function inscription(req, res) {
             });
         }
         const utilisateur = await (0, utilisateur_service_1.creerUtilisateur)(emailNormalise, motDePasse, nomNormalise);
-        const secret = process.env.JWT_SECRET;
-        if (!secret) {
-            console.error("JWT_SECRET n'est pas configuré.");
-            return res.status(500).json({
-                erreur: "Configuration serveur invalide.",
-            });
-        }
         /*
-         * Création automatique du token de vérification
-         * après l'inscription.
+         * Génération automatique du token de
+         * vérification après création du compte.
          */
         const tokenVerification = await (0, utilisateur_service_1.creerTokenVerificationEmail)(utilisateur.id);
         /*
-         * JWT conservé pour compatibilité avec
-         * le fonctionnement actuel du frontend.
+         * IMPORTANT :
+         * Aucun JWT de session n'est créé ici.
+         *
+         * L'utilisateur doit d'abord vérifier
+         * son adresse email.
          */
-        const jeton = jsonwebtoken_1.default.sign({
-            id: utilisateur.id,
-        }, secret, {
-            expiresIn: "7d",
-        });
         return res.status(201).json({
             utilisateur: {
                 id: utilisateur.id,
@@ -100,14 +91,13 @@ async function inscription(req, res) {
                 displayName: utilisateur.displayName,
                 emailVerified: utilisateur.emailVerified,
             },
-            jeton,
             /*
              * TEMPORAIRE POUR LES TESTS.
-             * À supprimer lorsque l'envoi d'email
-             * sera réellement branché.
+             * À supprimer lorsque l'envoi email
+             * sera configuré.
              */
             tokenVerification,
-            message: "Compte créé avec succès. Veuillez vérifier votre adresse email.",
+            message: "Compte créé avec succès. Veuillez vérifier votre adresse email avant de vous connecter.",
         });
     }
     catch (erreur) {
@@ -151,6 +141,15 @@ async function connexion(req, res) {
                 erreur: "Email ou mot de passe incorrect.",
             });
         }
+        /*
+         * Un compte non vérifié ne peut pas ouvrir
+         * de session.
+         */
+        if (!utilisateur.emailVerified) {
+            return res.status(403).json({
+                erreur: "Votre adresse email n'est pas encore vérifiée. Veuillez vérifier votre email avant de vous connecter.",
+            });
+        }
         const secret = process.env.JWT_SECRET;
         if (!secret) {
             console.error("JWT_SECRET n'est pas configuré.");
@@ -158,17 +157,11 @@ async function connexion(req, res) {
                 erreur: "Configuration serveur invalide.",
             });
         }
-        /*
-         * Création du JWT d'accès.
-         */
         const jeton = jsonwebtoken_1.default.sign({
             id: utilisateur.id,
         }, secret, {
             expiresIn: "7d",
         });
-        /*
-         * Création de la session et du refresh token.
-         */
         const userAgent = typeof req.headers["user-agent"] ===
             "string"
             ? req.headers["user-agent"]
@@ -207,10 +200,6 @@ async function deconnexion(req, res) {
                 erreur: "Refresh token requis.",
             });
         }
-        /*
-         * Le refresh token original n'est jamais
-         * recherché directement en base.
-         */
         const refreshTokenHash = crypto_1.default
             .createHash("sha256")
             .update(refreshToken)
@@ -245,9 +234,6 @@ async function rafraichir(req, res) {
             .createHash("sha256")
             .update(refreshToken)
             .digest("hex");
-        /*
-         * Recherche d'une session valide.
-         */
         const session = await (0, utilisateur_service_1.trouverSessionValide)(refreshTokenHash);
         if (!session) {
             return res.status(401).json({
@@ -265,9 +251,6 @@ async function rafraichir(req, res) {
                 erreur: "Configuration serveur invalide.",
             });
         }
-        /*
-         * Nouveau JWT.
-         */
         const jeton = jsonwebtoken_1.default.sign({
             id: session.userId,
         }, secret, {
@@ -304,9 +287,8 @@ async function motDePasseOublie(req, res) {
             .toLowerCase();
         const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
         /*
-         * Même réponse que le compte existe
-         * ou non pour éviter l'énumération
-         * des comptes.
+         * Même réponse si le compte existe
+         * ou non afin d'éviter l'énumération.
          */
         if (!utilisateur) {
             return res.status(200).json({
@@ -316,8 +298,7 @@ async function motDePasseOublie(req, res) {
         const token = await (0, utilisateur_service_1.creerTokenReinitialisation)(utilisateur.id);
         /*
          * TEMPORAIRE POUR LES TESTS.
-         * Ne plus retourner le token lorsque
-         * l'envoi d'emails sera configuré.
+         * À supprimer lorsque l'envoi email sera configuré.
          */
         return res.status(200).json({
             message: "Si un compte correspond à cet email, un lien de réinitialisation sera envoyé.",
@@ -352,9 +333,6 @@ async function reinitialiserMotDePasseControleur(req, res) {
         });
     }
     try {
-        /*
-         * Le token n'est jamais stocké en clair.
-         */
         const tokenHash = crypto_1.default
             .createHash("sha256")
             .update(token)
@@ -395,10 +373,6 @@ async function demanderVerificationEmail(req, res) {
             .trim()
             .toLowerCase();
         const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
-        /*
-         * Même réponse si le compte existe
-         * ou non.
-         */
         if (!utilisateur) {
             return res.status(200).json({
                 message: "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
@@ -465,8 +439,11 @@ async function verifierEmail(req, res) {
 }
 /**
  * =========================================================
- * VÉRIFICATION DE LA SESSION COURANTE
+ * UTILISATEUR COURANT
  * =========================================================
+ *
+ * Cette fonction peut être utilisée comme contrôleur
+ * si elle est appelée directement dans les routes.
  */
 async function moi(req, res) {
     if (!req.utilisateurId) {
