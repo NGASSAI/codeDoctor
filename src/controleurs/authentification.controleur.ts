@@ -1,4 +1,4 @@
-
+  
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
@@ -21,10 +21,6 @@ import {
 
 import { RequeteAuthentifiee } from "../middlewares/authentification.middleware";
 
-interface PayloadJWT {
-  id: string;
-}
-
 /**
  * =========================================================
  * INSCRIPTION
@@ -43,7 +39,8 @@ export async function inscription(
 
     if (!email || !motDePasse) {
       return res.status(400).json({
-        erreur: "Email et mot de passe requis.",
+        erreur:
+          "Email et mot de passe requis.",
       });
     }
 
@@ -116,22 +113,9 @@ export async function inscription(
         nomNormalise
       );
 
-    const secret = process.env.JWT_SECRET;
-
-    if (!secret) {
-      console.error(
-        "JWT_SECRET n'est pas configuré."
-      );
-
-      return res.status(500).json({
-        erreur:
-          "Configuration serveur invalide.",
-      });
-    }
-
     /*
-     * Création automatique du token de vérification
-     * après l'inscription.
+     * Génération automatique du token de
+     * vérification après création du compte.
      */
     const tokenVerification =
       await creerTokenVerificationEmail(
@@ -139,19 +123,12 @@ export async function inscription(
       );
 
     /*
-     * JWT conservé pour compatibilité avec
-     * le fonctionnement actuel du frontend.
+     * IMPORTANT :
+     * Aucun JWT de session n'est créé ici.
+     *
+     * L'utilisateur doit d'abord vérifier
+     * son adresse email.
      */
-    const jeton = jwt.sign(
-      {
-        id: utilisateur.id,
-      },
-      secret,
-      {
-        expiresIn: "7d",
-      }
-    );
-
     return res.status(201).json({
       utilisateur: {
         id: utilisateur.id,
@@ -162,17 +139,15 @@ export async function inscription(
           utilisateur.emailVerified,
       },
 
-      jeton,
-
       /*
        * TEMPORAIRE POUR LES TESTS.
-       * À supprimer lorsque l'envoi d'email
-       * sera réellement branché.
+       * À supprimer lorsque l'envoi email
+       * sera configuré.
        */
       tokenVerification,
 
       message:
-        "Compte créé avec succès. Veuillez vérifier votre adresse email.",
+        "Compte créé avec succès. Veuillez vérifier votre adresse email avant de vous connecter.",
     });
   } catch (erreur) {
     console.error(
@@ -247,6 +222,17 @@ export async function connexion(
       });
     }
 
+    /*
+     * Un compte non vérifié ne peut pas ouvrir
+     * de session.
+     */
+    if (!utilisateur.emailVerified) {
+      return res.status(403).json({
+        erreur:
+          "Votre adresse email n'est pas encore vérifiée. Veuillez vérifier votre email avant de vous connecter.",
+      });
+    }
+
     const secret = process.env.JWT_SECRET;
 
     if (!secret) {
@@ -260,9 +246,6 @@ export async function connexion(
       });
     }
 
-    /*
-     * Création du JWT d'accès.
-     */
     const jeton = jwt.sign(
       {
         id: utilisateur.id,
@@ -273,9 +256,6 @@ export async function connexion(
       }
     );
 
-    /*
-     * Création de la session et du refresh token.
-     */
     const userAgent =
       typeof req.headers["user-agent"] ===
       "string"
@@ -335,10 +315,6 @@ export async function deconnexion(
       });
     }
 
-    /*
-     * Le refresh token original n'est jamais
-     * recherché directement en base.
-     */
     const refreshTokenHash = crypto
       .createHash("sha256")
       .update(refreshToken)
@@ -390,9 +366,6 @@ export async function rafraichir(
       .update(refreshToken)
       .digest("hex");
 
-    /*
-     * Recherche d'une session valide.
-     */
     const session =
       await trouverSessionValide(
         refreshTokenHash
@@ -427,9 +400,6 @@ export async function rafraichir(
       });
     }
 
-    /*
-     * Nouveau JWT.
-     */
     const jeton = jwt.sign(
       {
         id: session.userId,
@@ -488,9 +458,8 @@ export async function motDePasseOublie(
       );
 
     /*
-     * Même réponse que le compte existe
-     * ou non pour éviter l'énumération
-     * des comptes.
+     * Même réponse si le compte existe
+     * ou non afin d'éviter l'énumération.
      */
     if (!utilisateur) {
       return res.status(200).json({
@@ -506,8 +475,7 @@ export async function motDePasseOublie(
 
     /*
      * TEMPORAIRE POUR LES TESTS.
-     * Ne plus retourner le token lorsque
-     * l'envoi d'emails sera configuré.
+     * À supprimer lorsque l'envoi email sera configuré.
      */
     return res.status(200).json({
       message:
@@ -561,9 +529,6 @@ export async function reinitialiserMotDePasseControleur(
   }
 
   try {
-    /*
-     * Le token n'est jamais stocké en clair.
-     */
     const tokenHash = crypto
       .createHash("sha256")
       .update(token)
@@ -634,10 +599,6 @@ export async function demanderVerificationEmail(
         emailNormalise
       );
 
-    /*
-     * Même réponse si le compte existe
-     * ou non.
-     */
     if (!utilisateur) {
       return res.status(200).json({
         message:
@@ -743,8 +704,11 @@ export async function verifierEmail(
 
 /**
  * =========================================================
- * VÉRIFICATION DE LA SESSION COURANTE
+ * UTILISATEUR COURANT
  * =========================================================
+ *
+ * Cette fonction peut être utilisée comme contrôleur
+ * si elle est appelée directement dans les routes.
  */
 export async function moi(
   req: RequeteAuthentifiee,
