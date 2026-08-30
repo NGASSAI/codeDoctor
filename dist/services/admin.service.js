@@ -7,6 +7,7 @@ exports.modifierStatutExperienceAdmin = modifierStatutExperienceAdmin;
 exports.modifierRoleUtilisateurAdmin = modifierRoleUtilisateurAdmin;
 exports.modifierStatutUtilisateurAdmin = modifierStatutUtilisateurAdmin;
 exports.supprimerUtilisateurAdmin = supprimerUtilisateurAdmin;
+exports.supprimerExperienceAdmin = supprimerExperienceAdmin;
 exports.obtenirNotificationsAdmin = obtenirNotificationsAdmin;
 const base_1 = require("../base");
 async function obtenirStatistiquesAdmin() {
@@ -192,6 +193,14 @@ async function modifierStatutUtilisateurAdmin(userId, estActif) {
 async function supprimerUtilisateurAdmin(userId) {
     return base_1.prisma.user.delete({
         where: { id: userId },
+    });
+}
+/**
+ * Supprimer définitivement une expérience.
+ */
+async function supprimerExperienceAdmin(experienceId) {
+    return base_1.prisma.experience.delete({
+        where: { id: experienceId },
     });
 }
 /**

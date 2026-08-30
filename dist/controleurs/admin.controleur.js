@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.dashboardAdmin = dashboardAdmin;
 exports.modifierRoleUtilisateur = modifierRoleUtilisateur;
 exports.utilisateursAdmin = utilisateursAdmin;
+exports.supprimerExperience = supprimerExperience;
 exports.supprimerUtilisateur = supprimerUtilisateur;
 exports.notificationsAdmin = notificationsAdmin;
 exports.experiencesAdmin = experiencesAdmin;
@@ -71,6 +72,27 @@ async function utilisateursAdmin(req, res) {
         return res.status(500).json({
             erreur: "Erreur interne du serveur.",
         });
+    }
+}
+/**
+ * Supprimer une expérience
+ * DELETE /api/admin/experiences/:id
+ */
+async function supprimerExperience(req, res) {
+    const { id } = req.params;
+    if (!id || typeof id !== "string") {
+        return res.status(400).json({ erreur: "Identifiant d'expérience invalide." });
+    }
+    try {
+        await (0, admin_service_1.supprimerExperienceAdmin)(id);
+        return res.status(200).json({ success: true });
+    }
+    catch (erreur) {
+        if (erreur?.code === "P2025") {
+            return res.status(404).json({ erreur: "Expérience introuvable." });
+        }
+        console.error("Erreur suppression expérience :", erreur);
+        return res.status(500).json({ erreur: "Erreur interne du serveur." });
     }
 }
 /**

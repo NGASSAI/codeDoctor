@@ -14,6 +14,11 @@ export declare function modifierRoleUtilisateur(req: RequeteAuthentifiee, res: R
  */
 export declare function utilisateursAdmin(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
+ * Supprimer une expérience
+ * DELETE /api/admin/experiences/:id
+ */
+export declare function supprimerExperience(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
+/**
  * Supprimer un utilisateur
  * DELETE /api/admin/utilisateurs/:id
  */

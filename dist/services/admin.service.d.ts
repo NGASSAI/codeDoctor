@@ -144,6 +144,25 @@ export declare function supprimerUtilisateurAdmin(userId: string): Promise<{
     recoveryHint: string | null;
 }>;
 /**
+ * Supprimer définitivement une expérience.
+ */
+export declare function supprimerExperienceAdmin(experienceId: string): Promise<{
+    id: string;
+    userId: string;
+    titre: string;
+    probleme: string;
+    code: string | null;
+    cause: string;
+    solution: string;
+    technologie: string | null;
+    categorie: import("../generated/prisma/enums").Category;
+    statut: ExperienceStatus;
+    createdAt: Date;
+    updatedAt: Date;
+    moderatedAt: Date | null;
+    moderatedBy: string | null;
+}>;
+/**
  * Notifications de l'administrateur connecté.
  */
 export declare function obtenirNotificationsAdmin(adminId: string, page: number, limite: number): Promise<{

@@ -17,6 +17,9 @@ routeur.patch("/utilisateurs/:id/role", admin_controleur_1.modifierRoleUtilisate
 routeur.get("/experiences", admin_controleur_1.experiencesAdmin);
 routeur.patch("/experiences/:id/statut", admin_controleur_1.modifierStatutExperience);
 routeur.delete("/utilisateurs/:id", admin_controleur_1.supprimerUtilisateur);
+routeur.get("/experiences", admin_controleur_1.experiencesAdmin);
+routeur.patch("/experiences/:id/statut", admin_controleur_1.modifierStatutExperience);
+routeur.delete("/experiences/:id", admin_controleur_1.supprimerExperience);
 // --- NOTIFICATIONS ---
 routeur.get("/notifications", admin_controleur_1.notificationsAdmin);
 // --- SIGNALEMENTS ---
