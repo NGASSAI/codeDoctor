@@ -124,6 +124,42 @@ if (role === "ADMIN" || role === "USER") {
   console.log("Utilisateur autorisé");
 }`,
     },
+    {
+        code: "JS007",
+        title: "Assignation utilisée à la place d'une comparaison",
+        category: client_1.Category.JAVASCRIPT,
+        severity: client_1.Severity.CRITIQUE,
+        explanation: "Un opérateur d'assignation (=) est utilisé dans une condition, ce qui modifie la valeur au lieu de la comparer.",
+        cause: "Une confusion entre = (assignation) et === (comparaison) dans une condition if/while.",
+        howToFind: "Recherchez un opérateur = seul dans une condition if ou while.",
+        fixHint: "Utilisez === pour comparer les valeurs.",
+        beforeCode: `if (statut = "actif") {
+  console.log("Actif");
+}`,
+        afterCode: `if (statut === "actif") {
+  console.log("Actif");
+}`,
+    },
+    {
+        code: "JS008",
+        title: "Boucle potentiellement infinie",
+        category: client_1.Category.JAVASCRIPT,
+        severity: client_1.Severity.CRITIQUE,
+        explanation: "Une boucle while(true) ne contient aucune instruction break détectable.",
+        cause: "La condition de sortie de la boucle n'est jamais atteinte.",
+        howToFind: "Vérifiez la présence d'un break dans une boucle while(true) ou for(;;).",
+        fixHint: "Ajoutez une condition de sortie claire (break ou condition de boucle).",
+        beforeCode: `while (true) {
+  traiterElement();
+}`,
+        afterCode: `while (true) {
+  const termine = traiterElement();
+
+  if (termine) {
+    break;
+  }
+}`,
+    },
     // ============================================================
     // TYPESCRIPT
     // ============================================================
@@ -280,6 +316,24 @@ if (!isLoggedIn) {
   return null;
 }`,
     },
+    {
+        code: "RE005",
+        title: "Effet sans nettoyage (fuite mémoire potentielle)",
+        category: client_1.Category.REACT,
+        severity: client_1.Severity.CRITIQUE,
+        explanation: "Un timer ou un écouteur d'événement est créé dans useEffect sans être nettoyé.",
+        cause: "La fonction de nettoyage (return) de useEffect est absente.",
+        howToFind: "Cherchez setInterval, setTimeout ou addEventListener dans un useEffect sans clearInterval/clearTimeout/removeEventListener en retour.",
+        fixHint: "Retournez une fonction de nettoyage dans useEffect.",
+        beforeCode: `useEffect(() => {
+  const id = setInterval(rafraichir, 1000);
+}, []);`,
+        afterCode: `useEffect(() => {
+  const id = setInterval(rafraichir, 1000);
+
+  return () => clearInterval(id);
+}, []);`,
+    },
     // ============================================================
     // HTTP
     // ============================================================
@@ -397,6 +451,30 @@ return res.json(utilisateur);`,
   });
 
 return res.json(utilisateur);`,
+    },
+    {
+        code: "API004",
+        title: "Injection SQL potentielle",
+        category: client_1.Category.API,
+        severity: client_1.Severity.CRITIQUE,
+        explanation: "Une requête SQL est construite par concaténation directe d'une variable utilisateur.",
+        cause: "La valeur n'est pas passée en paramètre lié (prepared statement).",
+        howToFind: "Recherchez une requête SQL construite avec des template strings incluant une variable.",
+        fixHint: "Utilisez des requêtes paramétrées ou un ORM avec échappement automatique.",
+        beforeCode: `const resultat = await db.query(\`SELECT * FROM users WHERE email = '\${email}'\`);`,
+        afterCode: `const resultat = await db.query("SELECT * FROM users WHERE email = $1", [email]);`,
+    },
+    {
+        code: "SEC001",
+        title: "Secret ou clé API en dur dans le code",
+        category: client_1.Category.API,
+        severity: client_1.Severity.CRITIQUE,
+        explanation: "Une clé secrète ou un mot de passe apparaît directement dans le code source.",
+        cause: "Les identifiants sensibles ne sont pas externalisés dans des variables d'environnement.",
+        howToFind: "Recherchez des chaînes assignées à des variables comme apiKey, secret ou password.",
+        fixHint: "Déplacez la valeur dans une variable d'environnement (process.env).",
+        beforeCode: `const apiKey = "sk_live_abcdef123456789";`,
+        afterCode: `const apiKey = process.env.API_KEY;`,
     },
     // ============================================================
     // HTML / CSS

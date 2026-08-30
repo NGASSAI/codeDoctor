@@ -1,8 +1,4 @@
-
-import {
-  Category,
-  Severity,
-} from "../generated/prisma/client";
+import { Category, Severity } from "../generated/prisma/client";
 
 export interface RegleDiagnostic {
   code: string;
@@ -33,8 +29,7 @@ export const REGLES_DIAGNOSTIC: RegleDiagnostic[] = [
       "Les variables let et const sont placées dans la temporal dead zone avant leur déclaration.",
     howToFind:
       "Recherchez une utilisation d'une variable avant la ligne où elle est déclarée.",
-    fixHint:
-      "Déclarez la variable avant toute utilisation.",
+    fixHint: "Déclarez la variable avant toute utilisation.",
     beforeCode: `console.log(nom);
 
 const nom = "Jean";`,
@@ -54,8 +49,7 @@ console.log(nom);`,
       "Une recherche, une fonction ou un accès à une propriété peut ne retourner aucune valeur.",
     howToFind:
       "Vérifiez les résultats de find(), les propriétés optionnelles et les fonctions pouvant retourner undefined.",
-    fixHint:
-      "Vérifiez l'existence de la valeur avant de l'utiliser.",
+    fixHint: "Vérifiez l'existence de la valeur avant de l'utiliser.",
     beforeCode: `const utilisateur = utilisateurs.find(
   (u) => u.id === id
 );
@@ -81,8 +75,7 @@ console.log(utilisateur.nom);`,
       "L'opérateur == peut provoquer une conversion implicite des types.",
     cause:
       "JavaScript effectue une conversion automatique lors de certaines comparaisons avec == ou !=.",
-    howToFind:
-      "Recherchez les opérateurs == et !=.",
+    howToFind: "Recherchez les opérateurs == et !=.",
     fixHint:
       "Utilisez === et !== lorsque la valeur et le type doivent être comparés.",
     beforeCode: `if (age == "18") {
@@ -104,8 +97,7 @@ console.log(utilisateur.nom);`,
       "Une Promise est utilisée sans await, catch ou mécanisme équivalent de gestion d'erreur.",
     howToFind:
       "Identifiez les appels asynchrones dont les erreurs ne sont pas traitées.",
-    fixHint:
-      "Utilisez try/catch avec await ou ajoutez un .catch().",
+    fixHint: "Utilisez try/catch avec await ou ajoutez un .catch().",
     beforeCode: `fetch("/api/users")
   .then((response) => response.json());`,
     afterCode: `try {
@@ -126,14 +118,11 @@ console.log(utilisateur.nom);`,
     title: "Mutation involontaire d'un tableau",
     category: Category.JAVASCRIPT,
     severity: Severity.MOYENNE,
-    explanation:
-      "Le tableau original est directement modifié.",
+    explanation: "Le tableau original est directement modifié.",
     cause:
       "Des méthodes comme push(), pop(), sort() ou splice() modifient directement le tableau.",
-    howToFind:
-      "Recherchez les modifications directes de tableaux partagés.",
-    fixHint:
-      "Créez une copie du tableau lorsque l'immuabilité est nécessaire.",
+    howToFind: "Recherchez les modifications directes de tableaux partagés.",
+    fixHint: "Créez une copie du tableau lorsque l'immuabilité est nécessaire.",
     beforeCode: `const utilisateurs = ["A", "B"];
 
 utilisateurs.push("C");`,
@@ -156,8 +145,7 @@ const nouveauxUtilisateurs = [
       "Une valeur littérale utilisée directement avec || est considérée comme vraie.",
     howToFind:
       "Vérifiez les conditions utilisant plusieurs opérateurs || et &&.",
-    fixHint:
-      "Comparez explicitement chaque valeur avec la variable concernée.",
+    fixHint: "Comparez explicitement chaque valeur avec la variable concernée.",
     beforeCode: `const role = "USER";
 
 if (role === "ADMIN" || "USER") {
@@ -167,6 +155,49 @@ if (role === "ADMIN" || "USER") {
 
 if (role === "ADMIN" || role === "USER") {
   console.log("Utilisateur autorisé");
+}`,
+  },
+
+  {
+    code: "JS007",
+    title: "Assignation utilisée à la place d'une comparaison",
+    category: Category.JAVASCRIPT,
+    severity: Severity.CRITIQUE,
+    explanation:
+      "Un opérateur d'assignation (=) est utilisé dans une condition, ce qui modifie la valeur au lieu de la comparer.",
+    cause:
+      "Une confusion entre = (assignation) et === (comparaison) dans une condition if/while.",
+    howToFind:
+      "Recherchez un opérateur = seul dans une condition if ou while.",
+    fixHint: "Utilisez === pour comparer les valeurs.",
+    beforeCode: `if (statut = "actif") {
+  console.log("Actif");
+}`,
+    afterCode: `if (statut === "actif") {
+  console.log("Actif");
+}`,
+  },
+
+  {
+    code: "JS008",
+    title: "Boucle potentiellement infinie",
+    category: Category.JAVASCRIPT,
+    severity: Severity.CRITIQUE,
+    explanation:
+      "Une boucle while(true) ne contient aucune instruction break détectable.",
+    cause: "La condition de sortie de la boucle n'est jamais atteinte.",
+    howToFind:
+      "Vérifiez la présence d'un break dans une boucle while(true) ou for(;;).",
+    fixHint: "Ajoutez une condition de sortie claire (break ou condition de boucle).",
+    beforeCode: `while (true) {
+  traiterElement();
+}`,
+    afterCode: `while (true) {
+  const termine = traiterElement();
+
+  if (termine) {
+    break;
+  }
 }`,
   },
 
@@ -210,12 +241,10 @@ function afficherUtilisateur(
     severity: Severity.MOYENNE,
     explanation:
       "Une valeur optionnelle est utilisée comme si elle existait toujours.",
-    cause:
-      "La valeur peut être undefined selon son type.",
+    cause: "La valeur peut être undefined selon son type.",
     howToFind:
       "Cherchez les propriétés optionnelles et les résultats pouvant être undefined.",
-    fixHint:
-      "Vérifiez la valeur avant utilisation ou fournissez une valeur par défaut.",
+    fixHint: "Vérifiez la valeur avant utilisation ou fournissez une valeur par défaut.",
     beforeCode: `interface User {
   name?: string;
 }
@@ -241,14 +270,11 @@ function afficher(user: User) {
     title: "Propriété inexistante sur un type",
     category: Category.TYPESCRIPT,
     severity: Severity.CRITIQUE,
-    explanation:
-      "Une propriété utilisée n'existe pas dans le type déclaré.",
-    cause:
-      "Le nom de propriété utilisé dans le code ne correspond pas au type.",
+    explanation: "Une propriété utilisée n'existe pas dans le type déclaré.",
+    cause: "Le nom de propriété utilisé dans le code ne correspond pas au type.",
     howToFind:
       "Comparez la propriété utilisée avec la définition de l'interface ou du type.",
-    fixHint:
-      "Utilisez la propriété correcte ou modifiez le type si nécessaire.",
+    fixHint: "Utilisez la propriété correcte ou modifiez le type si nécessaire.",
     beforeCode: `interface User {
   name: string;
 }
@@ -278,14 +304,10 @@ console.log(user.name);`,
     title: "Clé manquante dans une liste React",
     category: Category.REACT,
     severity: Severity.MOYENNE,
-    explanation:
-      "Chaque élément d'une liste React doit posséder une clé stable.",
-    cause:
-      "React utilise les clés pour identifier les éléments entre les différents rendus.",
-    howToFind:
-      "Recherchez les appels map() qui retournent des éléments sans prop key.",
-    fixHint:
-      "Utilisez un identifiant stable et unique comme clé.",
+    explanation: "Chaque élément d'une liste React doit posséder une clé stable.",
+    cause: "React utilise les clés pour identifier les éléments entre les différents rendus.",
+    howToFind: "Recherchez les appels map() qui retournent des éléments sans prop key.",
+    fixHint: "Utilisez un identifiant stable et unique comme clé.",
     beforeCode: `{users.map((user) => (
   <div>{user.name}</div>
 ))}`,
@@ -303,12 +325,10 @@ console.log(user.name);`,
     severity: Severity.MOYENNE,
     explanation:
       "L'effet utilise une valeur extérieure qui n'est pas représentée dans ses dépendances.",
-    cause:
-      "Le tableau de dépendances ne représente pas toutes les valeurs utilisées par l'effet.",
+    cause: "Le tableau de dépendances ne représente pas toutes les valeurs utilisées par l'effet.",
     howToFind:
       "Identifiez les props, états et valeurs extérieures utilisés dans useEffect.",
-    fixHint:
-      "Ajoutez les dépendances nécessaires ou restructurez l'effet.",
+    fixHint: "Ajoutez les dépendances nécessaires ou restructurez l'effet.",
     beforeCode: `useEffect(() => {
   chargerUtilisateur(userId);
 }, []);`,
@@ -324,12 +344,10 @@ console.log(user.name);`,
     severity: Severity.MOYENNE,
     explanation:
       "Une valeur directement dérivable des props ou du state ne nécessite généralement pas un state supplémentaire.",
-    cause:
-      "setState() est utilisé dans un effet pour calculer une valeur déjà disponible pendant le rendu.",
+    cause: "setState() est utilisé dans un effet pour calculer une valeur déjà disponible pendant le rendu.",
     howToFind:
       "Recherchez les useEffect qui calculent immédiatement une valeur à partir d'autres valeurs.",
-    fixHint:
-      "Calculez directement la valeur pendant le rendu lorsque cela est possible.",
+    fixHint: "Calculez directement la valeur pendant le rendu lorsque cela est possible.",
     beforeCode: `const [nomComplet, setNomComplet] =
   useState("");
 
@@ -345,14 +363,11 @@ useEffect(() => {
     title: "Hook React utilisé conditionnellement",
     category: Category.REACT,
     severity: Severity.CRITIQUE,
-    explanation:
-      "Les Hooks React doivent être appelés dans le même ordre à chaque rendu.",
-    cause:
-      "Un Hook est appelé dans une condition, une boucle ou une fonction imbriquée.",
+    explanation: "Les Hooks React doivent être appelés dans le même ordre à chaque rendu.",
+    cause: "Un Hook est appelé dans une condition, une boucle ou une fonction imbriquée.",
     howToFind:
       "Vérifiez si useState, useEffect ou un Hook personnalisé est appelé après une condition ou dans une boucle.",
-    fixHint:
-      "Placez les Hooks au niveau supérieur du composant.",
+    fixHint: "Placez les Hooks au niveau supérieur du composant.",
     beforeCode: `if (isLoggedIn) {
   const [user, setUser] = useState(null);
 }`,
@@ -361,6 +376,26 @@ useEffect(() => {
 if (!isLoggedIn) {
   return null;
 }`,
+  },
+
+  {
+    code: "RE005",
+    title: "Effet sans nettoyage (fuite mémoire potentielle)",
+    category: Category.REACT,
+    severity: Severity.CRITIQUE,
+    explanation: "Un timer ou un écouteur d'événement est créé dans useEffect sans être nettoyé.",
+    cause: "La fonction de nettoyage (return) de useEffect est absente.",
+    howToFind:
+      "Cherchez setInterval, setTimeout ou addEventListener dans un useEffect sans clearInterval/clearTimeout/removeEventListener en retour.",
+    fixHint: "Retournez une fonction de nettoyage dans useEffect.",
+    beforeCode: `useEffect(() => {
+  const id = setInterval(rafraichir, 1000);
+}, []);`,
+    afterCode: `useEffect(() => {
+  const id = setInterval(rafraichir, 1000);
+
+  return () => clearInterval(id);
+}, []);`,
   },
 
   // ============================================================
@@ -372,14 +407,10 @@ if (!isLoggedIn) {
     title: "Mauvais code de statut HTTP",
     category: Category.HTTP,
     severity: Severity.MOYENNE,
-    explanation:
-      "La réponse HTTP utilise un code qui ne représente pas correctement la situation.",
-    cause:
-      "Le serveur utilise un statut générique au lieu d'un statut correspondant à la situation.",
-    howToFind:
-      "Analysez le statut HTTP retourné selon la nature de l'opération.",
-    fixHint:
-      "Utilisez le code HTTP correspondant réellement à la situation.",
+    explanation: "La réponse HTTP utilise un code qui ne représente pas correctement la situation.",
+    cause: "Le serveur utilise un statut générique au lieu d'un statut correspondant à la situation.",
+    howToFind: "Analysez le statut HTTP retourné selon la nature de l'opération.",
+    fixHint: "Utilisez le code HTTP correspondant réellement à la situation.",
     beforeCode: `return res.status(200).json({
   erreur: "Utilisateur introuvable"
 });`,
@@ -393,14 +424,10 @@ if (!isLoggedIn) {
     title: "Mauvaise méthode HTTP",
     category: Category.HTTP,
     severity: Severity.MOYENNE,
-    explanation:
-      "La méthode HTTP ne correspond pas à l'opération réalisée.",
-    cause:
-      "Une opération de lecture, création, modification ou suppression utilise une méthode inadaptée.",
-    howToFind:
-      "Comparez l'intention de la requête avec GET, POST, PUT, PATCH et DELETE.",
-    fixHint:
-      "Utilisez la méthode HTTP correspondant à l'opération.",
+    explanation: "La méthode HTTP ne correspond pas à l'opération réalisée.",
+    cause: "Une opération de lecture, création, modification ou suppression utilise une méthode inadaptée.",
+    howToFind: "Comparez l'intention de la requête avec GET, POST, PUT, PATCH et DELETE.",
+    fixHint: "Utilisez la méthode HTTP correspondant à l'opération.",
     beforeCode: `app.get("/users", (req, res) => {
   const user = req.body;
 });`,
@@ -418,14 +445,10 @@ if (!isLoggedIn) {
     title: "Entrée utilisateur non validée",
     category: Category.API,
     severity: Severity.CRITIQUE,
-    explanation:
-      "Les données reçues par l'API sont utilisées sans validation.",
-    cause:
-      "Le serveur fait confiance directement aux données envoyées par le client.",
-    howToFind:
-      "Examinez req.body, req.params et req.query avant leur utilisation.",
-    fixHint:
-      "Validez systématiquement les données côté serveur.",
+    explanation: "Les données reçues par l'API sont utilisées sans validation.",
+    cause: "Le serveur fait confiance directement aux données envoyées par le client.",
+    howToFind: "Examinez req.body, req.params et req.query avant leur utilisation.",
+    fixHint: "Validez systématiquement les données côté serveur.",
     beforeCode: `const { email } = req.body;
 
 await creerUtilisateur(email);`,
@@ -448,14 +471,10 @@ await creerUtilisateur(email);`,
     title: "Erreur serveur non gérée",
     category: Category.API,
     severity: Severity.CRITIQUE,
-    explanation:
-      "Une opération asynchrone peut échouer sans être correctement interceptée.",
-    cause:
-      "Le contrôleur ne possède pas de mécanisme de gestion des exceptions.",
-    howToFind:
-      "Identifiez les opérations await exécutées sans try/catch ou middleware d'erreur.",
-    fixHint:
-      "Gérez les exceptions et retournez une réponse API cohérente.",
+    explanation: "Une opération asynchrone peut échouer sans être correctement interceptée.",
+    cause: "Le contrôleur ne possède pas de mécanisme de gestion des exceptions.",
+    howToFind: "Identifiez les opérations await exécutées sans try/catch ou middleware d'erreur.",
+    fixHint: "Gérez les exceptions et retournez une réponse API cohérente.",
     beforeCode: `app.get("/users", async (req, res) => {
   const users = await prisma.user.findMany();
 
@@ -481,14 +500,10 @@ await creerUtilisateur(email);`,
     title: "Donnée sensible exposée dans la réponse",
     category: Category.API,
     severity: Severity.CRITIQUE,
-    explanation:
-      "La réponse API retourne des informations qui ne devraient pas être accessibles au client.",
-    cause:
-      "L'objet complet provenant de la base de données est retourné sans filtrage.",
-    howToFind:
-      "Examinez les objets ORM directement retournés par les contrôleurs.",
-    fixHint:
-      "Sélectionnez explicitement les propriétés autorisées dans la réponse.",
+    explanation: "La réponse API retourne des informations qui ne devraient pas être accessibles au client.",
+    cause: "L'objet complet provenant de la base de données est retourné sans filtrage.",
+    howToFind: "Examinez les objets ORM directement retournés par les contrôleurs.",
+    fixHint: "Sélectionnez explicitement les propriétés autorisées dans la réponse.",
     beforeCode: `const utilisateur =
   await prisma.user.findUnique({
     where: { id },
@@ -508,6 +523,32 @@ return res.json(utilisateur);`,
 return res.json(utilisateur);`,
   },
 
+  {
+    code: "API004",
+    title: "Injection SQL potentielle",
+    category: Category.API,
+    severity: Severity.CRITIQUE,
+    explanation: "Une requête SQL est construite par concaténation directe d'une variable utilisateur.",
+    cause: "La valeur n'est pas passée en paramètre lié (prepared statement).",
+    howToFind: "Recherchez une requête SQL construite avec des template strings incluant une variable.",
+    fixHint: "Utilisez des requêtes paramétrées ou un ORM avec échappement automatique.",
+    beforeCode: `const resultat = await db.query(\`SELECT * FROM users WHERE email = '\${email}'\`);`,
+    afterCode: `const resultat = await db.query("SELECT * FROM users WHERE email = $1", [email]);`,
+  },
+
+  {
+    code: "SEC001",
+    title: "Secret ou clé API en dur dans le code",
+    category: Category.API,
+    severity: Severity.CRITIQUE,
+    explanation: "Une clé secrète ou un mot de passe apparaît directement dans le code source.",
+    cause: "Les identifiants sensibles ne sont pas externalisés dans des variables d'environnement.",
+    howToFind: "Recherchez des chaînes assignées à des variables comme apiKey, secret ou password.",
+    fixHint: "Déplacez la valeur dans une variable d'environnement (process.env).",
+    beforeCode: `const apiKey = "sk_live_abcdef123456789";`,
+    afterCode: `const apiKey = process.env.API_KEY;`,
+  },
+
   // ============================================================
   // HTML / CSS
   // ============================================================
@@ -517,14 +558,10 @@ return res.json(utilisateur);`,
     title: "Éléments HTML incorrectement imbriqués",
     category: Category.HTML_CSS,
     severity: Severity.MOYENNE,
-    explanation:
-      "Certains éléments HTML ne peuvent pas être placés directement à l'intérieur d'autres éléments.",
-    cause:
-      "La structure HTML ne respecte pas les règles d'imbrication.",
-    howToFind:
-      "Vérifiez les relations entre les éléments parents et enfants.",
-    fixHint:
-      "Utilisez une structure HTML valide.",
+    explanation: "Certains éléments HTML ne peuvent pas être placés directement à l'intérieur d'autres éléments.",
+    cause: "La structure HTML ne respecte pas les règles d'imbrication.",
+    howToFind: "Vérifiez les relations entre les éléments parents et enfants.",
+    fixHint: "Utilisez une structure HTML valide.",
     beforeCode: `<p>
   <div>Contenu</div>
 </p>`,
@@ -538,14 +575,10 @@ return res.json(utilisateur);`,
     title: "Image sans attribut alt",
     category: Category.HTML_CSS,
     severity: Severity.FAIBLE,
-    explanation:
-      "Une image informative devrait fournir une alternative textuelle.",
-    cause:
-      "L'attribut alt est absent.",
-    howToFind:
-      "Recherchez les balises img sans attribut alt.",
-    fixHint:
-      "Ajoutez une description pertinente dans l'attribut alt.",
+    explanation: "Une image informative devrait fournir une alternative textuelle.",
+    cause: "L'attribut alt est absent.",
+    howToFind: "Recherchez les balises img sans attribut alt.",
+    fixHint: "Ajoutez une description pertinente dans l'attribut alt.",
     beforeCode: `<img src="/photo.jpg" />`,
     afterCode: `<img
   src="/photo.jpg"
@@ -553,4 +586,3 @@ return res.json(utilisateur);`,
 />`,
   },
 ];
-

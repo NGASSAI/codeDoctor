@@ -5,11 +5,14 @@ exports.listerReglesDiagnostic = listerReglesDiagnostic;
 exports.verifierCatalogueDiagnostic = verifierCatalogueDiagnostic;
 const base_1 = require("../base");
 const regles_diagnostic_1 = require("../donnees/regles-diagnostic");
+const verification_syntaxe_service_1 = require("./verification-syntaxe.service");
 /**
  * Recherche les règles correspondant au code fourni.
  *
  * Le moteur de diagnostic fonctionne localement :
- * - il récupère les règles correspondant à la catégorie ;
+ * - il vérifie d'abord la syntaxe réelle du code (compilateur TS) ;
+ * - si le code est syntaxiquement valide, il récupère les règles
+ *   correspondant à la catégorie ;
  * - il applique un détecteur spécifique à chaque règle ;
  * - il retourne uniquement les problèmes détectés.
  *
@@ -19,6 +22,12 @@ async function diagnostiquerCode(code, categorie) {
     if (!code.trim()) {
         return [];
     }
+    // Étape 1 — erreurs de syntaxe réelles (avant tout le reste)
+    const erreursSyntaxe = (0, verification_syntaxe_service_1.verifierSyntaxe)(code, categorie);
+    if (erreursSyntaxe.length > 0) {
+        return erreursSyntaxe;
+    }
+    // Étape 2 — moteur de règles métier existant
     const codeNormalise = code.toLowerCase();
     const regles = await base_1.prisma.rule.findMany({
         where: {
@@ -41,11 +50,6 @@ async function diagnostiquerCode(code, categorie) {
              * JS001
              *
              * Détecte une variable let/const utilisée avant sa déclaration.
-             *
-             * Exemple :
-             *
-             * console.log(nom);
-             * const nom = "Jean";
              */
             case "JS001": {
                 const declarationRegex = /\b(?:const|let)\s+([A-Za-z_$][\w$]*)\b/g;
@@ -114,14 +118,33 @@ async function diagnostiquerCode(code, categorie) {
             /**
              * JS006
              *
-             * Détecte les conditions du type :
-             *
-             * role === "ADMIN" || "USER"
+             * Détecte les conditions du type : role === "ADMIN" || "USER"
              */
             case "JS006":
                 correspond =
                     /\|\|\s*["'`][^"'`]+["'`]/.test(code) ||
                         /\|\|\s*(?:true|false|\d+)\b/i.test(code);
+                break;
+            /**
+             * JS007
+             *
+             * Détecte une assignation (=) utilisée à la place d'une
+             * comparaison dans une condition if/while.
+             */
+            case "JS007":
+                correspond =
+                    /\bif\s*\(\s*[A-Za-z_$][\w$]*\s*=(?!=)[^=]/.test(code) ||
+                        /\bwhile\s*\(\s*[A-Za-z_$][\w$]*\s*=(?!=)[^=]/.test(code);
+                break;
+            /**
+             * JS008
+             *
+             * Détecte une boucle while(true) sans break détectable.
+             */
+            case "JS008":
+                correspond =
+                    /\bwhile\s*\(\s*true\s*\)\s*\{/.test(code) &&
+                        !/\bbreak\b/.test(code);
                 break;
             // ========================================================
             // TYPESCRIPT
@@ -150,8 +173,6 @@ async function diagnostiquerCode(code, categorie) {
              *
              * Détection volontairement prudente d'une propriété
              * potentiellement inexistante.
-             *
-             * Le moteur local ne remplace pas le compilateur TypeScript.
              */
             case "TS003": {
                 const interfaces = [
@@ -232,6 +253,19 @@ async function diagnostiquerCode(code, categorie) {
                     /if\s*\([^)]*\)\s*\{[\s\S]*?\b(useState|useEffect|useMemo|useCallback|useRef)\s*\(/i.test(code) ||
                         /(?:for|while)\s*\([^)]*\)\s*\{[\s\S]*?\b(useState|useEffect|useMemo|useCallback|useRef)\s*\(/i.test(code);
                 break;
+            /**
+             * RE005
+             *
+             * Détecte un timer/écouteur créé dans useEffect sans nettoyage.
+             */
+            case "RE005": {
+                const effetsAvecTimer = code.match(/useEffect\s*\(\s*\(\s*\)\s*=>\s*\{[\s\S]*?\}\s*,/gi);
+                if (effetsAvecTimer) {
+                    correspond = effetsAvecTimer.some((effet) => /(setInterval|setTimeout|addEventListener)\s*\(/.test(effet) &&
+                        !/(clearInterval|clearTimeout|removeEventListener)\s*\(/.test(effet));
+                }
+                break;
+            }
             // ========================================================
             // HTTP
             // ========================================================
@@ -261,8 +295,7 @@ async function diagnostiquerCode(code, categorie) {
             /**
              * API001
              *
-             * Détecte une entrée utilisateur utilisée sans validation
-             * apparente.
+             * Détecte une entrée utilisateur utilisée sans validation.
              */
             case "API001":
                 correspond =
@@ -291,6 +324,23 @@ async function diagnostiquerCode(code, categorie) {
                         /\bres\.json\s*\(/i.test(code) &&
                         !/\bselect\s*:/i.test(code);
                 break;
+            /**
+             * API004
+             *
+             * Détecte une requête SQL construite par concaténation directe.
+             */
+            case "API004":
+                correspond = /\.(query|execute)\s*\(\s*`[^`]*\$\{/.test(code);
+                break;
+            /**
+             * SEC001
+             *
+             * Détecte un secret ou une clé API en dur dans le code.
+             */
+            case "SEC001":
+                correspond =
+                    /\b(apiKey|api_key|secret|password|token)\s*=\s*["'][A-Za-z0-9_\-]{10,}["']/i.test(code);
+                break;
             // ========================================================
             // HTML / CSS
             // ========================================================
@@ -310,19 +360,12 @@ async function diagnostiquerCode(code, categorie) {
              * Détecte les images sans attribut alt.
              */
             case "HC002":
-                correspond =
-                    /<img\b(?![^>]*\balt\s*=)[^>]*>/i.test(code);
+                correspond = /<img\b(?![^>]*\balt\s*=)[^>]*>/i.test(code);
                 break;
             // ========================================================
             // FALLBACK
             // ========================================================
             default:
-                /**
-                 * Fallback pour les futures règles.
-                 *
-                 * Une règle est considérée comme pertinente si son code
-                 * ou son titre apparaît explicitement dans le code fourni.
-                 */
                 correspond =
                     codeNormalise.includes(codeRegle) ||
                         codeNormalise.includes(titreRegle);

@@ -16,7 +16,9 @@ export interface DiagnosticResultat {
  * Recherche les règles correspondant au code fourni.
  *
  * Le moteur de diagnostic fonctionne localement :
- * - il récupère les règles correspondant à la catégorie ;
+ * - il vérifie d'abord la syntaxe réelle du code (compilateur TS) ;
+ * - si le code est syntaxiquement valide, il récupère les règles
+ *   correspondant à la catégorie ;
  * - il applique un détecteur spécifique à chaque règle ;
  * - il retourne uniquement les problèmes détectés.
  *

@@ -1,9 +1,9 @@
-
 import { prisma } from "../base";
 
 import type { Category } from "../generated/prisma/client";
 
 import { REGLES_DIAGNOSTIC } from "../donnees/regles-diagnostic";
+import { verifierSyntaxe } from "./verification-syntaxe.service";
 
 export interface DiagnosticResultat {
   regleId: string;
@@ -23,7 +23,9 @@ export interface DiagnosticResultat {
  * Recherche les règles correspondant au code fourni.
  *
  * Le moteur de diagnostic fonctionne localement :
- * - il récupère les règles correspondant à la catégorie ;
+ * - il vérifie d'abord la syntaxe réelle du code (compilateur TS) ;
+ * - si le code est syntaxiquement valide, il récupère les règles
+ *   correspondant à la catégorie ;
  * - il applique un détecteur spécifique à chaque règle ;
  * - il retourne uniquement les problèmes détectés.
  *
@@ -37,6 +39,14 @@ export async function diagnostiquerCode(
     return [];
   }
 
+  // Étape 1 — erreurs de syntaxe réelles (avant tout le reste)
+  const erreursSyntaxe = verifierSyntaxe(code, categorie);
+
+  if (erreursSyntaxe.length > 0) {
+    return erreursSyntaxe;
+  }
+
+  // Étape 2 — moteur de règles métier existant
   const codeNormalise = code.toLowerCase();
 
   const regles = await prisma.rule.findMany({
@@ -65,11 +75,6 @@ export async function diagnostiquerCode(
        * JS001
        *
        * Détecte une variable let/const utilisée avant sa déclaration.
-       *
-       * Exemple :
-       *
-       * console.log(nom);
-       * const nom = "Jean";
        */
       case "JS001": {
         const declarationRegex =
@@ -80,11 +85,11 @@ export async function diagnostiquerCode(
         while ((match = declarationRegex.exec(code)) !== null) {
           const nomVariable = match[1];
 
-if (!nomVariable) {
-  continue;
-}
-          const positionDeclaration = match.index;
+          if (!nomVariable) {
+            continue;
+          }
 
+          const positionDeclaration = match.index;
           const avantDeclaration = code.slice(0, positionDeclaration);
 
           const utilisationAvantDeclaration = new RegExp(
@@ -166,14 +171,37 @@ if (!nomVariable) {
       /**
        * JS006
        *
-       * Détecte les conditions du type :
-       *
-       * role === "ADMIN" || "USER"
+       * Détecte les conditions du type : role === "ADMIN" || "USER"
        */
       case "JS006":
         correspond =
           /\|\|\s*["'`][^"'`]+["'`]/.test(code) ||
           /\|\|\s*(?:true|false|\d+)\b/i.test(code);
+
+        break;
+
+      /**
+       * JS007
+       *
+       * Détecte une assignation (=) utilisée à la place d'une
+       * comparaison dans une condition if/while.
+       */
+      case "JS007":
+        correspond =
+          /\bif\s*\(\s*[A-Za-z_$][\w$]*\s*=(?!=)[^=]/.test(code) ||
+          /\bwhile\s*\(\s*[A-Za-z_$][\w$]*\s*=(?!=)[^=]/.test(code);
+
+        break;
+
+      /**
+       * JS008
+       *
+       * Détecte une boucle while(true) sans break détectable.
+       */
+      case "JS008":
+        correspond =
+          /\bwhile\s*\(\s*true\s*\)\s*\{/.test(code) &&
+          !/\bbreak\b/.test(code);
 
         break;
 
@@ -209,8 +237,6 @@ if (!nomVariable) {
        *
        * Détection volontairement prudente d'une propriété
        * potentiellement inexistante.
-       *
-       * Le moteur local ne remplace pas le compilateur TypeScript.
        */
       case "TS003": {
         const interfaces = [
@@ -220,11 +246,11 @@ if (!nomVariable) {
         ];
 
         for (const interfaceMatch of interfaces) {
-      const contenuInterface = interfaceMatch[2];
+          const contenuInterface = interfaceMatch[2];
 
-if (!contenuInterface) {
-  continue;
-}
+          if (!contenuInterface) {
+            continue;
+          }
 
           const proprietes = [
             ...contenuInterface.matchAll(
@@ -327,6 +353,31 @@ if (!contenuInterface) {
 
         break;
 
+      /**
+       * RE005
+       *
+       * Détecte un timer/écouteur créé dans useEffect sans nettoyage.
+       */
+      case "RE005": {
+        const effetsAvecTimer = code.match(
+          /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{[\s\S]*?\}\s*,/gi
+        );
+
+        if (effetsAvecTimer) {
+          correspond = effetsAvecTimer.some(
+            (effet) =>
+              /(setInterval|setTimeout|addEventListener)\s*\(/.test(
+                effet
+              ) &&
+              !/(clearInterval|clearTimeout|removeEventListener)\s*\(/.test(
+                effet
+              )
+          );
+        }
+
+        break;
+      }
+
       // ========================================================
       // HTTP
       // ========================================================
@@ -362,8 +413,7 @@ if (!contenuInterface) {
       /**
        * API001
        *
-       * Détecte une entrée utilisateur utilisée sans validation
-       * apparente.
+       * Détecte une entrée utilisateur utilisée sans validation.
        */
       case "API001":
         correspond =
@@ -400,6 +450,29 @@ if (!contenuInterface) {
 
         break;
 
+      /**
+       * API004
+       *
+       * Détecte une requête SQL construite par concaténation directe.
+       */
+      case "API004":
+        correspond = /\.(query|execute)\s*\(\s*`[^`]*\$\{/.test(code);
+
+        break;
+
+      /**
+       * SEC001
+       *
+       * Détecte un secret ou une clé API en dur dans le code.
+       */
+      case "SEC001":
+        correspond =
+          /\b(apiKey|api_key|secret|password|token)\s*=\s*["'][A-Za-z0-9_\-]{10,}["']/i.test(
+            code
+          );
+
+        break;
+
       // ========================================================
       // HTML / CSS
       // ========================================================
@@ -424,8 +497,7 @@ if (!contenuInterface) {
        * Détecte les images sans attribut alt.
        */
       case "HC002":
-        correspond =
-          /<img\b(?![^>]*\balt\s*=)[^>]*>/i.test(code);
+        correspond = /<img\b(?![^>]*\balt\s*=)[^>]*>/i.test(code);
 
         break;
 
@@ -434,12 +506,6 @@ if (!contenuInterface) {
       // ========================================================
 
       default:
-        /**
-         * Fallback pour les futures règles.
-         *
-         * Une règle est considérée comme pertinente si son code
-         * ou son titre apparaît explicitement dans le code fourni.
-         */
         correspond =
           codeNormalise.includes(codeRegle) ||
           codeNormalise.includes(titreRegle);
@@ -473,9 +539,7 @@ if (!contenuInterface) {
  * Récupère toutes les règles de diagnostic enregistrées
  * en base de données.
  */
-export async function listerReglesDiagnostic(
-  categorie?: Category
-) {
+export async function listerReglesDiagnostic(categorie?: Category) {
   const requete = {
     orderBy: [
       {
@@ -527,4 +591,3 @@ export async function verifierCatalogueDiagnostic() {
 
   return resultats;
 }
-
