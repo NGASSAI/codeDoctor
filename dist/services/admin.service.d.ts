@@ -110,4 +110,58 @@ export declare function modifierStatutExperienceAdmin(experienceId: string, stat
     moderatedAt: Date | null;
     moderatedBy: string | null;
 }>;
+/**
+ * Modifier le rôle d'un utilisateur (ex: USER <-> ADMIN).
+ */
+export declare function modifierRoleUtilisateurAdmin(userId: string, role: "USER" | "ADMIN"): Promise<{
+    displayName: string | null;
+    email: string;
+    id: string;
+    role: import("../generated/prisma/enums").UserRole;
+}>;
+/**
+ * Modifier le statut d'activation / bannissement d'un utilisateur.
+ */
+export declare function modifierStatutUtilisateurAdmin(userId: string, estActif: boolean): Promise<{
+    displayName: string | null;
+    email: string;
+    id: string;
+    role: import("../generated/prisma/enums").UserRole;
+}>;
+/**
+ * Supprimer définitivement un utilisateur.
+ */
+export declare function supprimerUtilisateurAdmin(userId: string): Promise<{
+    id: string;
+    email: string;
+    passwordHash: string;
+    displayName: string | null;
+    emailVerified: boolean;
+    createdAt: Date;
+    updatedAt: Date;
+    role: import("../generated/prisma/enums").UserRole;
+    recoveryAnswerHash: string | null;
+    recoveryHint: string | null;
+}>;
+/**
+ * Notifications de l'administrateur connecté.
+ */
+export declare function obtenirNotificationsAdmin(adminId: string, page: number, limite: number): Promise<{
+    notifications: {
+        id: string;
+        userId: string;
+        type: import("../generated/prisma/enums").NotificationType;
+        titre: string;
+        message: string;
+        lien: string | null;
+        lue: boolean;
+        createdAt: Date;
+    }[];
+    pagination: {
+        page: number;
+        limite: number;
+        total: number;
+        pages: number;
+    };
+}>;
 //# sourceMappingURL=admin.service.d.ts.map

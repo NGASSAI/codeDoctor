@@ -8,6 +8,9 @@ import {
   listerUtilisateursAdmin,
   listerExperiencesAdmin,
   modifierStatutExperienceAdmin,
+  modifierRoleUtilisateurAdmin,
+  supprimerUtilisateurAdmin,
+  obtenirNotificationsAdmin,
 } from "../services/admin.service";
 
 import {
@@ -39,7 +42,39 @@ export async function dashboardAdmin(
     });
   }
 }
+/**
+ * Modifier le rôle d'un utilisateur
+ * PATCH /api/admin/utilisateurs/:id/role
+ */
+export async function modifierRoleUtilisateur(
+  req: RequeteAuthentifiee,
+  res: Response
+) {
+  const { id } = req.params;
+  const { role } = req.body;
 
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({ erreur: "Identifiant utilisateur invalide." });
+  }
+
+  if (role !== "USER" && role !== "ADMIN") {
+    return res.status(400).json({ erreur: "Rôle invalide." });
+  }
+
+  try {
+    const utilisateur = await modifierRoleUtilisateurAdmin(id, role);
+    return res.status(200).json({
+      message: "Rôle mis à jour avec succès.",
+      utilisateur,
+    });
+  } catch (erreur: any) {
+    if (erreur?.code === "P2025") {
+      return res.status(404).json({ erreur: "Utilisateur introuvable." });
+    }
+    console.error("Erreur modification rôle :", erreur);
+    return res.status(500).json({ erreur: "Erreur interne du serveur." });
+  }
+}
 /**
  * Lister les utilisateurs pour l'administration
  */
@@ -76,6 +111,66 @@ export async function utilisateursAdmin(
     return res.status(500).json({
       erreur: "Erreur interne du serveur.",
     });
+  }
+}
+/**
+ * Supprimer un utilisateur
+ * DELETE /api/admin/utilisateurs/:id
+ */
+export async function supprimerUtilisateur(
+  req: RequeteAuthentifiee,
+  res: Response
+) {
+  const { id } = req.params;
+  const adminId = req.utilisateurId;
+
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({ erreur: "Identifiant utilisateur invalide." });
+  }
+
+  if (id === adminId) {
+    return res.status(400).json({ erreur: "Vous ne pouvez pas supprimer votre propre compte." });
+  }
+
+  try {
+    await supprimerUtilisateurAdmin(id);
+    return res.status(200).json({ success: true });
+  } catch (erreur: any) {
+    if (erreur?.code === "P2025") {
+      return res.status(404).json({ erreur: "Utilisateur introuvable." });
+    }
+    console.error("Erreur suppression utilisateur :", erreur);
+    return res.status(500).json({ erreur: "Erreur interne du serveur." });
+  }
+}
+
+/**
+ * Notifications de l'administrateur connecté
+ * GET /api/admin/notifications
+ */
+export async function notificationsAdmin(
+  req: RequeteAuthentifiee,
+  res: Response
+) {
+  const adminId = req.utilisateurId;
+
+  if (!adminId) {
+    return res.status(401).json({ erreur: "Authentification requise." });
+  }
+
+  try {
+    const page = Math.max(Number.parseInt(req.query.page as string) || 1, 1);
+    const limite = Math.min(
+      Math.max(Number.parseInt(req.query.limite as string) || 20, 1),
+      100
+    );
+
+    const resultat = await obtenirNotificationsAdmin(adminId, page, limite);
+
+    return res.status(200).json(resultat);
+  } catch (erreur) {
+    console.error("Erreur récupération notifications admin :", erreur);
+    return res.status(500).json({ erreur: "Erreur interne du serveur." });
   }
 }
 

@@ -179,3 +179,80 @@ export async function modifierStatutExperienceAdmin(
     },
   });
 }
+/**
+ * Modifier le rôle d'un utilisateur (ex: USER <-> ADMIN).
+ */
+export async function modifierRoleUtilisateurAdmin(
+  userId: string,
+  role: "USER" | "ADMIN"
+) {
+  return prisma.user.update({
+    where: { id: userId },
+    data: { role },
+    select: {
+      id: true,
+      email: true,
+      displayName: true,
+      role: true,
+    },
+  });
+}
+
+/**
+ * Modifier le statut d'activation / bannissement d'un utilisateur.
+ */
+export async function modifierStatutUtilisateurAdmin(
+  userId: string,
+  estActif: boolean
+) {
+  // Ajuste le champ selon ton schéma Prisma (ex: estActif, estBanni, etc.)
+  return prisma.user.update({
+    where: { id: userId },
+    data: { isBlocked: !estActif }, // Adapté si tu as un champ isBlocked ou similaire
+    select: {
+      id: true,
+      email: true,
+      displayName: true,
+      role: true,
+    },
+  });
+}
+/**
+ * Supprimer définitivement un utilisateur.
+ */
+export async function supprimerUtilisateurAdmin(userId: string) {
+  return prisma.user.delete({
+    where: { id: userId },
+  });
+}
+
+/**
+ * Notifications de l'administrateur connecté.
+ */
+export async function obtenirNotificationsAdmin(
+  adminId: string,
+  page: number,
+  limite: number
+) {
+  const skip = (page - 1) * limite;
+
+  const [notifications, total] = await Promise.all([
+    prisma.notification.findMany({
+      where: { userId: adminId },
+      skip,
+      take: limite,
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.notification.count({ where: { userId: adminId } }),
+  ]);
+
+  return {
+    notifications,
+    pagination: {
+      page,
+      limite,
+      total,
+      pages: Math.ceil(total / limite),
+    },
+  };
+}

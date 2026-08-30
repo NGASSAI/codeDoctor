@@ -4,6 +4,10 @@ exports.obtenirStatistiquesAdmin = obtenirStatistiquesAdmin;
 exports.listerUtilisateursAdmin = listerUtilisateursAdmin;
 exports.listerExperiencesAdmin = listerExperiencesAdmin;
 exports.modifierStatutExperienceAdmin = modifierStatutExperienceAdmin;
+exports.modifierRoleUtilisateurAdmin = modifierRoleUtilisateurAdmin;
+exports.modifierStatutUtilisateurAdmin = modifierStatutUtilisateurAdmin;
+exports.supprimerUtilisateurAdmin = supprimerUtilisateurAdmin;
+exports.obtenirNotificationsAdmin = obtenirNotificationsAdmin;
 const base_1 = require("../base");
 async function obtenirStatistiquesAdmin() {
     const [utilisateurs, experiences, experiencesPubliees, experiencesCachees, commentaires, reactions, signalements, signalementsEnAttente, exercices, conversations, notifications,] = await Promise.all([
@@ -150,5 +154,68 @@ async function modifierStatutExperienceAdmin(experienceId, statut, adminId) {
             },
         },
     });
+}
+/**
+ * Modifier le rôle d'un utilisateur (ex: USER <-> ADMIN).
+ */
+async function modifierRoleUtilisateurAdmin(userId, role) {
+    return base_1.prisma.user.update({
+        where: { id: userId },
+        data: { role },
+        select: {
+            id: true,
+            email: true,
+            displayName: true,
+            role: true,
+        },
+    });
+}
+/**
+ * Modifier le statut d'activation / bannissement d'un utilisateur.
+ */
+async function modifierStatutUtilisateurAdmin(userId, estActif) {
+    // Ajuste le champ selon ton schéma Prisma (ex: estActif, estBanni, etc.)
+    return base_1.prisma.user.update({
+        where: { id: userId },
+        data: { isBlocked: !estActif }, // Adapté si tu as un champ isBlocked ou similaire
+        select: {
+            id: true,
+            email: true,
+            displayName: true,
+            role: true,
+        },
+    });
+}
+/**
+ * Supprimer définitivement un utilisateur.
+ */
+async function supprimerUtilisateurAdmin(userId) {
+    return base_1.prisma.user.delete({
+        where: { id: userId },
+    });
+}
+/**
+ * Notifications de l'administrateur connecté.
+ */
+async function obtenirNotificationsAdmin(adminId, page, limite) {
+    const skip = (page - 1) * limite;
+    const [notifications, total] = await Promise.all([
+        base_1.prisma.notification.findMany({
+            where: { userId: adminId },
+            skip,
+            take: limite,
+            orderBy: { createdAt: "desc" },
+        }),
+        base_1.prisma.notification.count({ where: { userId: adminId } }),
+    ]);
+    return {
+        notifications,
+        pagination: {
+            page,
+            limite,
+            total,
+            pages: Math.ceil(total / limite),
+        },
+    };
 }
 //# sourceMappingURL=admin.service.js.map
