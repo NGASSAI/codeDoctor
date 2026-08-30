@@ -225,7 +225,14 @@ export async function supprimerUtilisateurAdmin(userId: string) {
     where: { id: userId },
   });
 }
-
+/**
+ * Supprimer définitivement une expérience.
+ */
+export async function supprimerExperienceAdmin(experienceId: string) {
+  return prisma.experience.delete({
+    where: { id: experienceId },
+  });
+}
 /**
  * Notifications de l'administrateur connecté.
  */

@@ -10,6 +10,7 @@ import {
   modifierStatutExperienceAdmin,
   modifierRoleUtilisateurAdmin,
   supprimerUtilisateurAdmin,
+  supprimerExperienceAdmin,
   obtenirNotificationsAdmin,
 } from "../services/admin.service";
 
@@ -111,6 +112,31 @@ export async function utilisateursAdmin(
     return res.status(500).json({
       erreur: "Erreur interne du serveur.",
     });
+  }
+}
+/**
+ * Supprimer une expérience
+ * DELETE /api/admin/experiences/:id
+ */
+export async function supprimerExperience(
+  req: RequeteAuthentifiee,
+  res: Response
+) {
+  const { id } = req.params;
+
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({ erreur: "Identifiant d'expérience invalide." });
+  }
+
+  try {
+    await supprimerExperienceAdmin(id);
+    return res.status(200).json({ success: true });
+  } catch (erreur: any) {
+    if (erreur?.code === "P2025") {
+      return res.status(404).json({ erreur: "Expérience introuvable." });
+    }
+    console.error("Erreur suppression expérience :", erreur);
+    return res.status(500).json({ erreur: "Erreur interne du serveur." });
   }
 }
 /**

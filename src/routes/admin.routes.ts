@@ -13,6 +13,7 @@ import {
   experiencesAdmin,
   modifierStatutExperience,
   signalementsAdmin,
+  supprimerExperience,
   modifierStatutSignalementAdmin,
   notificationsAdmin,
 } from "../controleurs/admin.controleur";
@@ -36,6 +37,9 @@ routeur.patch("/utilisateurs/:id/role", modifierRoleUtilisateur);
 routeur.get("/experiences", experiencesAdmin);
 routeur.patch("/experiences/:id/statut", modifierStatutExperience);
 routeur.delete("/utilisateurs/:id", supprimerUtilisateur);
+routeur.get("/experiences", experiencesAdmin);
+routeur.patch("/experiences/:id/statut", modifierStatutExperience);
+routeur.delete("/experiences/:id", supprimerExperience);
 
 // --- NOTIFICATIONS ---
 routeur.get("/notifications", notificationsAdmin);
