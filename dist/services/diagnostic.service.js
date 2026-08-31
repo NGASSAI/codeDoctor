@@ -518,6 +518,301 @@ async function diagnostiquerCode(code, categorie) {
                 correspond = [...compteur.values()].some((n) => n >= 3);
                 break;
             }
+            //----------------------------------------------------------------------
+            // ========================================================
+            // TYPESCRIPT
+            // ========================================================
+            /**
+             * TS-001 — Utilisation excessive de any
+             */
+            case "TS-001":
+                correspond = detectionsAST.has("TS-001");
+                break;
+            /**
+             * TS-002 — Paramètre de fonction non typé
+             *
+             * Un paramètre de fonction sans annotation ":" dans un contexte
+             * TypeScript.
+             */
+            case "TS-002": {
+                const fonctionsRegex = /\bfunction\s+[A-Za-z_$][\w$]*\s*\(([^)]*)\)/g;
+                let matchFn;
+                while ((matchFn = fonctionsRegex.exec(code)) !== null) {
+                    const params = matchFn[1];
+                    if (!params?.trim())
+                        continue;
+                    const parametresSansType = params
+                        .split(",")
+                        .map((p) => p.trim())
+                        .filter(Boolean)
+                        .some((p) => !p.includes(":"));
+                    if (parametresSansType) {
+                        correspond = true;
+                        break;
+                    }
+                }
+                break;
+            }
+            /**
+             * TS-003 — Retour de fonction non typé
+             *
+             * function nom(...) { sans ": Type" avant l'accolade.
+             */
+            case "TS-003":
+                correspond =
+                    /\bfunction\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*\{/.test(code) &&
+                        !/\bfunction\s+[A-Za-z_$][\w$]*\s*\([^)]*\)\s*:\s*[A-Za-z_$]/.test(code);
+                break;
+            /**
+             * TS-004 — Interface préférable pour une structure réutilisée
+             *
+             * Un objet de type inline ({ nom: string; age: number }) utilisé
+             * directement dans une signature de fonction.
+             */
+            case "TS-004":
+                correspond =
+                    /\([^)]*:\s*\{[^}]*;[^}]*\}[^)]*\)/.test(code);
+                break;
+            /**
+             * TS-005 — unknown préférable à any pour une donnée inconnue
+             *
+             * any utilisé sur un paramètre dont le nom suggère une donnée
+             * externe (data, response, payload, body).
+             */
+            case "TS-005":
+                correspond =
+                    /\b(data|response|payload|body|reponse|donnees)\s*:\s*any\b/i.test(code);
+                break;
+            /**
+             * TS-006 — Non-null assertion utilisée sans garantie
+             */
+            case "TS-006":
+                correspond = /[A-Za-z_$][\w$]*!\s*[.;)]/.test(code);
+                break;
+            /**
+             * TS-007 — Type union non vérifié
+             *
+             * Un paramètre typé avec une union (string | number) utilisé
+             * directement avec une méthode spécifique à un seul type,
+             * sans vérification typeof/instanceof préalable.
+             */
+            case "TS-007":
+                correspond =
+                    /:\s*[A-Za-z_$][\w$]*\s*\|\s*[A-Za-z_$][\w$]*/.test(code) &&
+                        !/\btypeof\b|\binstanceof\b/.test(code);
+                break;
+            /**
+             * TS-008 — Enum ou union non respecté
+             *
+             * Détection prudente : une variable typée avec un type union
+             * de chaînes littérales reçoit une valeur qui n'apparaît pas
+             * dans la liste des littéraux du type.
+             */
+            case "TS-008": {
+                const unionTypeRegex = /type\s+([A-Za-z_$][\w$]*)\s*=\s*((?:"[^"]+"\s*\|\s*)*"[^"]+")/g;
+                let matchType;
+                while ((matchType = unionTypeRegex.exec(code)) !== null) {
+                    const nomType = matchType[1];
+                    const litteraux = matchType[2];
+                    if (!nomType || !litteraux)
+                        continue;
+                    const valeursAutorisees = [
+                        ...litteraux.matchAll(/"([^"]+)"/g),
+                    ].map((m) => m[1]);
+                    const utilisationRegex = new RegExp(`:\\s*${nomType}\\s*=\\s*"([^"]+)"`);
+                    const matchUtilisation = utilisationRegex.exec(code);
+                    if (matchUtilisation &&
+                        matchUtilisation[1] &&
+                        !valeursAutorisees.includes(matchUtilisation[1])) {
+                        correspond = true;
+                        break;
+                    }
+                }
+                break;
+            }
+            //----------------------------------------------
+            // ========================================================
+            // REACT
+            // ========================================================
+            /**
+             * REACT-001 — Mutation directe du state
+             *
+             * Une variable issue de useState est réassignée directement
+             * (sans passer par son setter).
+             */
+            case "REACT-001": {
+                const useStateRegex = /const\s*\[\s*([A-Za-z_$][\w$]*)\s*,\s*set[A-Z][A-Za-z0-9_$]*\s*\]\s*=\s*useState/g;
+                let matchState;
+                while ((matchState = useStateRegex.exec(code)) !== null) {
+                    const nomState = matchState[1];
+                    if (!nomState)
+                        continue;
+                    const reassignationRegex = new RegExp(`\\b${nomState}\\s*=(?!=)`).test(code);
+                    if (reassignationRegex) {
+                        correspond = true;
+                        break;
+                    }
+                }
+                break;
+            }
+            /**
+             * REACT-002 — Mutation directe d'un tableau dans le state
+             */
+            case "REACT-002":
+                correspond = detectionsAST.has("REACT-002");
+                break;
+            /**
+             * REACT-003 — Mutation directe d'un objet dans le state
+             *
+             * Affectation directe sur une propriété d'une variable de state.
+             */
+            case "REACT-003": {
+                const useStateRegex = /const\s*\[\s*([A-Za-z_$][\w$]*)\s*,\s*set[A-Z][A-Za-z0-9_$]*\s*\]\s*=\s*useState/g;
+                let matchState;
+                while ((matchState = useStateRegex.exec(code)) !== null) {
+                    const nomState = matchState[1];
+                    if (!nomState)
+                        continue;
+                    const mutationPropriete = new RegExp(`\\b${nomState}\\.[A-Za-z_$][\\w$]*\\s*=(?!=)`).test(code);
+                    if (mutationPropriete) {
+                        correspond = true;
+                        break;
+                    }
+                }
+                break;
+            }
+            /**
+             * REACT-004 — useEffect utilisé pour une valeur dérivée
+             *
+             * useEffect dont le corps ne fait qu'un seul setState calculable
+             * directement à partir d'autres valeurs.
+             */
+            case "REACT-004": {
+                const effets = code.match(/useEffect\s*\(\s*\(\s*\)\s*=>\s*\{([\s\S]*?)\}\s*,\s*\[[^\]]*\]\s*\)/g);
+                if (effets) {
+                    correspond = effets.some((effet) => {
+                        const corps = effet.match(/\{([\s\S]*)\}/)?.[1]?.trim() ?? "";
+                        const instructions = corps
+                            .split(";")
+                            .map((i) => i.trim())
+                            .filter(Boolean);
+                        return (instructions.length === 1 &&
+                            /^set[A-Z][A-Za-z0-9_$]*\s*\(/.test(instructions[0] ?? ""));
+                    });
+                }
+                break;
+            }
+            /**
+             * REACT-005 — Hook utilisé conditionnellement
+             */
+            case "REACT-005":
+                correspond = detectionsAST.has("REACT-005");
+                break;
+            /**
+             * REACT-006 — Hook placé après un return conditionnel
+             *
+             * Un "return" apparaît avant un appel useState/useEffect/etc.
+             * dans le corps du composant.
+             */
+            case "REACT-006": {
+                const returnRegex = /\breturn\b/g;
+                const hookRegex = /\b(useState|useEffect|useMemo|useCallback|useRef|useContext)\s*\(/g;
+                const matchReturn = returnRegex.exec(code);
+                const matchHook = hookRegex.exec(code);
+                correspond = Boolean(matchReturn &&
+                    matchHook &&
+                    matchReturn.index < matchHook.index);
+                break;
+            }
+            /**
+             * REACT-007 — Absence de key stable dans une liste
+             */
+            case "REACT-007":
+                correspond = detectionsAST.has("REACT-007");
+                break;
+            /**
+             * REACT-008 — Index utilisé comme key pour une liste dynamique
+             */
+            case "REACT-008":
+                correspond =
+                    /\.map\s*\(\s*\([^,)]+,\s*index\s*\)\s*=>[\s\S]*?key\s*=\s*\{?\s*index\s*\}?/.test(code);
+                break;
+            /**
+             * REACT-009 — Effet avec dépendance manquante
+             *
+             * useEffect avec un tableau de dépendances vide alors qu'une
+             * variable extérieure (prop/state courant) est utilisée dedans.
+             */
+            case "REACT-009":
+                correspond = detectionsAST.has("REACT-009");
+                break;
+            /**
+             * REACT-010 — Effet provoquant potentiellement une boucle de rendu
+             *
+             * useEffect qui modifie un state présent dans ses propres
+             * dépendances.
+             */
+            case "REACT-010": {
+                const effets = [
+                    ...code.matchAll(/useEffect\s*\(\s*\(\s*\)\s*=>\s*\{([\s\S]*?)\}\s*,\s*\[([^\]]*)\]\s*\)/g),
+                ];
+                for (const effet of effets) {
+                    const corps = effet[1];
+                    const dependances = effet[2];
+                    if (!corps || dependances === undefined)
+                        continue;
+                    const deps = dependances
+                        .split(",")
+                        .map((d) => d.trim())
+                        .filter(Boolean);
+                    const modifieUneDependance = deps.some((dep) => new RegExp(`\\bset${dep.charAt(0).toUpperCase()}${dep.slice(1)}\\s*\\(`).test(corps));
+                    if (modifieUneDependance) {
+                        correspond = true;
+                        break;
+                    }
+                }
+                break;
+            }
+            /**
+             * REACT-011 — Effet sans nettoyage pour une ressource externe
+             */
+            case "REACT-011": {
+                const effetsAvecRessource = code.match(/useEffect\s*\(\s*\(\s*\)\s*=>\s*\{[\s\S]*?\}\s*,/g);
+                if (effetsAvecRessource) {
+                    correspond = effetsAvecRessource.some((effet) => /(addEventListener|setInterval|setTimeout|subscribe|new WebSocket)/.test(effet) &&
+                        !/(removeEventListener|clearInterval|clearTimeout|unsubscribe|\.close\s*\()/.test(effet));
+                }
+                break;
+            }
+            /**
+             * REACT-012 — setState utilisé avec une ancienne valeur dans
+             * plusieurs mises à jour
+             *
+             * Deux appels consécutifs à un setter avec la même variable
+             * de state en argument direct (non fonctionnel).
+             */
+            case "REACT-012": {
+                const setterRegex = /\bset([A-Z][A-Za-z0-9_$]*)\s*\(\s*([A-Za-z_$][\w$]*)\s*\+/g;
+                const occurrences = [...code.matchAll(setterRegex)];
+                const compteur = new Map();
+                for (const m of occurrences) {
+                    const cle = `${m[1]}-${m[2]}`;
+                    compteur.set(cle, (compteur.get(cle) ?? 0) + 1);
+                }
+                correspond = [...compteur.values()].some((n) => n > 1);
+                break;
+            }
+            /**
+             * REACT-013 — Effet utilisé pour répondre directement à une
+             * action utilisateur
+             *
+             * useEffect déclenché par un état booléen représentant un
+             * événement ponctuel (envoye, submitted, clicked...).
+             */
+            case "REACT-013":
+                correspond =
+                    /useEffect\s*\(\s*\(\s*\)\s*=>\s*\{[\s\S]*?\}\s*,\s*\[\s*(envoye|submitted|clicked|clique|valide)\s*\]\s*\)/i.test(code);
+                break;
             // ========================================================
             // FALLBACK — tant qu'une règle n'a pas de détecteur dédié
             // ========================================================
