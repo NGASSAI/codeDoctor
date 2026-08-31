@@ -1,5 +1,5 @@
 import { Router } from "express";
-
+import { listerCapacites } from "../controleurs/diagnostic.controleur";
 import {
   lister,
   obtenir,
@@ -47,7 +47,7 @@ router.get(
   authentificationMiddleware,
   indice
 );
-
+router.get("/capacites", listerCapacites);
 /**
  * Soumettre une réponse.
  */

@@ -4,6 +4,7 @@ import type { Category } from "../generated/prisma/client";
 
 import { REGLES_DIAGNOSTIC } from "../donnees/regles-diagnostic";
 import { verifierSyntaxe } from "./verification-syntaxe.service";
+import { detecterViaAST } from "./analyse-ast.service";
 
 export interface DiagnosticResultat {
   regleId: string;
@@ -23,13 +24,15 @@ export interface DiagnosticResultat {
  * Recherche les règles correspondant au code fourni.
  *
  * Le moteur de diagnostic fonctionne localement :
- * - il vérifie d'abord la syntaxe réelle du code (compilateur TS) ;
- * - si le code est syntaxiquement valide, il récupère les règles
- *   correspondant à la catégorie ;
- * - il applique un détecteur spécifique à chaque règle ;
+ * - il vérifie d'abord la syntaxe réelle du code (Babel parser) ;
+ * - si le code est syntaxiquement valide, il exécute les détections
+ *   basées sur l'AST (plus fiables) ;
+ * - il complète avec les détections regex pour les règles non
+ *   encore migrées vers l'AST ;
  * - il retourne uniquement les problèmes détectés.
  *
- * L'IA pourra être ajoutée plus tard comme couche complémentaire.
+ * L'IA reste disponible en complément pour tout ce que ce moteur
+ * ne couvre pas.
  */
 export async function diagnostiquerCode(
   code: string,
@@ -46,7 +49,10 @@ export async function diagnostiquerCode(
     return erreursSyntaxe;
   }
 
-  // Étape 2 — moteur de règles métier existant
+  // Étape 2 — détections basées sur l'AST (règles migrées)
+  const detectionsAST = detecterViaAST(code, categorie);
+
+  // Étape 3 — moteur de règles (AST en priorité, regex en fallback)
   const codeNormalise = code.toLowerCase();
 
   const regles = await prisma.rule.findMany({
@@ -116,31 +122,23 @@ export async function diagnostiquerCode(
       case "JS002":
         correspond =
           /\b[A-Za-z_$][\w$]*\s*=\s*[\s\S]*?\.find\s*\(/i.test(code) ||
-          /\b[A-Za-z_$][\w$]*\s*=\s*[\s\S]*?\.find\s*\([\s\S]*?\)/i.test(
-            code
-          ) ||
           /\b[A-Za-z_$][\w$]*\s*\?\.\s*[A-Za-z_$][\w$]*/i.test(code) ||
           /\bundefined\b/i.test(code);
 
         break;
 
       /**
-       * JS003
-       *
-       * Détecte == et != sans les confondre avec === et !==.
+       * JS003 — migré vers l'AST (précision structurelle)
        */
       case "JS003":
-        correspond =
-          /(^|[^=])==([^=]|$)/.test(code) ||
-          /(^|[^!])!=([^=]|$)/.test(code);
+        correspond = detectionsAST.has("JS003");
 
         break;
 
       /**
        * JS004
        *
-       * Détecte les opérations asynchrones qui ne semblent
-       * pas disposer d'une gestion d'erreur.
+       * Détecte les opérations asynchrones sans gestion d'erreur.
        */
       case "JS004": {
         const operationAsynchrone =
@@ -149,8 +147,7 @@ export async function diagnostiquerCode(
           /\.then\s*\(/i.test(code);
 
         const gestionErreur =
-          /\btry\s*\{/i.test(code) ||
-          /\.catch\s*\(/i.test(code);
+          /\btry\s*\{/i.test(code) || /\.catch\s*\(/i.test(code);
 
         correspond = operationAsynchrone && !gestionErreur;
 
@@ -158,13 +155,10 @@ export async function diagnostiquerCode(
       }
 
       /**
-       * JS005
-       *
-       * Détecte les méthodes qui modifient directement un tableau.
+       * JS005 — migré vers l'AST (précision structurelle)
        */
       case "JS005":
-        correspond =
-          /\.\s*(push|pop|splice|sort|shift|unshift)\s*\(/i.test(code);
+        correspond = detectionsAST.has("JS005");
 
         break;
 
@@ -205,17 +199,52 @@ export async function diagnostiquerCode(
 
         break;
 
+      /**
+       * JS009
+       *
+       * Détecte une variable assignée sans jamais avoir été
+       * déclarée avec let, const ou var.
+       */
+      case "JS009": {
+        const assignationRegex = /^\s*([A-Za-z_$][\w$]*)\s*=(?!=)/gm;
+
+        const variablesAssignees = new Set<string>();
+
+        let matchAssignation: RegExpExecArray | null;
+
+        while (
+          (matchAssignation = assignationRegex.exec(code)) !== null
+        ) {
+          const nom = matchAssignation[1];
+
+          if (nom) {
+            variablesAssignees.add(nom);
+          }
+        }
+
+        for (const nom of variablesAssignees) {
+          const declaree = new RegExp(
+            `\\b(?:let|const|var|function)\\s+${nom}\\b|\\b${nom}\\s*[,)]\\s*=>|function\\s*\\([^)]*\\b${nom}\\b`
+          ).test(code);
+
+          if (!declaree) {
+            correspond = true;
+            break;
+          }
+        }
+
+        break;
+      }
+
       // ========================================================
       // TYPESCRIPT
       // ========================================================
 
       /**
-       * TS001
-       *
-       * Détecte l'utilisation de any.
+       * TS001 — migré vers l'AST (précision structurelle)
        */
       case "TS001":
-        correspond = /\bany\b/.test(code);
+        correspond = detectionsAST.has("TS001");
 
         break;
 
@@ -269,7 +298,9 @@ export async function diagnostiquerCode(
 
           let utilisation: RegExpExecArray | null;
 
-          while ((utilisation = objetUtilisation.exec(code)) !== null) {
+          while (
+            (utilisation = objetUtilisation.exec(code)) !== null
+          ) {
             const proprieteUtilisee = utilisation[2];
 
             if (!proprietes.includes(proprieteUtilisee)) {
@@ -291,16 +322,10 @@ export async function diagnostiquerCode(
       // ========================================================
 
       /**
-       * RE001
-       *
-       * Détecte un map() JSX sans key.
+       * RE001 — migré vers l'AST (précision structurelle)
        */
       case "RE001":
-        correspond =
-          /\.map\s*\(/i.test(code) &&
-          /=>\s*\(?\s*</.test(code) &&
-          /<[A-Za-z][^>]*>/i.test(code) &&
-          !/\bkey\s*=/.test(code);
+        correspond = detectionsAST.has("RE001");
 
         break;
 
@@ -338,18 +363,10 @@ export async function diagnostiquerCode(
       }
 
       /**
-       * RE004
-       *
-       * Détecte un Hook appelé dans un bloc conditionnel.
+       * RE004 — migré vers l'AST (précision structurelle)
        */
       case "RE004":
-        correspond =
-          /if\s*\([^)]*\)\s*\{[\s\S]*?\b(useState|useEffect|useMemo|useCallback|useRef)\s*\(/i.test(
-            code
-          ) ||
-          /(?:for|while)\s*\([^)]*\)\s*\{[\s\S]*?\b(useState|useEffect|useMemo|useCallback|useRef)\s*\(/i.test(
-            code
-          );
+        correspond = detectionsAST.has("RE004");
 
         break;
 

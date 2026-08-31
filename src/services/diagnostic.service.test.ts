@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-
+import { detecterViaAST } from "./analyse-ast.service";
 import { Category } from "../generated/prisma/client";
 import { diagnostiquerCode } from "./diagnostic.service";
 

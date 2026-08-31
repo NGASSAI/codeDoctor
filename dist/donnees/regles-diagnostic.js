@@ -510,5 +510,21 @@ return res.json(utilisateur);`,
   alt="Portrait de l'utilisateur"
 />`,
     },
+    {
+        code: "JS009",
+        title: "Variable assignée sans déclaration",
+        category: client_1.Category.JAVASCRIPT,
+        severity: client_1.Severity.CRITIQUE,
+        explanation: "Une valeur est assignée à une variable qui n'a jamais été déclarée avec let, const ou var.",
+        cause: "En mode strict (module ES, classes, ou 'use strict'), assigner une variable non déclarée provoque une ReferenceError à l'exécution.",
+        howToFind: "Recherchez des assignations (nom = valeur) dont le nom n'apparaît jamais après let, const ou var.",
+        fixHint: "Déclarez la variable avec let ou const avant de lui assigner une valeur.",
+        beforeCode: `a = 2;
+b = 4;
+c = a + b;`,
+        afterCode: `let a = 2;
+let b = 4;
+let c = a + b;`,
+    },
 ];
 //# sourceMappingURL=regles-diagnostic.js.map

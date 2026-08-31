@@ -16,13 +16,15 @@ export interface DiagnosticResultat {
  * Recherche les règles correspondant au code fourni.
  *
  * Le moteur de diagnostic fonctionne localement :
- * - il vérifie d'abord la syntaxe réelle du code (compilateur TS) ;
- * - si le code est syntaxiquement valide, il récupère les règles
- *   correspondant à la catégorie ;
- * - il applique un détecteur spécifique à chaque règle ;
+ * - il vérifie d'abord la syntaxe réelle du code (Babel parser) ;
+ * - si le code est syntaxiquement valide, il exécute les détections
+ *   basées sur l'AST (plus fiables) ;
+ * - il complète avec les détections regex pour les règles non
+ *   encore migrées vers l'AST ;
  * - il retourne uniquement les problèmes détectés.
  *
- * L'IA pourra être ajoutée plus tard comme couche complémentaire.
+ * L'IA reste disponible en complément pour tout ce que ce moteur
+ * ne couvre pas.
  */
 export declare function diagnostiquerCode(code: string, categorie: Category): Promise<DiagnosticResultat[]>;
 /**

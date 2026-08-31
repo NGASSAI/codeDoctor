@@ -2,7 +2,7 @@ import { Router } from "express";
 
 import { diagnostiquer } from "../controleurs/diagnostic.controleur";
 import { authentificationMiddleware } from "../middlewares/authentification.middleware";
-
+import { listerCapacites } from "../controleurs/diagnostic.controleur";
 const router = Router();
 
 /**
@@ -16,5 +16,5 @@ router.post(
   authentificationMiddleware,
   diagnostiquer
 );
-
+router.get("/capacites", listerCapacites);
 export default router;

@@ -15,6 +15,7 @@
   "description": "",
   "dependencies": {
     "@babel/parser": "^7.29.8",
+    "@babel/traverse": "^7.29.8",
     "@prisma/adapter-pg": "^7.10.0",
     "@prisma/client": "^7.10.0",
     "bcrypt": "^6.0.0",
@@ -30,6 +31,7 @@
     "typescript": "^7.0.2"
   },
   "devDependencies": {
+    "@types/babel__traverse": "^7.28.0",
     "@types/bcrypt": "^6.0.0",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",

@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
+const diagnostic_controleur_1 = require("../controleurs/diagnostic.controleur");
 const exercice_controleur_1 = require("../controleurs/exercice.controleur");
 const authentification_middleware_1 = require("../middlewares/authentification.middleware");
 const router = (0, express_1.Router)();
@@ -21,6 +22,7 @@ router.get("/:id", exercice_controleur_1.obtenir);
  * Récupérer un indice.
  */
 router.get("/:id/indices/:numero", authentification_middleware_1.authentificationMiddleware, exercice_controleur_1.indice);
+router.get("/capacites", diagnostic_controleur_1.listerCapacites);
 /**
  * Soumettre une réponse.
  */

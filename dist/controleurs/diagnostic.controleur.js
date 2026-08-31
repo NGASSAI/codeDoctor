@@ -1,7 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.diagnostiquer = diagnostiquer;
+exports.listerCapacites = listerCapacites;
 const diagnostic_service_1 = require("../services/diagnostic.service");
+const diagnostic_service_2 = require("../services/diagnostic.service");
 const CATEGORIES_DIAGNOSTIC = [
     "JAVASCRIPT",
     "TYPESCRIPT",
@@ -37,7 +39,7 @@ async function diagnostiquer(req, res) {
                 categories: CATEGORIES_DIAGNOSTIC,
             });
         }
-        const resultats = await (0, diagnostic_service_1.diagnostiquerCode)(code, categorie);
+        const resultats = await (0, diagnostic_service_2.diagnostiquerCode)(code, categorie);
         return res.status(200).json({
             succes: true,
             categorie,
@@ -50,6 +52,27 @@ async function diagnostiquer(req, res) {
         return res.status(500).json({
             succes: false,
             erreur: "Impossible d'effectuer le diagnostic.",
+        });
+    }
+}
+async function listerCapacites(req, res) {
+    try {
+        const categorie = req.query.categorie;
+        const regles = await (0, diagnostic_service_1.listerReglesDiagnostic)(categorie && estCategorieValide(categorie)
+            ? categorie
+            : undefined);
+        const capacites = regles.map((regle) => ({
+            code: regle.code,
+            titre: regle.title,
+            categorie: regle.category,
+            severite: regle.severity,
+        }));
+        return res.status(200).json({ capacites });
+    }
+    catch (erreur) {
+        console.error("Erreur récupération capacités :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de récupérer les capacités du moteur.",
         });
     }
 }

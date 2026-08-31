@@ -1,5 +1,5 @@
 import type { Request, Response } from "express";
-
+import { listerReglesDiagnostic } from "../services/diagnostic.service";
 import type { Category } from "../generated/prisma/client";
 import { diagnostiquerCode } from "../services/diagnostic.service";
 
@@ -79,6 +79,36 @@ export async function diagnostiquer(
       succes: false,
       erreur:
         "Impossible d'effectuer le diagnostic.",
+    });
+  }
+}
+
+export async function listerCapacites(
+  req: Request,
+  res: Response
+) {
+  try {
+    const categorie = req.query.categorie as string | undefined;
+
+    const regles = await listerReglesDiagnostic(
+      categorie && estCategorieValide(categorie)
+        ? (categorie as Category)
+        : undefined
+    );
+
+    const capacites = regles.map((regle) => ({
+      code: regle.code,
+      titre: regle.title,
+      categorie: regle.category,
+      severite: regle.severity,
+    }));
+
+    return res.status(200).json({ capacites });
+  } catch (erreur) {
+    console.error("Erreur récupération capacités :", erreur);
+
+    return res.status(500).json({
+      erreur: "Impossible de récupérer les capacités du moteur.",
     });
   }
 }
