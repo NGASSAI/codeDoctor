@@ -781,11 +781,11 @@ export async function diagnostiquerCode(
           );
         break;
 
-      /**
+          /**
        * TS-006 — Non-null assertion utilisée sans garantie
        */
       case "TS-006":
-        correspond = /[A-Za-z_$][\w$]*!\s*[.;)]/.test(code);
+        correspond = /[\w$)\]]!(?![=\w])/.test(code);
         break;
 
       /**
@@ -1099,6 +1099,428 @@ export async function diagnostiquerCode(
             code
           );
         break;  
+        //----------------------------------------
+              // ========================================================
+      // HTTP
+      // ========================================================
+
+      /**
+       * HTTP-001 — Mauvaise méthode HTTP pour l'opération
+       *
+       * fetch avec method: "GET" mais un body présent dans les options.
+       */
+      case "HTTP-001":
+        correspond =
+          /method\s*:\s*["']GET["'][\s\S]{0,150}?\bbody\s*:/i.test(code) ||
+          /\bbody\s*:[\s\S]{0,150}?method\s*:\s*["']GET["']/i.test(code);
+        break;
+
+      /**
+       * HTTP-002 — Absence de vérification de response.ok
+       *
+       * fetch suivi directement de response.json() sans test
+       * response.ok / response.status.
+       */
+      case "HTTP-002":
+        correspond =
+          /\bfetch\s*\([^)]*\)/.test(code) &&
+          /\.json\s*\(\s*\)/.test(code) &&
+          !/\.ok\b/.test(code) &&
+          !/\.status\b/.test(code);
+        break;
+
+      /**
+       * HTTP-003 — Mauvais code de statut HTTP
+       *
+       * status(200) accompagné d'un champ d'erreur dans la réponse.
+       */
+      case "HTTP-003":
+        correspond =
+          /status\s*\(\s*200\s*\)/i.test(code) &&
+          /\b(erreur|error|introuvable|not found|failed|echec)\b/i.test(
+            code
+          );
+        break;
+
+      /**
+       * HTTP-004 — Création de ressource sans statut approprié
+       *
+       * Route POST qui renvoie status(200) au lieu de 201.
+       */
+      case "HTTP-004":
+        correspond =
+          /\b(?:app|router)\.post\s*\(/.test(code) &&
+          /status\s*\(\s*200\s*\)/.test(code) &&
+          !/status\s*\(\s*201\s*\)/.test(code);
+        break;
+
+      /**
+       * HTTP-005 — Corps JSON envoyé sans Content-Type
+       */
+      case "HTTP-005":
+        correspond =
+          /body\s*:\s*JSON\.stringify\s*\(/.test(code) &&
+          !/Content-Type/i.test(code);
+        break;
+
+      /**
+       * HTTP-006 — Endpoint sensible sans authentification
+       *
+       * Route dont le chemin suggère une ressource privée, définie
+       * sans middleware d'authentification.
+       */
+      case "HTTP-006": {
+        const routeRegex =
+          /\b(?:app|router)\.(get|post|put|patch|delete)\s*\(\s*["'`]([^"'`]*(?:profil|compte|prive|admin|moi|me)[^"'`]*)["'`]\s*,\s*([^)]*)\)/gi;
+
+        let matchRoute: RegExpExecArray | null;
+
+        while ((matchRoute = routeRegex.exec(code)) !== null) {
+          const handlers = matchRoute[3];
+
+          if (
+            handlers &&
+            !/authentification/i.test(handlers) &&
+            !/authMiddleware/i.test(handlers)
+          ) {
+            correspond = true;
+            break;
+          }
+        }
+
+        break;
+      }
+
+            // ========================================================
+      // API
+      // ========================================================
+
+      /**
+       * API-001 — Données utilisateur non validées
+       */
+      case "API-001":
+        correspond =
+          /\breq\.(body|params|query)\b/i.test(code) &&
+          !/\b(zod|joi|yup|validator|validate|safeParse|parse|schema)\b/i.test(
+            code
+          );
+        break;
+
+      /**
+       * API-002 — Erreur interne exposée au client
+       *
+       * L'objet error (ou sa stack) est directement renvoyé au client.
+       */
+      case "API-002":
+        correspond =
+          /catch\s*\(\s*(error|erreur)\s*\)\s*\{[\s\S]*?res\.(json|send)\s*\(\s*\{[^}]*\b(error|erreur)\s*[,:}]/i.test(
+            code
+          ) ||
+          /res\.(json|send)\s*\([^)]*\.stack\b/i.test(code);
+        break;
+
+      /**
+       * API-003 — Route utilisant une donnée d'identité fournie par
+       * le client
+       */
+      case "API-003":
+        correspond =
+          /const\s*\{\s*userId\s*\}\s*=\s*req\.body/i.test(code) ||
+          /req\.body\.userId\b/i.test(code) ||
+          /req\.params\.userId\b/i.test(code);
+        break;
+
+      /**
+       * API-004 — Absence de contrôle d'autorisation
+       *
+       * Route sensible (supprimer/admin) avec authentification mais
+       * sans vérification de rôle.
+       */
+      case "API-004":
+        correspond =
+          /authentificationMiddleware/i.test(code) &&
+          /\b(supprimer|admin)/i.test(code) &&
+          !/\b(adminMiddleware|verifierRole|role\s*===?\s*["']ADMIN["'])/i.test(
+            code
+          );
+        break;
+
+      /**
+       * API-005 — Absence de gestion d'une ressource inexistante
+       *
+       * Résultat de findUnique/findFirst utilisé directement sans
+       * vérification préalable.
+       */
+      case "API-005": {
+        const rechercheRegex =
+          /const\s+([A-Za-z_$][\w$]*)\s*=\s*await\s+[\s\S]*?\.(findUnique|findFirst)\s*\(/g;
+
+        let matchRecherche: RegExpExecArray | null;
+
+        while ((matchRecherche = rechercheRegex.exec(code)) !== null) {
+          const nomVariable = matchRecherche[1];
+
+          if (!nomVariable) continue;
+
+          const positionApres =
+            matchRecherche.index + matchRecherche[0].length;
+          const suite = code.slice(positionApres);
+
+          const verifieExistence = new RegExp(
+            `if\\s*\\(\\s*!\\s*${nomVariable}\\b`
+          ).test(suite);
+
+          const utiliseDirectement = new RegExp(
+            `\\b${nomVariable}\\.[A-Za-z_$]`
+          ).test(suite);
+
+          if (utiliseDirectement && !verifieExistence) {
+            correspond = true;
+            break;
+          }
+        }
+
+        break;
+      }
+
+      /**
+       * API-006 — Absence de limitation d'une entrée volumineuse
+       *
+       * Une donnée reçue (code, texte) est utilisée sans vérification
+       * de longueur maximale.
+       */
+      case "API-006":
+        correspond =
+          /const\s*\{\s*code\s*\}\s*=\s*req\.body/i.test(code) &&
+          !/\.length\s*[<>]/.test(code);
+        break;
+
+      /**
+       * API-007 — Opération sensible sans rate limiting
+       */
+      case "API-007":
+        correspond =
+          /\b(?:app|router)\.(post|get)\s*\(\s*["'`][^"'`]*(connexion|login|reset|analyser|inscription)[^"'`]*["'`]/i.test(
+            code
+          ) && !/rateLimit/i.test(code);
+        break;
+
+      /**
+       * API-008 — Données sensibles enregistrées dans les logs
+       */
+      case "API-008":
+        correspond =
+          /console\.log\s*\([^)]*req\.body[^)]*\)/i.test(code) ||
+          /console\.log\s*\([^)]*\b(password|motDePasse|token|secret)\b[^)]*\)/i.test(
+            code
+          );
+        break;
+
+      /**
+       * API-009 — Réponse API non normalisée
+       *
+       * Détection volontairement désactivée : nécessite de comparer
+       * plusieurs endpoints entre eux, hors de portée d'une analyse
+       * ligne à ligne. Laissé au fallback IA.
+       */
+      case "API-009":
+        correspond = false;
+        break;
+
+      /**
+       * API-010 — Absence de validation d'un paramètre d'URL
+       */
+      case "API-010": {
+        const paramRegex =
+          /const\s+([A-Za-z_$][\w$]*)\s*=\s*req\.params\.[A-Za-z_$][\w$]*/g;
+
+        let matchParam: RegExpExecArray | null;
+
+        while ((matchParam = paramRegex.exec(code)) !== null) {
+          const nomVariable = matchParam[1];
+
+          if (!nomVariable) continue;
+
+          const positionApres = matchParam.index + matchParam[0].length;
+          const suite = code.slice(positionApres, positionApres + 200);
+
+          const verifie = new RegExp(
+            `if\\s*\\([^)]*${nomVariable}\\b`
+          ).test(suite);
+
+          if (!verifie) {
+            correspond = true;
+            break;
+          }
+        }
+
+        break;
+      }
+
+      /**
+       * API-011 — Validation insuffisante d'une pagination
+       */
+      case "API-011":
+        correspond =
+          /Number\s*\(\s*req\.query\.(limite|limit|page)\s*\)/i.test(
+            code
+          ) &&
+          !/Math\.min|Math\.max/.test(code);
+        break;
+
+      /**
+       * API-012 — Donnée utilisateur utilisée directement dans une
+       * réponse HTML
+       */
+      case "API-012":
+        correspond =
+          /\.innerHTML\s*=\s*[A-Za-z_$][\w$]*(?:\.[A-Za-z_$][\w$]*)*\s*;/.test(
+            code
+          ) && !/\.innerHTML\s*=\s*["'`]/.test(code);
+        break;
+
+
+              // ========================================================
+      // HTML / CSS
+      // ========================================================
+
+      /**
+       * HTML-001 — Image sans attribut alt
+       */
+      case "HTML-001":
+        correspond = /<img\b(?![^>]*\balt\s*=)[^>]*>/i.test(code);
+        break;
+
+      /**
+       * HTML-002 — Bouton sans type explicite dans un formulaire
+       */
+      case "HTML-002":
+        correspond =
+          /<form\b[\s\S]*?<button\b(?![^>]*\btype\s*=)[^>]*>[\s\S]*?<\/form>/i.test(
+            code
+          );
+        break;
+
+      /**
+       * HTML-003 — Input sans label accessible
+       *
+       * input avec un id qui n'apparaît dans aucun htmlFor, ou input
+       * sans id du tout et sans label englobant.
+       */
+      case "HTML-003":
+        correspond =
+          /<input\b[^>]*>/i.test(code) &&
+          !/\bhtmlFor\s*=/.test(code) &&
+          !/<label\b[^>]*>[\s\S]*?<input\b/i.test(code);
+        break;
+
+      /**
+       * HTML-004 — Utilisation d'un div comme bouton
+       */
+      case "HTML-004":
+        correspond = /<div\b[^>]*\bonClick\s*=/.test(code);
+        break;
+
+      /**
+       * HTML-005 — Hiérarchie de titres incohérente
+       *
+       * Un titre de niveau N est immédiatement suivi d'un titre de
+       * niveau N+2 ou plus (saut de niveau).
+       */
+      case "HTML-005": {
+        const titres = [
+          ...code.matchAll(/<h([1-6])\b/gi),
+        ].map((m) => Number(m[1]));
+
+        for (let i = 0; i < titres.length - 1; i++) {
+          const actuel = titres[i];
+          const suivant = titres[i + 1];
+
+          if (
+            actuel !== undefined &&
+            suivant !== undefined &&
+            suivant > actuel + 1
+          ) {
+            correspond = true;
+            break;
+          }
+        }
+
+        break;
+      }
+
+      /**
+       * HTML-006 — Formulaire sans gestion explicite de soumission
+       */
+      case "HTML-006":
+        correspond =
+          /<form\b(?![^>]*\bonSubmit\s*=)[^>]*>/i.test(code);
+        break;
+
+      /**
+       * HTML-007 — Texte de placeholder utilisé comme seule étiquette
+       */
+      case "HTML-007":
+        correspond =
+          /<input\b[^>]*\bplaceholder\s*=/i.test(code) &&
+          !/<label\b/i.test(code);
+        break;
+
+      /**
+       * HTML-008 — Lien utilisé pour une action
+       */
+      case "HTML-008":
+        correspond =
+          /<a\b[^>]*href\s*=\s*["']#["'][^>]*\bonClick\s*=/i.test(code);
+        break;
+
+      /**
+       * HTML-009 — Contenu pouvant provoquer un débordement horizontal
+       *
+       * Largeur fixe en pixels supérieure à 600px sans max-width.
+       */
+      case "HTML-009": {
+        const largeurRegex = /width\s*:\s*(\d+)px/g;
+
+        let matchLargeur: RegExpExecArray | null;
+
+        while ((matchLargeur = largeurRegex.exec(code)) !== null) {
+          const valeur = Number(matchLargeur[1]);
+
+          if (valeur >= 600 && !/max-width/.test(code)) {
+            correspond = true;
+            break;
+          }
+        }
+
+        break;
+      }
+
+      /**
+       * HTML-010 — Image non responsive
+       *
+       * Une classe ou un sélecteur visant une image (photo, img, image)
+       * a une largeur fixe en pixels sans max-width.
+       */
+      case "HTML-010": {
+        const selecteurImageRegex =
+          /\.(photo|image|img)\s*\{[^}]*width\s*:\s*(\d+)px[^}]*\}/gi;
+
+        let matchSelecteur: RegExpExecArray | null;
+
+        while (
+          (matchSelecteur = selecteurImageRegex.exec(code)) !== null
+        ) {
+          const blocComplet = matchSelecteur[0];
+
+          if (!/max-width/.test(blocComplet)) {
+            correspond = true;
+            break;
+          }
+        }
+
+        break;
+      }
       // ========================================================
       // FALLBACK — tant qu'une règle n'a pas de détecteur dédié
       // ========================================================
