@@ -15,21 +15,18 @@ export interface DiagnosticResultat {
 /**
  * Recherche les règles correspondant au code fourni.
  *
- * Le moteur de diagnostic fonctionne localement :
- * - il vérifie d'abord la syntaxe réelle du code (Babel parser) ;
- * - si le code est syntaxiquement valide, il exécute les détections
- *   basées sur l'AST (plus fiables) ;
- * - il complète avec les détections regex pour les règles non
- *   encore migrées vers l'AST ;
- * - il retourne uniquement les problèmes détectés.
+ * Étapes :
+ * 1. Vérification de la syntaxe réelle (Babel parser).
+ * 2. Détections basées sur l'AST (règles migrées, une par une).
+ * 3. Détections regex (fallback, pour les règles pas encore migrées).
  *
- * L'IA reste disponible en complément pour tout ce que ce moteur
- * ne couvre pas.
+ * Les codes de règles utilisés ici doivent EXACTEMENT correspondre
+ * à ceux définis dans src/data/codeDoctorRules.ts (format avec tiret,
+ * ex: "JS-001", "REACT-001", "HTML-001").
  */
 export declare function diagnostiquerCode(code: string, categorie: Category): Promise<DiagnosticResultat[]>;
 /**
- * Récupère toutes les règles de diagnostic enregistrées
- * en base de données.
+ * Récupère toutes les règles de diagnostic enregistrées en base.
  */
 export declare function listerReglesDiagnostic(categorie?: Category): Promise<{
     id: string;
@@ -46,7 +43,7 @@ export declare function listerReglesDiagnostic(categorie?: Category): Promise<{
     createdAt: Date;
 }[]>;
 /**
- * Vérifie quelles règles du catalogue local
+ * Vérifie quelles règles du catalogue local (CODE_DOCTOR_RULES)
  * sont déjà présentes en base.
  */
 export declare function verifierCatalogueDiagnostic(): Promise<{
