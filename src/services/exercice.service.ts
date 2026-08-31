@@ -268,3 +268,66 @@ export async function obtenirProgression(
     },
   });
 }
+
+/**
+ * Crée un nouvel exercice (réservé à l'admin).
+ */
+export async function creerExercice(donnees: {
+  title: string;
+  category: Category;
+  difficulty: string;
+  buggyCode: string;
+  hint1: string;
+  hint2: string;
+  hint3: string;
+  solution: string;
+  keywords: string[];
+}) {
+  return prisma.exercise.create({
+    data: donnees,
+  });
+}
+
+/**
+ * Modifie un exercice existant (réservé à l'admin).
+ */
+export async function modifierExercice(
+  exerciceId: string,
+  donnees: {
+    title?: string;
+    category?: Category;
+    difficulty?: string;
+    buggyCode?: string;
+    hint1?: string;
+    hint2?: string;
+    hint3?: string;
+    solution?: string;
+    keywords?: string[];
+  }
+) {
+  return prisma.exercise.update({
+    where: { id: exerciceId },
+    data: donnees,
+  });
+}
+
+/**
+ * Supprime un exercice (réservé à l'admin).
+ */
+export async function supprimerExercice(
+  exerciceId: string
+) {
+  return prisma.exercise.delete({
+    where: { id: exerciceId },
+  });
+}
+
+/**
+ * Liste complète des exercices pour l'admin,
+ * incluant la solution et les mots-clés.
+ */
+export async function listerExercicesAdmin() {
+  return prisma.exercise.findMany({
+    orderBy: { createdAt: "desc" },
+  });
+}

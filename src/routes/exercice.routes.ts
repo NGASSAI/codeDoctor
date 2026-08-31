@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { listerCapacites } from "../controleurs/diagnostic.controleur";
+
 import {
   lister,
   obtenir,
@@ -7,9 +7,14 @@ import {
   tenter,
   mesTentatives,
   maProgression,
+  listerPourAdmin,
+  creer,
+  modifier,
+  supprimer,
 } from "../controleurs/exercice.controleur";
 
 import { authentificationMiddleware } from "../middlewares/authentification.middleware";
+import { adminMiddleware } from "../middlewares/admin.middleware";
 
 const router = Router();
 
@@ -30,7 +35,40 @@ router.get(
 );
 
 /**
- * Liste des exercices.
+ * Routes ADMIN — gestion des exercices.
+ * Placées avant /:id pour ne pas être interceptées.
+ */
+
+router.get(
+  "/admin/tous",
+  authentificationMiddleware,
+  adminMiddleware,
+  listerPourAdmin
+);
+
+router.post(
+  "/admin",
+  authentificationMiddleware,
+  adminMiddleware,
+  creer
+);
+
+router.put(
+  "/admin/:id",
+  authentificationMiddleware,
+  adminMiddleware,
+  modifier
+);
+
+router.delete(
+  "/admin/:id",
+  authentificationMiddleware,
+  adminMiddleware,
+  supprimer
+);
+
+/**
+ * Liste des exercices (public).
  */
 router.get("/", lister);
 
@@ -47,7 +85,7 @@ router.get(
   authentificationMiddleware,
   indice
 );
-router.get("/capacites", listerCapacites);
+
 /**
  * Soumettre une réponse.
  */
