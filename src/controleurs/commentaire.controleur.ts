@@ -1,12 +1,11 @@
 import { Request, Response } from "express";
-
+import { prisma } from "../base";
 import {
   creerCommentaire,
   obtenirCommentaires,
   trouverCommentaireUtilisateur,
   supprimerCommentaire,
 } from "../services/commentaire.service";
-
 import { RequeteAuthentifiee } from "../middlewares/authentification.middleware";
 
 /**
@@ -55,6 +54,32 @@ export async function creer(
       experienceId,
       contenuNettoye
     );
+
+    // Récupération de l'expérience et du commentateur pour la notification
+    const [experience, auteurCommentaire] = await Promise.all([
+      prisma.experience.findUnique({
+        where: { id: experienceId },
+        select: { userId: true, titre: true },
+      }),
+      prisma.user.findUnique({
+        where: { id: utilisateurId },
+        select: { displayName: true },
+      }),
+    ]);
+
+    // Notification à l'auteur de l'expérience si ce n'est pas lui-même qui commente
+    if (experience && experience.userId !== utilisateurId) {
+      const nomAuteur = auteurCommentaire?.displayName || "Un utilisateur";
+      await prisma.notification.create({
+        data: {
+          userId: experience.userId,
+          type: "NOUVEAU_COMMENTAIRE",
+          titre: "Nouveau commentaire",
+          message: `${nomAuteur} a commenté votre expérience "${experience.titre}".`,
+          lien: `/experiences/${experienceId}`,
+        },
+      });
+    }
 
     return res.status(201).json({
       message: "Commentaire ajouté avec succès.",

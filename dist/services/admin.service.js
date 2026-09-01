@@ -11,6 +11,7 @@ exports.modifierStatutUtilisateurAdmin = modifierStatutUtilisateurAdmin;
 exports.supprimerUtilisateurAdmin = supprimerUtilisateurAdmin;
 exports.supprimerExperienceAdmin = supprimerExperienceAdmin;
 exports.obtenirNotificationsAdmin = obtenirNotificationsAdmin;
+exports.marquerNotificationCommeLueService = marquerNotificationCommeLueService;
 const base_1 = require("../base");
 /**
  * Créer une expérience depuis l'espace admin.
@@ -260,5 +261,19 @@ async function obtenirNotificationsAdmin(adminId, page, limite) {
             pages: Math.ceil(total / limite),
         },
     };
+}
+/**
+ * Marquer une notification comme lue.
+ */
+async function marquerNotificationCommeLueService(notificationId, adminId) {
+    return base_1.prisma.notification.update({
+        where: {
+            id: notificationId,
+            userId: adminId,
+        },
+        data: {
+            lue: true,
+        },
+    });
 }
 //# sourceMappingURL=admin.service.js.map

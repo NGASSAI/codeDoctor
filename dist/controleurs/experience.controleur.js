@@ -5,6 +5,7 @@ exports.lister = lister;
 exports.obtenir = obtenir;
 exports.modifier = modifier;
 exports.supprimer = supprimer;
+const base_1 = require("../base");
 const experience_service_1 = require("../services/experience.service");
 const client_1 = require("../generated/prisma/client");
 /**
@@ -39,6 +40,22 @@ async function creer(req, res) {
             technologie,
             categorie,
         });
+        // Notification envoyée aux administrateurs
+        const admins = await base_1.prisma.user.findMany({
+            where: { role: "ADMIN" },
+            select: { id: true },
+        });
+        if (admins.length > 0) {
+            await base_1.prisma.notification.createMany({
+                data: admins.map((admin) => ({
+                    userId: admin.id,
+                    type: "NOUVELLE_EXPERIENCE",
+                    titre: "Nouvelle expérience soumise",
+                    message: `Une nouvelle expérience "${experience.titre}" a été soumise pour modération.`,
+                    lien: `/admin/experiences`,
+                })),
+            });
+        }
         return res.status(201).json({
             message: "Expérience publiée avec succès.",
             experience,
@@ -69,21 +86,18 @@ async function lister(req, res) {
         const limiteParam = typeof req.query.limite === "string"
             ? Number(req.query.limite)
             : 10;
-        // Validation de la catégorie
         if (categorie &&
             !Object.values(client_1.Category).includes(categorie)) {
             return res.status(400).json({
                 erreur: "Catégorie invalide.",
             });
         }
-        // Validation de la page
         if (!Number.isInteger(pageParam) ||
             pageParam < 1) {
             return res.status(400).json({
                 erreur: "Le numéro de page doit être un entier supérieur ou égal à 1.",
             });
         }
-        // Validation de la limite
         if (!Number.isInteger(limiteParam) ||
             limiteParam < 1 ||
             limiteParam > 50) {

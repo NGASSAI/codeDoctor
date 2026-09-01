@@ -28,15 +28,6 @@ export declare function rafraichir(req: Request, res: Response): Promise<Respons
  * =========================================================
  * MOT DE PASSE OUBLIÉ — ÉTAPE 1 ET 2
  * =========================================================
- *
- * Étape 1 :
- *   email uniquement
- *   → retourne l'indice de récupération
- *
- * Étape 2 :
- *   email + phrase secrète
- *   → vérifie la phrase
- *   → génère un token valable 5 minutes
  */
 export declare function motDePasseOublie(req: Request, res: Response): Promise<Response<any, Record<string, any>>>;
 /**

@@ -3,13 +3,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.paiementsAdmin = paiementsAdmin;
 exports.approuverPaiementAdmin = approuverPaiementAdmin;
 exports.rejeterPaiementAdmin = rejeterPaiementAdmin;
+const base_1 = require("../base");
 const paiement_service_1 = require("../services/paiement.service");
 /**
- * =========================================================
  * LISTER LES PAIEMENTS PREMIUM
- *
  * GET /api/admin/paiements
- * =========================================================
  */
 async function paiementsAdmin(req, res) {
     try {
@@ -26,14 +24,8 @@ async function paiementsAdmin(req, res) {
     }
 }
 /**
- * =========================================================
  * APPROUVER UN PAIEMENT
- *
  * PATCH /api/admin/paiements/:id/approuver
- *
- * L'approbation active automatiquement le Premium
- * de l'utilisateur pendant 30 jours.
- * =========================================================
  */
 async function approuverPaiementAdmin(req, res) {
     const paiementId = req.params.id;
@@ -44,6 +36,16 @@ async function approuverPaiementAdmin(req, res) {
     }
     try {
         const paiement = await (0, paiement_service_1.approuverPaiement)(paiementId);
+        // Notification envoyée à l'utilisateur concerné
+        await base_1.prisma.notification.create({
+            data: {
+                userId: paiement.userId,
+                type: "PAIEMENT_APPROUVE",
+                titre: "Paiement approuvé",
+                message: `Votre paiement de ${paiement.montant} FCFA a été validé. Votre accès Premium est désormais actif.`,
+                lien: "/profil",
+            },
+        });
         return res.status(200).json({
             message: "Paiement approuvé avec succès.",
             paiement,
@@ -62,11 +64,8 @@ async function approuverPaiementAdmin(req, res) {
     }
 }
 /**
- * =========================================================
  * REJETER UN PAIEMENT
- *
  * PATCH /api/admin/paiements/:id/rejeter
- * =========================================================
  */
 async function rejeterPaiementAdmin(req, res) {
     const paiementId = req.params.id;
@@ -77,6 +76,16 @@ async function rejeterPaiementAdmin(req, res) {
     }
     try {
         const paiement = await (0, paiement_service_1.rejeterPaiement)(paiementId);
+        // Notification envoyée à l'utilisateur concerné
+        await base_1.prisma.notification.create({
+            data: {
+                userId: paiement.userId,
+                type: "PAIEMENT_REJETE",
+                titre: "Paiement rejeté",
+                message: `Votre demande de paiement de ${paiement.montant} FCFA n'a pas pu être validée.`,
+                lien: "/profil",
+            },
+        });
         return res.status(200).json({
             message: "Paiement rejeté avec succès.",
             paiement,

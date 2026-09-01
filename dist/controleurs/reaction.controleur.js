@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ajouter = ajouter;
 exports.lister = lister;
 exports.supprimer = supprimer;
+const base_1 = require("../base");
 const reaction_service_1 = require("../services/reaction.service");
 /**
  * Ajouter une réaction
@@ -23,10 +24,7 @@ async function ajouter(req, res) {
             });
         }
         const { type } = req.body;
-        const typesAutorises = [
-            "LIKE",
-            "USEFUL",
-        ];
+        const typesAutorises = ["LIKE", "USEFUL"];
         if (typeof type !== "string" ||
             !typesAutorises.includes(type)) {
             return res.status(400).json({
@@ -40,6 +38,31 @@ async function ajouter(req, res) {
             });
         }
         const reaction = await (0, reaction_service_1.ajouterReaction)(utilisateurId, experienceId, type);
+        // Récupération des informations sur l'expérience et l'auteur de la réaction
+        const [experience, utilisateur] = await Promise.all([
+            base_1.prisma.experience.findUnique({
+                where: { id: experienceId },
+                select: { userId: true, titre: true },
+            }),
+            base_1.prisma.user.findUnique({
+                where: { id: utilisateurId },
+                select: { displayName: true },
+            }),
+        ]);
+        // Notification envoyée à l'auteur si ce n'est pas lui qui réagit
+        if (experience && experience.userId !== utilisateurId) {
+            const nomAuteur = utilisateur?.displayName || "Un utilisateur";
+            const libelleType = type === "LIKE" ? "aimé" : "trouvé utile";
+            await base_1.prisma.notification.create({
+                data: {
+                    userId: experience.userId,
+                    type: "NOUVELLE_REACTION",
+                    titre: "Nouvelle réaction",
+                    message: `${nomAuteur} a ${libelleType} votre expérience "${experience.titre}".`,
+                    lien: `/experiences/${experienceId}`,
+                },
+            });
+        }
         return res.status(201).json({
             message: "Réaction ajoutée avec succès.",
             reaction,
@@ -96,10 +119,7 @@ async function supprimer(req, res) {
                 erreur: "Paramètres invalides.",
             });
         }
-        const typesAutorises = [
-            "LIKE",
-            "USEFUL",
-        ];
+        const typesAutorises = ["LIKE", "USEFUL"];
         if (!typesAutorises.includes(type)) {
             return res.status(400).json({
                 erreur: "Type de réaction invalide.",

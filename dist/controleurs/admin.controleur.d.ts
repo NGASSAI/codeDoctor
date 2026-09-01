@@ -35,6 +35,9 @@ export declare function experiencesAdmin(req: RequeteAuthentifiee, res: Response
 /**
  * Modifier le statut d'une expérience
  */
+/**
+ * Modifier le statut d'une expérience + déclencher notification
+ */
 export declare function modifierStatutExperience(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
  * Lister les signalements pour l'administration
@@ -54,4 +57,9 @@ export declare function creerExperience(req: RequeteAuthentifiee, res: Response)
  * PUT /api/admin/experiences/:id
  */
 export declare function modifierExperience(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
+/**
+ * Marquer une notification comme lue
+ * PATCH /api/admin/notifications/:id/lue
+ */
+export declare function marquerNotificationLueAdmin(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
 //# sourceMappingURL=admin.controleur.d.ts.map

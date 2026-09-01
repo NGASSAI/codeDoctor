@@ -240,4 +240,17 @@ export declare function obtenirNotificationsAdmin(adminId: string, page: number,
         pages: number;
     };
 }>;
+/**
+ * Marquer une notification comme lue.
+ */
+export declare function marquerNotificationCommeLueService(notificationId: string, adminId: string): Promise<{
+    id: string;
+    userId: string;
+    type: import("../generated/prisma/enums").NotificationType;
+    titre: string;
+    message: string;
+    lien: string | null;
+    lue: boolean;
+    createdAt: Date;
+}>;
 //# sourceMappingURL=admin.service.d.ts.map

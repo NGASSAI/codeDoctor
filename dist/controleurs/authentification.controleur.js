@@ -14,6 +14,7 @@ exports.verifierEmail = verifierEmail;
 exports.moi = moi;
 const crypto_1 = __importDefault(require("crypto"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+const base_1 = require("../base");
 const utilisateur_service_1 = require("../services/utilisateur.service");
 /**
  * =========================================================
@@ -70,22 +71,12 @@ async function inscription(req, res) {
                 erreur: "L'indice de récupération doit contenir au moins 3 caractères.",
             });
         }
-        /*
-         * La phrase secrète doit être différente
-         * du mot de passe.
-         */
-        if (phraseRecuperation.toLowerCase() ===
-            motDePasse.toLowerCase()) {
+        if (phraseRecuperation.toLowerCase() === motDePasse.toLowerCase()) {
             return res.status(400).json({
                 erreur: "La phrase secrète doit être différente du mot de passe.",
             });
         }
-        /*
-         * L'indice ne doit pas être identique
-         * à la phrase secrète.
-         */
-        if (indiceRecuperation.toLowerCase() ===
-            phraseRecuperation.toLowerCase()) {
+        if (indiceRecuperation.toLowerCase() === phraseRecuperation.toLowerCase()) {
             return res.status(400).json({
                 erreur: "L'indice doit aider à retrouver la phrase sans la révéler.",
             });
@@ -97,15 +88,23 @@ async function inscription(req, res) {
             });
         }
         const utilisateur = await (0, utilisateur_service_1.creerUtilisateur)(emailNormalise, motDePasse, nomNormalise, phraseRecuperation, indiceRecuperation);
-        /*
-         * Création automatique du token
-         * de vérification email.
-         */
         const tokenVerification = await (0, utilisateur_service_1.creerTokenVerificationEmail)(utilisateur.id);
-        /*
-         * Aucun JWT de session n'est créé avant
-         * la vérification de l'adresse email.
-         */
+        // Notification aux administrateurs pour informer du nouvel utilisateur enregistré
+        const admins = await base_1.prisma.user.findMany({
+            where: { role: "ADMIN" },
+            select: { id: true },
+        });
+        if (admins.length > 0) {
+            await base_1.prisma.notification.createMany({
+                data: admins.map((admin) => ({
+                    userId: admin.id,
+                    type: "NOUVEL_UTILISATEUR",
+                    titre: "Nouveau membre",
+                    message: `L'utilisateur ${utilisateur.displayName} (${utilisateur.email}) vient de s'inscrire.`,
+                    lien: "/admin/utilisateurs",
+                })),
+            });
+        }
         return res.status(201).json({
             utilisateur: {
                 id: utilisateur.id,
@@ -113,12 +112,6 @@ async function inscription(req, res) {
                 displayName: utilisateur.displayName,
                 emailVerified: utilisateur.emailVerified,
             },
-            /*
-             * TEMPORAIRE POUR LES TESTS.
-             *
-             * À remplacer par un envoi email
-             * avant une véritable mise en production.
-             */
             tokenVerification,
             message: "Compte créé avec succès. Veuillez vérifier votre adresse email avant de vous connecter.",
         });
@@ -137,7 +130,7 @@ async function inscription(req, res) {
  */
 async function connexion(req, res) {
     try {
-        const { email, motDePasse, } = req.body;
+        const { email, motDePasse } = req.body;
         if (!email || !motDePasse) {
             return res.status(400).json({
                 erreur: "Email et mot de passe requis.",
@@ -162,19 +155,11 @@ async function connexion(req, res) {
                 erreur: "Email ou mot de passe incorrect.",
             });
         }
-        /*
-         * L'administrateur configuré dans EMAIL_ADMIN
-         * peut se connecter même si emailVerified
-         * est encore false.
-         *
-         * Le rôle ADMIN doit déjà être présent en base.
-         */
         const emailAdmin = (process.env.EMAIL_ADMIN ?? "")
             .trim()
             .toLowerCase();
         const estAdminConfigure = emailAdmin !== "" &&
-            utilisateur.email.toLowerCase() ===
-                emailAdmin &&
+            utilisateur.email.toLowerCase() === emailAdmin &&
             utilisateur.role === "ADMIN";
         if (!utilisateur.emailVerified &&
             !estAdminConfigure) {
@@ -194,8 +179,7 @@ async function connexion(req, res) {
         }, secret, {
             expiresIn: "7d",
         });
-        const userAgent = typeof req.headers["user-agent"] ===
-            "string"
+        const userAgent = typeof req.headers["user-agent"] === "string"
             ? req.headers["user-agent"]
             : undefined;
         const { refreshToken } = await (0, utilisateur_service_1.creerSession)(utilisateur.id, userAgent);
@@ -205,8 +189,7 @@ async function connexion(req, res) {
                 email: utilisateur.email,
                 displayName: utilisateur.displayName,
                 role: utilisateur.role,
-                emailVerified: utilisateur.emailVerified ||
-                    estAdminConfigure,
+                emailVerified: utilisateur.emailVerified || estAdminConfigure,
             },
             jeton,
             refreshToken,
@@ -226,7 +209,7 @@ async function connexion(req, res) {
  */
 async function deconnexion(req, res) {
     try {
-        const { refreshToken, } = req.body;
+        const { refreshToken } = req.body;
         if (!refreshToken ||
             typeof refreshToken !== "string") {
             return res.status(400).json({
@@ -256,7 +239,7 @@ async function deconnexion(req, res) {
  */
 async function rafraichir(req, res) {
     try {
-        const { refreshToken, } = req.body;
+        const { refreshToken } = req.body;
         if (!refreshToken ||
             typeof refreshToken !== "string") {
             return res.status(400).json({
@@ -273,7 +256,7 @@ async function rafraichir(req, res) {
                 erreur: "Refresh token invalide ou expiré.",
             });
         }
-        const { refreshToken: nouveauRefreshToken, } = await (0, utilisateur_service_1.renouvelerSession)(session.id);
+        const { refreshToken: nouveauRefreshToken } = await (0, utilisateur_service_1.renouvelerSession)(session.id);
         const secret = process.env.JWT_SECRET;
         if (!secret) {
             console.error("JWT_SECRET n'est pas configuré.");
@@ -302,37 +285,19 @@ async function rafraichir(req, res) {
  * =========================================================
  * MOT DE PASSE OUBLIÉ — ÉTAPE 1 ET 2
  * =========================================================
- *
- * Étape 1 :
- *   email uniquement
- *   → retourne l'indice de récupération
- *
- * Étape 2 :
- *   email + phrase secrète
- *   → vérifie la phrase
- *   → génère un token valable 5 minutes
  */
 async function motDePasseOublie(req, res) {
     try {
-        const { email, recoveryAnswer, } = req.body;
-        if (!email ||
-            typeof email !== "string") {
+        const { email, recoveryAnswer } = req.body;
+        if (!email || typeof email !== "string") {
             return res.status(400).json({
                 erreur: "Email requis.",
             });
         }
         const emailNormalise = email.trim().toLowerCase();
         const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
-        /*
-         * -------------------------------------------------------
-         * ÉTAPE 1 : récupérer l'indice
-         * -------------------------------------------------------
-         */
         if (recoveryAnswer === undefined) {
             if (!utilisateur) {
-                /*
-                 * Réponse volontairement générique.
-                 */
                 return res.status(200).json({
                     message: "Si un compte correspond à cet email, vous pouvez poursuivre la récupération.",
                 });
@@ -347,11 +312,6 @@ async function motDePasseOublie(req, res) {
                 recoveryHint: utilisateur.recoveryHint,
             });
         }
-        /*
-         * -------------------------------------------------------
-         * ÉTAPE 2 : vérifier la phrase secrète
-         * -------------------------------------------------------
-         */
         if (typeof recoveryAnswer !== "string") {
             return res.status(400).json({
                 erreur: "Phrase secrète invalide.",
@@ -373,13 +333,6 @@ async function motDePasseOublie(req, res) {
                 erreur: "Les informations de récupération sont incorrectes.",
             });
         }
-        /*
-         * Phrase correcte :
-         * création d'un token de réinitialisation.
-         *
-         * Sa durée de vie est de 5 minutes
-         * dans creerTokenReinitialisation().
-         */
         const token = await (0, utilisateur_service_1.creerTokenReinitialisation)(utilisateur.id);
         const frontendUrl = (process.env.FRONTEND_URL ??
             "https://code-doctor-front.vercel.app").replace(/\/+$/, "");
@@ -402,7 +355,7 @@ async function motDePasseOublie(req, res) {
  * =========================================================
  */
 async function reinitialiserMotDePasseControleur(req, res) {
-    const { token, nouveauMotDePasse, } = req.body;
+    const { token, nouveauMotDePasse } = req.body;
     if (!token ||
         typeof token !== "string" ||
         !nouveauMotDePasse ||
@@ -447,18 +400,13 @@ async function reinitialiserMotDePasseControleur(req, res) {
 async function demanderVerificationEmail(req, res) {
     try {
         const { email } = req.body;
-        if (!email ||
-            typeof email !== "string") {
+        if (!email || typeof email !== "string") {
             return res.status(400).json({
                 erreur: "Email requis.",
             });
         }
         const emailNormalise = email.trim().toLowerCase();
         const utilisateur = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
-        /*
-         * Même réponse si le compte existe
-         * ou non.
-         */
         if (!utilisateur) {
             return res.status(200).json({
                 message: "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
@@ -470,9 +418,6 @@ async function demanderVerificationEmail(req, res) {
             });
         }
         const token = await (0, utilisateur_service_1.creerTokenVerificationEmail)(utilisateur.id);
-        /*
-         * TEMPORAIRE POUR LES TESTS.
-         */
         return res.status(200).json({
             message: "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
             token,

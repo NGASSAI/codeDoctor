@@ -1,4 +1,5 @@
 import { Request, Response } from "express";
+import { prisma } from "../base";
 import {
   creerExperience,
   obtenirExperiences,
@@ -57,6 +58,24 @@ export async function creer(req: RequeteAuthentifiee, res: Response) {
       categorie,
     });
 
+    // Notification envoyée aux administrateurs
+    const admins = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      select: { id: true },
+    });
+
+    if (admins.length > 0) {
+      await prisma.notification.createMany({
+        data: admins.map((admin) => ({
+          userId: admin.id,
+          type: "NOUVELLE_EXPERIENCE",
+          titre: "Nouvelle expérience soumise",
+          message: `Une nouvelle expérience "${experience.titre}" a été soumise pour modération.`,
+          lien: `/admin/experiences`,
+        })),
+      });
+    }
+
     return res.status(201).json({
       message: "Expérience publiée avec succès.",
       experience,
@@ -96,7 +115,6 @@ export async function lister(req: Request, res: Response) {
         ? Number(req.query.limite)
         : 10;
 
-    // Validation de la catégorie
     if (
       categorie &&
       !Object.values(Category).includes(categorie as Category)
@@ -106,7 +124,6 @@ export async function lister(req: Request, res: Response) {
       });
     }
 
-    // Validation de la page
     if (
       !Number.isInteger(pageParam) ||
       pageParam < 1
@@ -116,7 +133,6 @@ export async function lister(req: Request, res: Response) {
       });
     }
 
-    // Validation de la limite
     if (
       !Number.isInteger(limiteParam) ||
       limiteParam < 1 ||
@@ -150,15 +166,15 @@ export async function lister(req: Request, res: Response) {
  */
 export async function obtenir(req: Request, res: Response) {
   try {
-  const id = req.params.id;
+    const id = req.params.id;
 
-if (typeof id !== "string") {
-  return res.status(400).json({
-    erreur: "Identifiant d'expérience invalide.",
-  });
-}
+    if (typeof id !== "string") {
+      return res.status(400).json({
+        erreur: "Identifiant d'expérience invalide.",
+      });
+    }
 
-const experience = await obtenirExperienceParId(id);
+    const experience = await obtenirExperienceParId(id);
 
     if (!experience) {
       return res.status(404).json({
@@ -195,18 +211,18 @@ export async function modifier(
       });
     }
 
-   const id = req.params.id;
+    const id = req.params.id;
 
-if (typeof id !== "string") {
-  return res.status(400).json({
-    erreur: "Identifiant d'expérience invalide.",
-  });
-}
+    if (typeof id !== "string") {
+      return res.status(400).json({
+        erreur: "Identifiant d'expérience invalide.",
+      });
+    }
 
-const experience = await trouverExperienceUtilisateur(
-  id,
-  utilisateurId
-);
+    const experience = await trouverExperienceUtilisateur(
+      id,
+      utilisateurId
+    );
 
     if (!experience) {
       return res.status(404).json({
@@ -275,18 +291,18 @@ export async function supprimer(
       });
     }
 
-   const id = req.params.id;
+    const id = req.params.id;
 
-if (typeof id !== "string") {
-  return res.status(400).json({
-    erreur: "Identifiant d'expérience invalide.",
-  });
-}
+    if (typeof id !== "string") {
+      return res.status(400).json({
+        erreur: "Identifiant d'expérience invalide.",
+      });
+    }
 
-const experience = await trouverExperienceUtilisateur(
-  id,
-  utilisateurId
-);
+    const experience = await trouverExperienceUtilisateur(
+      id,
+      utilisateurId
+    );
 
     if (!experience) {
       return res.status(404).json({

@@ -12,6 +12,8 @@ exports.signalementsAdmin = signalementsAdmin;
 exports.modifierStatutSignalementAdmin = modifierStatutSignalementAdmin;
 exports.creerExperience = creerExperience;
 exports.modifierExperience = modifierExperience;
+exports.marquerNotificationLueAdmin = marquerNotificationLueAdmin;
+const { prisma } = require("../lib/prisma");
 const admin_service_1 = require("../services/admin.service");
 const report_service_1 = require("../services/report.service");
 /**
@@ -162,29 +164,38 @@ async function experiencesAdmin(req, res) {
 /**
  * Modifier le statut d'une expérience
  */
+/**
+ * Modifier le statut d'une expérience + déclencher notification
+ */
 async function modifierStatutExperience(req, res) {
     const adminId = req.utilisateurId;
     const id = req.params.id;
     const { statut } = req.body;
     if (!adminId) {
-        return res.status(401).json({
-            erreur: "Authentification requise.",
-        });
+        return res.status(401).json({ erreur: "Authentification requise." });
     }
     if (!id || typeof id !== "string") {
-        return res.status(400).json({
-            erreur: "Identifiant d'expérience invalide.",
-        });
+        return res.status(400).json({ erreur: "Identifiant d'expérience invalide." });
     }
-    if (statut !== "PUBLISHED" &&
-        statut !== "HIDDEN" &&
-        statut !== "DELETED") {
-        return res.status(400).json({
-            erreur: "Statut d'expérience invalide.",
-        });
+    if (statut !== "PUBLISHED" && statut !== "HIDDEN" && statut !== "DELETED") {
+        return res.status(400).json({ erreur: "Statut d'expérience invalide." });
     }
     try {
         const experience = await (0, admin_service_1.modifierStatutExperienceAdmin)(id, statut, adminId);
+        // Déclenchement de la notification de modération pour l'auteur de l'expérience
+        const typeNotif = statut === "PUBLISHED" ? "EXPERIENCE_APPROUVEE" : "EXPERIENCE_REFUSEE";
+        const messageNotif = statut === "PUBLISHED"
+            ? `Votre expérience "${experience.titre}" a été approuvée.`
+            : `Votre expérience "${experience.titre}" a été refusée ou masquée.`;
+        await prisma.notification.create({
+            data: {
+                userId: experience.userId,
+                type: typeNotif,
+                titre: statut === "PUBLISHED" ? "Expérience approuvée" : "Expérience masquée",
+                message: messageNotif,
+                lien: `/experiences/${experience.id}`,
+            },
+        });
         return res.status(200).json({
             message: "Statut de l'expérience mis à jour.",
             experience,
@@ -192,14 +203,10 @@ async function modifierStatutExperience(req, res) {
     }
     catch (erreur) {
         if (erreur?.code === "P2025") {
-            return res.status(404).json({
-                erreur: "Expérience introuvable.",
-            });
+            return res.status(404).json({ erreur: "Expérience introuvable." });
         }
         console.error("Erreur lors de la modification du statut :", erreur);
-        return res.status(500).json({
-            erreur: "Erreur interne du serveur.",
-        });
+        return res.status(500).json({ erreur: "Erreur interne du serveur." });
     }
 }
 /**
@@ -367,6 +374,32 @@ async function modifierExperience(req, res) {
         return res.status(500).json({
             erreur: "Impossible de modifier l'expérience.",
         });
+    }
+}
+/**
+ * Marquer une notification comme lue
+ * PATCH /api/admin/notifications/:id/lue
+ */
+async function marquerNotificationLueAdmin(req, res) {
+    const { id } = req.params;
+    const adminId = req.utilisateurId;
+    if (!adminId) {
+        return res.status(401).json({ erreur: "Authentification requise." });
+    }
+    if (!id || typeof id !== "string") {
+        return res.status(400).json({ erreur: "Identifiant invalide." });
+    }
+    try {
+        // Appel du service pour mettre à jour la notification
+        const notification = await (0, admin_service_1.marquerNotificationCommeLueService)(id, adminId);
+        return res.status(200).json({ success: true, notification });
+    }
+    catch (erreur) {
+        if (erreur?.code === "P2025") {
+            return res.status(404).json({ erreur: "Notification introuvable." });
+        }
+        console.error("Erreur notification lue :", erreur);
+        return res.status(500).json({ erreur: "Erreur interne du serveur." });
     }
 }
 //# sourceMappingURL=admin.controleur.js.map

@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.creer = creer;
 exports.lister = lister;
 exports.supprimer = supprimer;
+const base_1 = require("../base");
 const commentaire_service_1 = require("../services/commentaire.service");
 /**
  * Créer un commentaire
@@ -35,6 +36,30 @@ async function creer(req, res) {
             });
         }
         const commentaire = await (0, commentaire_service_1.creerCommentaire)(utilisateurId, experienceId, contenuNettoye);
+        // Récupération de l'expérience et du commentateur pour la notification
+        const [experience, auteurCommentaire] = await Promise.all([
+            base_1.prisma.experience.findUnique({
+                where: { id: experienceId },
+                select: { userId: true, titre: true },
+            }),
+            base_1.prisma.user.findUnique({
+                where: { id: utilisateurId },
+                select: { displayName: true },
+            }),
+        ]);
+        // Notification à l'auteur de l'expérience si ce n'est pas lui-même qui commente
+        if (experience && experience.userId !== utilisateurId) {
+            const nomAuteur = auteurCommentaire?.displayName || "Un utilisateur";
+            await base_1.prisma.notification.create({
+                data: {
+                    userId: experience.userId,
+                    type: "NOUVEAU_COMMENTAIRE",
+                    titre: "Nouveau commentaire",
+                    message: `${nomAuteur} a commenté votre expérience "${experience.titre}".`,
+                    lien: `/experiences/${experienceId}`,
+                },
+            });
+        }
         return res.status(201).json({
             message: "Commentaire ajouté avec succès.",
             commentaire,

@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-
+import { prisma } from "../base";
 import type { ReactionType } from "../generated/prisma/client";
 
 import {
@@ -38,10 +38,7 @@ export async function ajouter(
 
     const { type } = req.body;
 
-    const typesAutorises = [
-      "LIKE",
-      "USEFUL",
-    ];
+    const typesAutorises = ["LIKE", "USEFUL"];
 
     if (
       typeof type !== "string" ||
@@ -69,6 +66,34 @@ export async function ajouter(
       experienceId,
       type as ReactionType
     );
+
+    // Récupération des informations sur l'expérience et l'auteur de la réaction
+    const [experience, utilisateur] = await Promise.all([
+      prisma.experience.findUnique({
+        where: { id: experienceId },
+        select: { userId: true, titre: true },
+      }),
+      prisma.user.findUnique({
+        where: { id: utilisateurId },
+        select: { displayName: true },
+      }),
+    ]);
+
+    // Notification envoyée à l'auteur si ce n'est pas lui qui réagit
+    if (experience && experience.userId !== utilisateurId) {
+      const nomAuteur = utilisateur?.displayName || "Un utilisateur";
+      const libelleType = type === "LIKE" ? "aimé" : "trouvé utile";
+
+      await prisma.notification.create({
+        data: {
+          userId: experience.userId,
+          type: "NOUVELLE_REACTION",
+          titre: "Nouvelle réaction",
+          message: `${nomAuteur} a ${libelleType} votre expérience "${experience.titre}".`,
+          lien: `/experiences/${experienceId}`,
+        },
+      });
+    }
 
     return res.status(201).json({
       message: "Réaction ajoutée avec succès.",
@@ -143,10 +168,7 @@ export async function supprimer(
       });
     }
 
-    const typesAutorises = [
-       "LIKE",
-  "USEFUL",
-    ];
+    const typesAutorises = ["LIKE", "USEFUL"];
 
     if (!typesAutorises.includes(type)) {
       return res.status(400).json({

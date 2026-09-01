@@ -326,3 +326,20 @@ export async function obtenirNotificationsAdmin(
     },
   };
 }
+/**
+ * Marquer une notification comme lue.
+ */
+export async function marquerNotificationCommeLueService(
+  notificationId: string,
+  adminId: string
+) {
+  return prisma.notification.update({
+    where: {
+      id: notificationId,
+      userId: adminId,
+    },
+    data: {
+      lue: true,
+    },
+  });
+}

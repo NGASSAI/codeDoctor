@@ -1,7 +1,7 @@
-
 import { Request, Response } from "express";
 import crypto from "crypto";
 import jwt from "jsonwebtoken";
+import { prisma } from "../base";
 
 import {
   creerUtilisateur,
@@ -46,8 +46,7 @@ export async function inscription(
 
     if (!email || !motDePasse) {
       return res.status(400).json({
-        erreur:
-          "Email et mot de passe requis.",
+        erreur: "Email et mot de passe requis.",
       });
     }
 
@@ -66,22 +65,14 @@ export async function inscription(
       typeof recoveryHint !== "string"
     ) {
       return res.status(400).json({
-        erreur:
-          "Nom, phrase secrète et indice sont requis.",
+        erreur: "Nom, phrase secrète et indice sont requis.",
       });
     }
 
-    const emailNormalise =
-      email.trim().toLowerCase();
-
-    const nomNormalise =
-      displayName.trim();
-
-    const phraseRecuperation =
-      recoveryAnswer.trim();
-
-    const indiceRecuperation =
-      recoveryHint.trim();
+    const emailNormalise = email.trim().toLowerCase();
+    const nomNormalise = displayName.trim();
+    const phraseRecuperation = recoveryAnswer.trim();
+    const indiceRecuperation = recoveryHint.trim();
 
     if (!emailNormalise) {
       return res.status(400).json({
@@ -91,124 +82,100 @@ export async function inscription(
 
     if (nomNormalise.length < 2) {
       return res.status(400).json({
-        erreur:
-          "Le nom doit contenir au moins 2 caractères.",
+        erreur: "Le nom doit contenir au moins 2 caractères.",
       });
     }
 
     if (motDePasse.length < 8) {
       return res.status(400).json({
-        erreur:
-          "Le mot de passe doit contenir au moins 8 caractères.",
+        erreur: "Le mot de passe doit contenir au moins 8 caractères.",
       });
     }
 
     if (phraseRecuperation.length < 8) {
       return res.status(400).json({
-        erreur:
-          "La phrase secrète doit contenir au moins 8 caractères.",
+        erreur: "La phrase secrète doit contenir au moins 8 caractères.",
       });
     }
 
     if (indiceRecuperation.length < 3) {
       return res.status(400).json({
-        erreur:
-          "L'indice de récupération doit contenir au moins 3 caractères.",
+        erreur: "L'indice de récupération doit contenir au moins 3 caractères.",
       });
     }
 
-    /*
-     * La phrase secrète doit être différente
-     * du mot de passe.
-     */
     if (
-      phraseRecuperation.toLowerCase() ===
-      motDePasse.toLowerCase()
+      phraseRecuperation.toLowerCase() === motDePasse.toLowerCase()
     ) {
       return res.status(400).json({
-        erreur:
-          "La phrase secrète doit être différente du mot de passe.",
+        erreur: "La phrase secrète doit être différente du mot de passe.",
       });
     }
 
-    /*
-     * L'indice ne doit pas être identique
-     * à la phrase secrète.
-     */
     if (
-      indiceRecuperation.toLowerCase() ===
-      phraseRecuperation.toLowerCase()
+      indiceRecuperation.toLowerCase() === phraseRecuperation.toLowerCase()
     ) {
       return res.status(400).json({
-        erreur:
-          "L'indice doit aider à retrouver la phrase sans la révéler.",
+        erreur: "L'indice doit aider à retrouver la phrase sans la révéler.",
       });
     }
 
-    const utilisateurExistant =
-      await trouverUtilisateurParEmail(
-        emailNormalise
-      );
+    const utilisateurExistant = await trouverUtilisateurParEmail(
+      emailNormalise
+    );
 
     if (utilisateurExistant) {
       return res.status(409).json({
-        erreur:
-          "Un compte existe déjà avec cet email.",
+        erreur: "Un compte existe déjà avec cet email.",
       });
     }
 
-    const utilisateur =
-      await creerUtilisateur(
-        emailNormalise,
-        motDePasse,
-        nomNormalise,
-        phraseRecuperation,
-        indiceRecuperation
-      );
+    const utilisateur = await creerUtilisateur(
+      emailNormalise,
+      motDePasse,
+      nomNormalise,
+      phraseRecuperation,
+      indiceRecuperation
+    );
 
-    /*
-     * Création automatique du token
-     * de vérification email.
-     */
-    const tokenVerification =
-      await creerTokenVerificationEmail(
-        utilisateur.id
-      );
+    const tokenVerification = await creerTokenVerificationEmail(
+      utilisateur.id
+    );
 
-    /*
-     * Aucun JWT de session n'est créé avant
-     * la vérification de l'adresse email.
-     */
+    // Notification aux administrateurs pour informer du nouvel utilisateur enregistré
+    const admins = await prisma.user.findMany({
+      where: { role: "ADMIN" },
+      select: { id: true },
+    });
+
+    if (admins.length > 0) {
+      await prisma.notification.createMany({
+        data: admins.map((admin) => ({
+          userId: admin.id,
+          type: "NOUVEL_UTILISATEUR",
+          titre: "Nouveau membre",
+          message: `L'utilisateur ${utilisateur.displayName} (${utilisateur.email}) vient de s'inscrire.`,
+          lien: "/admin/utilisateurs",
+        })),
+      });
+    }
+
     return res.status(201).json({
       utilisateur: {
         id: utilisateur.id,
         email: utilisateur.email,
-        displayName:
-          utilisateur.displayName,
-        emailVerified:
-          utilisateur.emailVerified,
+        displayName: utilisateur.displayName,
+        emailVerified: utilisateur.emailVerified,
       },
-
-      /*
-       * TEMPORAIRE POUR LES TESTS.
-       *
-       * À remplacer par un envoi email
-       * avant une véritable mise en production.
-       */
       tokenVerification,
-
       message:
         "Compte créé avec succès. Veuillez vérifier votre adresse email avant de vous connecter.",
     });
   } catch (erreur) {
-    console.error(
-      "Erreur lors de l'inscription :",
-      erreur
-    );
+    console.error("Erreur lors de l'inscription :", erreur);
 
     return res.status(500).json({
-      erreur:
-        "Impossible de créer le compte.",
+      erreur: "Impossible de créer le compte.",
     });
   }
 }
@@ -223,15 +190,11 @@ export async function connexion(
   res: Response
 ) {
   try {
-    const {
-      email,
-      motDePasse,
-    } = req.body;
+    const { email, motDePasse } = req.body;
 
     if (!email || !motDePasse) {
       return res.status(400).json({
-        erreur:
-          "Email et mot de passe requis.",
+        erreur: "Email et mot de passe requis.",
       });
     }
 
@@ -244,51 +207,36 @@ export async function connexion(
       });
     }
 
-    const emailNormalise =
-      email.trim().toLowerCase();
+    const emailNormalise = email.trim().toLowerCase();
 
-    const utilisateur =
-      await trouverUtilisateurParEmail(
-        emailNormalise
-      );
+    const utilisateur = await trouverUtilisateurParEmail(
+      emailNormalise
+    );
 
     if (!utilisateur) {
       return res.status(401).json({
-        erreur:
-          "Email ou mot de passe incorrect.",
+        erreur: "Email ou mot de passe incorrect.",
       });
     }
 
-    const motDePasseValide =
-      await verifierMotDePasse(
-        motDePasse,
-        utilisateur.passwordHash
-      );
+    const motDePasseValide = await verifierMotDePasse(
+      motDePasse,
+      utilisateur.passwordHash
+    );
 
     if (!motDePasseValide) {
       return res.status(401).json({
-        erreur:
-          "Email ou mot de passe incorrect.",
+        erreur: "Email ou mot de passe incorrect.",
       });
     }
 
-    /*
-     * L'administrateur configuré dans EMAIL_ADMIN
-     * peut se connecter même si emailVerified
-     * est encore false.
-     *
-     * Le rôle ADMIN doit déjà être présent en base.
-     */
-    const emailAdmin = (
-      process.env.EMAIL_ADMIN ?? ""
-    )
+    const emailAdmin = (process.env.EMAIL_ADMIN ?? "")
       .trim()
       .toLowerCase();
 
     const estAdminConfigure =
       emailAdmin !== "" &&
-      utilisateur.email.toLowerCase() ===
-        emailAdmin &&
+      utilisateur.email.toLowerCase() === emailAdmin &&
       utilisateur.role === "ADMIN";
 
     if (
@@ -301,17 +249,13 @@ export async function connexion(
       });
     }
 
-    const secret =
-      process.env.JWT_SECRET;
+    const secret = process.env.JWT_SECRET;
 
     if (!secret) {
-      console.error(
-        "JWT_SECRET n'est pas configuré."
-      );
+      console.error("JWT_SECRET n'est pas configuré.");
 
       return res.status(500).json({
-        erreur:
-          "Configuration serveur invalide.",
+        erreur: "Configuration serveur invalide.",
       });
     }
 
@@ -326,40 +270,32 @@ export async function connexion(
     );
 
     const userAgent =
-      typeof req.headers["user-agent"] ===
-      "string"
+      typeof req.headers["user-agent"] === "string"
         ? req.headers["user-agent"]
         : undefined;
 
-    const { refreshToken } =
-      await creerSession(
-        utilisateur.id,
-        userAgent
-      );
+    const { refreshToken } = await creerSession(
+      utilisateur.id,
+      userAgent
+    );
 
     return res.status(200).json({
       utilisateur: {
         id: utilisateur.id,
         email: utilisateur.email,
-        displayName:
-          utilisateur.displayName,
+        displayName: utilisateur.displayName,
         role: utilisateur.role,
         emailVerified:
-          utilisateur.emailVerified ||
-          estAdminConfigure,
+          utilisateur.emailVerified || estAdminConfigure,
       },
       jeton,
       refreshToken,
     });
   } catch (erreur) {
-    console.error(
-      "Erreur lors de la connexion :",
-      erreur
-    );
+    console.error("Erreur lors de la connexion :", erreur);
 
     return res.status(500).json({
-      erreur:
-        "Impossible de se connecter.",
+      erreur: "Impossible de se connecter.",
     });
   }
 }
@@ -374,43 +310,32 @@ export async function deconnexion(
   res: Response
 ) {
   try {
-    const {
-      refreshToken,
-    } = req.body;
+    const { refreshToken } = req.body;
 
     if (
       !refreshToken ||
       typeof refreshToken !== "string"
     ) {
       return res.status(400).json({
-        erreur:
-          "Refresh token requis.",
+        erreur: "Refresh token requis.",
       });
     }
 
-    const refreshTokenHash =
-      crypto
-        .createHash("sha256")
-        .update(refreshToken)
-        .digest("hex");
+    const refreshTokenHash = crypto
+      .createHash("sha256")
+      .update(refreshToken)
+      .digest("hex");
 
-    await supprimerSession(
-      refreshTokenHash
-    );
+    await supprimerSession(refreshTokenHash);
 
     return res.status(200).json({
-      message:
-        "Déconnexion réussie.",
+      message: "Déconnexion réussie.",
     });
   } catch (erreur) {
-    console.error(
-      "Erreur lors de la déconnexion :",
-      erreur
-    );
+    console.error("Erreur lors de la déconnexion :", erreur);
 
     return res.status(500).json({
-      erreur:
-        "Impossible de se déconnecter.",
+      erreur: "Impossible de se déconnecter.",
     });
   }
 }
@@ -425,56 +350,42 @@ export async function rafraichir(
   res: Response
 ) {
   try {
-    const {
-      refreshToken,
-    } = req.body;
+    const { refreshToken } = req.body;
 
     if (
       !refreshToken ||
       typeof refreshToken !== "string"
     ) {
       return res.status(400).json({
-        erreur:
-          "Refresh token requis.",
+        erreur: "Refresh token requis.",
       });
     }
 
-    const refreshTokenHash =
-      crypto
-        .createHash("sha256")
-        .update(refreshToken)
-        .digest("hex");
+    const refreshTokenHash = crypto
+      .createHash("sha256")
+      .update(refreshToken)
+      .digest("hex");
 
-    const session =
-      await trouverSessionValide(
-        refreshTokenHash
-      );
+    const session = await trouverSessionValide(
+      refreshTokenHash
+    );
 
     if (!session) {
       return res.status(401).json({
-        erreur:
-          "Refresh token invalide ou expiré.",
+        erreur: "Refresh token invalide ou expiré.",
       });
     }
 
-    const {
-      refreshToken:
-        nouveauRefreshToken,
-    } = await renouvelerSession(
-      session.id
-    );
+    const { refreshToken: nouveauRefreshToken } =
+      await renouvelerSession(session.id);
 
-    const secret =
-      process.env.JWT_SECRET;
+    const secret = process.env.JWT_SECRET;
 
     if (!secret) {
-      console.error(
-        "JWT_SECRET n'est pas configuré."
-      );
+      console.error("JWT_SECRET n'est pas configuré.");
 
       return res.status(500).json({
-        erreur:
-          "Configuration serveur invalide.",
+        erreur: "Configuration serveur invalide.",
       });
     }
 
@@ -490,18 +401,13 @@ export async function rafraichir(
 
     return res.status(200).json({
       jeton,
-      refreshToken:
-        nouveauRefreshToken,
+      refreshToken: nouveauRefreshToken,
     });
   } catch (erreur) {
-    console.error(
-      "Erreur lors du rafraîchissement :",
-      erreur
-    );
+    console.error("Erreur lors du rafraîchissement :", erreur);
 
     return res.status(500).json({
-      erreur:
-        "Impossible de rafraîchir la session.",
+      erreur: "Impossible de rafraîchir la session.",
     });
   }
 }
@@ -510,64 +416,35 @@ export async function rafraichir(
  * =========================================================
  * MOT DE PASSE OUBLIÉ — ÉTAPE 1 ET 2
  * =========================================================
- *
- * Étape 1 :
- *   email uniquement
- *   → retourne l'indice de récupération
- *
- * Étape 2 :
- *   email + phrase secrète
- *   → vérifie la phrase
- *   → génère un token valable 5 minutes
  */
 export async function motDePasseOublie(
   req: Request,
   res: Response
 ) {
   try {
-    const {
-      email,
-      recoveryAnswer,
-    } = req.body;
+    const { email, recoveryAnswer } = req.body;
 
-    if (
-      !email ||
-      typeof email !== "string"
-    ) {
+    if (!email || typeof email !== "string") {
       return res.status(400).json({
         erreur: "Email requis.",
       });
     }
 
-    const emailNormalise =
-      email.trim().toLowerCase();
+    const emailNormalise = email.trim().toLowerCase();
 
-    const utilisateur =
-      await trouverUtilisateurParEmail(
-        emailNormalise
-      );
+    const utilisateur = await trouverUtilisateurParEmail(
+      emailNormalise
+    );
 
-    /*
-     * -------------------------------------------------------
-     * ÉTAPE 1 : récupérer l'indice
-     * -------------------------------------------------------
-     */
-    if (
-      recoveryAnswer === undefined
-    ) {
+    if (recoveryAnswer === undefined) {
       if (!utilisateur) {
-        /*
-         * Réponse volontairement générique.
-         */
         return res.status(200).json({
           message:
             "Si un compte correspond à cet email, vous pouvez poursuivre la récupération.",
         });
       }
 
-      if (
-        !utilisateur.recoveryAnswerHash
-      ) {
+      if (!utilisateur.recoveryAnswerHash) {
         return res.status(403).json({
           erreur:
             "Aucune phrase secrète de récupération n'est configurée pour ce compte.",
@@ -577,23 +454,13 @@ export async function motDePasseOublie(
       return res.status(200).json({
         message:
           "Veuillez utiliser votre phrase secrète de récupération.",
-        recoveryHint:
-          utilisateur.recoveryHint,
+        recoveryHint: utilisateur.recoveryHint,
       });
     }
 
-    /*
-     * -------------------------------------------------------
-     * ÉTAPE 2 : vérifier la phrase secrète
-     * -------------------------------------------------------
-     */
-
-    if (
-      typeof recoveryAnswer !== "string"
-    ) {
+    if (typeof recoveryAnswer !== "string") {
       return res.status(400).json({
-        erreur:
-          "Phrase secrète invalide.",
+        erreur: "Phrase secrète invalide.",
       });
     }
 
@@ -604,20 +471,17 @@ export async function motDePasseOublie(
       });
     }
 
-    if (
-      !utilisateur.recoveryAnswerHash
-    ) {
+    if (!utilisateur.recoveryAnswerHash) {
       return res.status(403).json({
         erreur:
           "Aucune phrase secrète de récupération n'est configurée pour ce compte.",
       });
     }
 
-    const phraseCorrecte =
-      await verifierPhraseRecuperation(
-        utilisateur.id,
-        recoveryAnswer
-      );
+    const phraseCorrecte = await verifierPhraseRecuperation(
+      utilisateur.id,
+      recoveryAnswer
+    );
 
     if (!phraseCorrecte) {
       return res.status(401).json({
@@ -626,27 +490,18 @@ export async function motDePasseOublie(
       });
     }
 
-    /*
-     * Phrase correcte :
-     * création d'un token de réinitialisation.
-     *
-     * Sa durée de vie est de 5 minutes
-     * dans creerTokenReinitialisation().
-     */
-    const token =
-      await creerTokenReinitialisation(
-        utilisateur.id
-      );
+    const token = await creerTokenReinitialisation(
+      utilisateur.id
+    );
 
     const frontendUrl = (
       process.env.FRONTEND_URL ??
       "https://code-doctor-front.vercel.app"
     ).replace(/\/+$/, "");
 
-    const resetUrl =
-      `${frontendUrl}/reinitialiser-mot-de-passe?token=${encodeURIComponent(
-        token
-      )}`;
+    const resetUrl = `${frontendUrl}/reinitialiser-mot-de-passe?token=${encodeURIComponent(
+      token
+    )}`;
 
     return res.status(200).json({
       message:
@@ -660,8 +515,7 @@ export async function motDePasseOublie(
     );
 
     return res.status(500).json({
-      erreur:
-        "Erreur interne du serveur.",
+      erreur: "Erreur interne du serveur.",
     });
   }
 }
@@ -675,10 +529,7 @@ export async function reinitialiserMotDePasseControleur(
   req: Request,
   res: Response
 ) {
-  const {
-    token,
-    nouveauMotDePasse,
-  } = req.body;
+  const { token, nouveauMotDePasse } = req.body;
 
   if (
     !token ||
@@ -687,14 +538,11 @@ export async function reinitialiserMotDePasseControleur(
     typeof nouveauMotDePasse !== "string"
   ) {
     return res.status(400).json({
-      erreur:
-        "Token et nouveau mot de passe requis.",
+      erreur: "Token et nouveau mot de passe requis.",
     });
   }
 
-  if (
-    nouveauMotDePasse.length < 8
-  ) {
+  if (nouveauMotDePasse.length < 8) {
     return res.status(400).json({
       erreur:
         "Le mot de passe doit contenir au moins 8 caractères.",
@@ -702,21 +550,18 @@ export async function reinitialiserMotDePasseControleur(
   }
 
   try {
-    const tokenHash =
-      crypto
-        .createHash("sha256")
-        .update(token)
-        .digest("hex");
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
 
-    const resetToken =
-      await trouverTokenReinitialisation(
-        tokenHash
-      );
+    const resetToken = await trouverTokenReinitialisation(
+      tokenHash
+    );
 
     if (!resetToken) {
       return res.status(401).json({
-        erreur:
-          "Token invalide, expiré ou déjà utilisé.",
+        erreur: "Token invalide, expiré ou déjà utilisé.",
       });
     }
 
@@ -727,8 +572,7 @@ export async function reinitialiserMotDePasseControleur(
     );
 
     return res.status(200).json({
-      message:
-        "Mot de passe réinitialisé avec succès.",
+      message: "Mot de passe réinitialisé avec succès.",
     });
   } catch (erreur) {
     console.error(
@@ -737,8 +581,7 @@ export async function reinitialiserMotDePasseControleur(
     );
 
     return res.status(500).json({
-      erreur:
-        "Erreur interne du serveur.",
+      erreur: "Erreur interne du serveur.",
     });
   }
 }
@@ -753,30 +596,20 @@ export async function demanderVerificationEmail(
   res: Response
 ) {
   try {
-    const { email } =
-      req.body;
+    const { email } = req.body;
 
-    if (
-      !email ||
-      typeof email !== "string"
-    ) {
+    if (!email || typeof email !== "string") {
       return res.status(400).json({
         erreur: "Email requis.",
       });
     }
 
-    const emailNormalise =
-      email.trim().toLowerCase();
+    const emailNormalise = email.trim().toLowerCase();
 
-    const utilisateur =
-      await trouverUtilisateurParEmail(
-        emailNormalise
-      );
+    const utilisateur = await trouverUtilisateurParEmail(
+      emailNormalise
+    );
 
-    /*
-     * Même réponse si le compte existe
-     * ou non.
-     */
     if (!utilisateur) {
       return res.status(200).json({
         message:
@@ -786,19 +619,14 @@ export async function demanderVerificationEmail(
 
     if (utilisateur.emailVerified) {
       return res.status(200).json({
-        message:
-          "Cette adresse email est déjà vérifiée.",
+        message: "Cette adresse email est déjà vérifiée.",
       });
     }
 
-    const token =
-      await creerTokenVerificationEmail(
-        utilisateur.id
-      );
+    const token = await creerTokenVerificationEmail(
+      utilisateur.id
+    );
 
-    /*
-     * TEMPORAIRE POUR LES TESTS.
-     */
     return res.status(200).json({
       message:
         "Si un compte correspond à cet email, un lien de vérification sera envoyé.",
@@ -811,8 +639,7 @@ export async function demanderVerificationEmail(
     );
 
     return res.status(500).json({
-      erreur:
-        "Impossible de demander la vérification email.",
+      erreur: "Impossible de demander la vérification email.",
     });
   }
 }
@@ -833,39 +660,33 @@ export async function verifierEmail(
 
   if (!token) {
     return res.status(400).json({
-      erreur:
-        "Token de vérification requis.",
+      erreur: "Token de vérification requis.",
     });
   }
 
   try {
-    const tokenHash =
-      crypto
-        .createHash("sha256")
-        .update(token)
-        .digest("hex");
+    const tokenHash = crypto
+      .createHash("sha256")
+      .update(token)
+      .digest("hex");
 
-    const verificationToken =
-      await verifierTokenEmail(
-        tokenHash
-      );
+    const verificationToken = await verifierTokenEmail(
+      tokenHash
+    );
 
     if (!verificationToken) {
       return res.status(401).json({
-        erreur:
-          "Token invalide ou expiré.",
+        erreur: "Token invalide ou expiré.",
       });
     }
 
-    const utilisateur =
-      await validerEmailUtilisateur(
-        verificationToken.userId,
-        verificationToken.id
-      );
+    const utilisateur = await validerEmailUtilisateur(
+      verificationToken.userId,
+      verificationToken.id
+    );
 
     return res.status(200).json({
-      message:
-        "Adresse email vérifiée avec succès.",
+      message: "Adresse email vérifiée avec succès.",
       utilisateur,
     });
   } catch (erreur) {
@@ -875,8 +696,7 @@ export async function verifierEmail(
     );
 
     return res.status(500).json({
-      erreur:
-        "Impossible de vérifier l'adresse email.",
+      erreur: "Impossible de vérifier l'adresse email.",
     });
   }
 }
@@ -892,15 +712,12 @@ export async function moi(
 ) {
   if (!req.utilisateurId) {
     return res.status(401).json({
-      erreur:
-        "Authentification requise.",
+      erreur: "Authentification requise.",
     });
   }
 
   return res.status(200).json({
-    message:
-      "Authentification réussie.",
-    utilisateurId:
-      req.utilisateurId,
+    message: "Authentification réussie.",
+    utilisateurId: req.utilisateurId,
   });
 }
