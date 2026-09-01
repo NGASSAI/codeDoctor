@@ -167,7 +167,7 @@ export async function supprimer(
     );
 
     return res.status(200).json({
-      message: "Commentaire supprimé avec succès.",
+      message: "Commentaire supprimé avec succès..",
     });
   } catch (erreur) {
     console.error("Erreur suppression commentaire :", erreur);
