@@ -61,7 +61,10 @@ app.use((0, cors_1.default)({
         callback(new Error(`Origine CORS non autorisée : ${origin ?? "inconnue"}`));
     },
     credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
 }));
+app.options(/(.*)/, (0, cors_1.default)());
 /**
  * =========================================================
  * MIDDLEWARES
