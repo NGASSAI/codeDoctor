@@ -201,7 +201,7 @@ export async function supprimer(
     console.error("Erreur suppression réaction :", erreur);
 
     return res.status(500).json({
-      erreur: "Impossible de supprimer la réaction.",
+      erreur: "Impossible de supprimer la réaction..",
     });
   }
 }
