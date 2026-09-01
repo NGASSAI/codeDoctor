@@ -6,6 +6,10 @@ exports.obtenirIndice = obtenirIndice;
 exports.soumettreTentative = soumettreTentative;
 exports.listerTentativesUtilisateur = listerTentativesUtilisateur;
 exports.obtenirProgression = obtenirProgression;
+exports.creerExercice = creerExercice;
+exports.modifierExercice = modifierExercice;
+exports.supprimerExercice = supprimerExercice;
+exports.listerExercicesAdmin = listerExercicesAdmin;
 const base_1 = require("../base");
 /**
  * Liste les exercices disponibles.
@@ -230,6 +234,40 @@ async function obtenirProgression(utilisateurId) {
         orderBy: {
             categorie: "asc",
         },
+    });
+}
+/**
+ * Crée un nouvel exercice (réservé à l'admin).
+ */
+async function creerExercice(donnees) {
+    return base_1.prisma.exercise.create({
+        data: donnees,
+    });
+}
+/**
+ * Modifie un exercice existant (réservé à l'admin).
+ */
+async function modifierExercice(exerciceId, donnees) {
+    return base_1.prisma.exercise.update({
+        where: { id: exerciceId },
+        data: donnees,
+    });
+}
+/**
+ * Supprime un exercice (réservé à l'admin).
+ */
+async function supprimerExercice(exerciceId) {
+    return base_1.prisma.exercise.delete({
+        where: { id: exerciceId },
+    });
+}
+/**
+ * Liste complète des exercices pour l'admin,
+ * incluant la solution et les mots-clés.
+ */
+async function listerExercicesAdmin() {
+    return base_1.prisma.exercise.findMany({
+        orderBy: { createdAt: "desc" },
     });
 }
 //# sourceMappingURL=exercice.service.js.map

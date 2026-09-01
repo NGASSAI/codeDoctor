@@ -6,6 +6,10 @@ exports.indice = indice;
 exports.tenter = tenter;
 exports.mesTentatives = mesTentatives;
 exports.maProgression = maProgression;
+exports.listerPourAdmin = listerPourAdmin;
+exports.creer = creer;
+exports.modifier = modifier;
+exports.supprimer = supprimer;
 const exercice_service_1 = require("../services/exercice.service");
 const client_1 = require("../generated/prisma/client");
 /**
@@ -235,6 +239,173 @@ async function maProgression(req, res) {
         console.error("Erreur lors de la récupération de la progression :", erreur);
         return res.status(500).json({
             erreur: "Impossible de récupérer votre progression.",
+        });
+    }
+}
+const DIFFICULTES_VALIDES = ["FACILE", "MOYEN", "DIFFICILE"];
+function difficulteValide(valeur) {
+    return (typeof valeur === "string" &&
+        DIFFICULTES_VALIDES.includes(valeur.toUpperCase()));
+}
+function validerDonneesExercice(body) {
+    const { title, category, difficulty, buggyCode, hint1, hint2, hint3, solution, keywords, } = body;
+    if (typeof title !== "string" || !title.trim()) {
+        return { valide: false, erreur: "Le titre est requis." };
+    }
+    if (!categorieValide(category)) {
+        return { valide: false, erreur: "Catégorie invalide." };
+    }
+    if (!difficulteValide(difficulty)) {
+        return {
+            valide: false,
+            erreur: "La difficulté doit être FACILE, MOYEN ou DIFFICILE.",
+        };
+    }
+    if (typeof buggyCode !== "string" || !buggyCode.trim()) {
+        return {
+            valide: false,
+            erreur: "Le code buggé est requis.",
+        };
+    }
+    if (typeof hint1 !== "string" ||
+        typeof hint2 !== "string" ||
+        typeof hint3 !== "string" ||
+        !hint1.trim() ||
+        !hint2.trim() ||
+        !hint3.trim()) {
+        return {
+            valide: false,
+            erreur: "Les 3 indices sont requis.",
+        };
+    }
+    if (typeof solution !== "string" || !solution.trim()) {
+        return {
+            valide: false,
+            erreur: "La solution est requise.",
+        };
+    }
+    if (!Array.isArray(keywords) ||
+        !keywords.every((k) => typeof k === "string")) {
+        return {
+            valide: false,
+            erreur: "Les mots-clés doivent être une liste de textes.",
+        };
+    }
+    return {
+        valide: true,
+        donnees: {
+            title: title.trim(),
+            category,
+            difficulty: difficulty.toUpperCase(),
+            buggyCode,
+            hint1: hint1.trim(),
+            hint2: hint2.trim(),
+            hint3: hint3.trim(),
+            solution: solution.trim(),
+            keywords: keywords.map((k) => k.trim()).filter(Boolean),
+        },
+    };
+}
+/**
+ * GET /api/exercices/admin/tous
+ *
+ * Liste complète pour l'admin (avec solution et mots-clés).
+ */
+async function listerPourAdmin(req, res) {
+    try {
+        const exercices = await (0, exercice_service_1.listerExercicesAdmin)();
+        return res.status(200).json({
+            exercices,
+            total: exercices.length,
+        });
+    }
+    catch (erreur) {
+        console.error("Erreur lors de la récupération des exercices (admin) :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de récupérer les exercices.",
+        });
+    }
+}
+/**
+ * POST /api/exercices/admin
+ *
+ * Crée un exercice.
+ */
+async function creer(req, res) {
+    const validation = validerDonneesExercice(req.body);
+    if (!validation.valide || !validation.donnees) {
+        return res.status(400).json({
+            erreur: validation.erreur,
+        });
+    }
+    try {
+        const exercice = await (0, exercice_service_1.creerExercice)(validation.donnees);
+        return res.status(201).json({
+            message: "Exercice créé avec succès.",
+            exercice,
+        });
+    }
+    catch (erreur) {
+        console.error("Erreur lors de la création de l'exercice :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de créer l'exercice.",
+        });
+    }
+}
+/**
+ * PUT /api/exercices/admin/:id
+ *
+ * Modifie un exercice.
+ */
+async function modifier(req, res) {
+    const idParam = req.params.id;
+    if (typeof idParam !== "string" || !idParam.trim()) {
+        return res.status(400).json({
+            erreur: "Identifiant d'exercice invalide.",
+        });
+    }
+    const validation = validerDonneesExercice(req.body);
+    if (!validation.valide || !validation.donnees) {
+        return res.status(400).json({
+            erreur: validation.erreur,
+        });
+    }
+    try {
+        const exercice = await (0, exercice_service_1.modifierExercice)(idParam, validation.donnees);
+        return res.status(200).json({
+            message: "Exercice modifié avec succès.",
+            exercice,
+        });
+    }
+    catch (erreur) {
+        console.error("Erreur lors de la modification de l'exercice :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de modifier l'exercice.",
+        });
+    }
+}
+/**
+ * DELETE /api/exercices/admin/:id
+ *
+ * Supprime un exercice.
+ */
+async function supprimer(req, res) {
+    const idParam = req.params.id;
+    if (typeof idParam !== "string" || !idParam.trim()) {
+        return res.status(400).json({
+            erreur: "Identifiant d'exercice invalide.",
+        });
+    }
+    try {
+        await (0, exercice_service_1.supprimerExercice)(idParam);
+        return res.status(200).json({
+            message: "Exercice supprimé avec succès.",
+        });
+    }
+    catch (erreur) {
+        console.error("Erreur lors de la suppression de l'exercice :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de supprimer l'exercice.",
         });
     }
 }

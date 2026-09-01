@@ -81,4 +81,89 @@ export declare function obtenirProgression(utilisateurId: string): Promise<{
     compteur: number;
     id: string;
 }[]>;
+/**
+ * Crée un nouvel exercice (réservé à l'admin).
+ */
+export declare function creerExercice(donnees: {
+    title: string;
+    category: Category;
+    difficulty: string;
+    buggyCode: string;
+    hint1: string;
+    hint2: string;
+    hint3: string;
+    solution: string;
+    keywords: string[];
+}): Promise<{
+    id: string;
+    title: string;
+    category: Category;
+    difficulty: string;
+    buggyCode: string;
+    hint1: string;
+    hint2: string;
+    hint3: string;
+    solution: string;
+    keywords: string[];
+    createdAt: Date;
+}>;
+/**
+ * Modifie un exercice existant (réservé à l'admin).
+ */
+export declare function modifierExercice(exerciceId: string, donnees: {
+    title?: string;
+    category?: Category;
+    difficulty?: string;
+    buggyCode?: string;
+    hint1?: string;
+    hint2?: string;
+    hint3?: string;
+    solution?: string;
+    keywords?: string[];
+}): Promise<{
+    id: string;
+    title: string;
+    category: Category;
+    difficulty: string;
+    buggyCode: string;
+    hint1: string;
+    hint2: string;
+    hint3: string;
+    solution: string;
+    keywords: string[];
+    createdAt: Date;
+}>;
+/**
+ * Supprime un exercice (réservé à l'admin).
+ */
+export declare function supprimerExercice(exerciceId: string): Promise<{
+    id: string;
+    title: string;
+    category: Category;
+    difficulty: string;
+    buggyCode: string;
+    hint1: string;
+    hint2: string;
+    hint3: string;
+    solution: string;
+    keywords: string[];
+    createdAt: Date;
+}>;
+/**
+ * Liste complète des exercices pour l'admin,
+ * incluant la solution et les mots-clés.
+ */
+export declare function listerExercicesAdmin(): Promise<{
+    id: string;
+    title: string;
+    category: Category;
+    difficulty: string;
+    buggyCode: string;
+    hint1: string;
+    hint2: string;
+    hint3: string;
+    solution: string;
+    keywords: string[];
+    createdAt: Date;
+}[]>;
 //# sourceMappingURL=exercice.service.d.ts.map

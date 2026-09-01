@@ -120,7 +120,7 @@ export async function lister(
         "PENDING",
         "REVIEWED",
         "RESOLVED",
-        "DISMISSED",
+        "REJECTED",
       ];
 
       if (!statutsAutorises.includes(statut)) {
