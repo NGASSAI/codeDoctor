@@ -11,13 +11,14 @@ import {
   modifierRoleUtilisateur,
   supprimerUtilisateur,
   experiencesAdmin,
+  creerExperience,
+  modifierExperience,
   modifierStatutExperience,
   signalementsAdmin,
   supprimerExperience,
   modifierStatutSignalementAdmin,
   notificationsAdmin,
 } from "../controleurs/admin.controleur";
-
 import { authentificationMiddleware } from "../middlewares/authentification.middleware";
 import { adminMiddleware } from "../middlewares/admin.middleware";
 
@@ -40,6 +41,8 @@ routeur.delete("/utilisateurs/:id", supprimerUtilisateur);
 routeur.get("/experiences", experiencesAdmin);
 routeur.patch("/experiences/:id/statut", modifierStatutExperience);
 routeur.delete("/experiences/:id", supprimerExperience);
+routeur.post("/experiences", creerExperience);
+routeur.put("/experiences/:id", modifierExperience);
 
 // --- NOTIFICATIONS ---
 routeur.get("/notifications", notificationsAdmin);

@@ -1,5 +1,65 @@
 import { prisma } from "../base";
 import { ExperienceStatus } from "../generated/prisma/client";
+import { Category } from "../generated/prisma/client";
+
+/**
+ * Créer une expérience depuis l'espace admin.
+ * L'admin connecté devient l'auteur de l'expérience.
+ */
+export async function creerExperienceAdmin(
+  adminId: string,
+  donnees: {
+    titre: string;
+    categorie: Category;
+    probleme: string;
+    cause: string;
+    solution: string;
+    technologie?: string| null | undefined;
+    code?: string | null | undefined;
+    userId: string;
+  }
+) {
+  return prisma.experience.create({
+    data: {
+      titre: donnees.titre,
+      categorie: donnees.categorie,
+      probleme: donnees.probleme,
+      cause: donnees.cause,
+      solution: donnees.solution,
+      technologie: donnees.technologie ?? null,
+      code: donnees.code ?? null,
+      userId: donnees.userId,
+      statut: "PUBLISHED",
+    },
+  });
+}
+
+/**
+ * Modifier une expérience depuis l'espace admin.
+ */
+export async function modifierExperienceAdmin(
+  experienceId: string,
+  donnees: {
+    titre?: string;
+    categorie?: Category;
+    probleme?: string;
+    cause?: string;
+    solution?: string;
+    technologie?: string | null | undefined;
+    code?: string | null | undefined;
+  }
+) {
+  const { technologie, code, ...rest } = donnees;
+
+  return prisma.experience.update({
+    where: { id: experienceId },
+    data: {
+      ...rest,
+      ...(technologie !== undefined ? { technologie: technologie ?? null } : {}),
+      ...(code !== undefined ? { code: code ?? null } : {}),
+    },
+  });
+}
 
 export async function obtenirStatistiquesAdmin() {
   const [
@@ -179,6 +239,7 @@ export async function modifierStatutExperienceAdmin(
     },
   });
 }
+
 /**
  * Modifier le rôle d'un utilisateur (ex: USER <-> ADMIN).
  */
@@ -205,10 +266,9 @@ export async function modifierStatutUtilisateurAdmin(
   userId: string,
   estActif: boolean
 ) {
-  // Ajuste le champ selon ton schéma Prisma (ex: estActif, estBanni, etc.)
   return prisma.user.update({
     where: { id: userId },
-    data: { isBlocked: !estActif }, // Adapté si tu as un champ isBlocked ou similaire
+    data: { isBlocked: !estActif },
     select: {
       id: true,
       email: true,
@@ -217,6 +277,7 @@ export async function modifierStatutUtilisateurAdmin(
     },
   });
 }
+
 /**
  * Supprimer définitivement un utilisateur.
  */
@@ -225,6 +286,7 @@ export async function supprimerUtilisateurAdmin(userId: string) {
     where: { id: userId },
   });
 }
+
 /**
  * Supprimer définitivement une expérience.
  */
@@ -233,6 +295,7 @@ export async function supprimerExperienceAdmin(experienceId: string) {
     where: { id: experienceId },
   });
 }
+
 /**
  * Notifications de l'administrateur connecté.
  */

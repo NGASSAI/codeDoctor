@@ -1,5 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.creerExperienceAdmin = creerExperienceAdmin;
+exports.modifierExperienceAdmin = modifierExperienceAdmin;
 exports.obtenirStatistiquesAdmin = obtenirStatistiquesAdmin;
 exports.listerUtilisateursAdmin = listerUtilisateursAdmin;
 exports.listerExperiencesAdmin = listerExperiencesAdmin;
@@ -10,6 +12,39 @@ exports.supprimerUtilisateurAdmin = supprimerUtilisateurAdmin;
 exports.supprimerExperienceAdmin = supprimerExperienceAdmin;
 exports.obtenirNotificationsAdmin = obtenirNotificationsAdmin;
 const base_1 = require("../base");
+/**
+ * Créer une expérience depuis l'espace admin.
+ * L'admin connecté devient l'auteur de l'expérience.
+ */
+async function creerExperienceAdmin(adminId, donnees) {
+    return base_1.prisma.experience.create({
+        data: {
+            titre: donnees.titre,
+            categorie: donnees.categorie,
+            probleme: donnees.probleme,
+            cause: donnees.cause,
+            solution: donnees.solution,
+            technologie: donnees.technologie ?? null,
+            code: donnees.code ?? null,
+            userId: donnees.userId,
+            statut: "PUBLISHED",
+        },
+    });
+}
+/**
+ * Modifier une expérience depuis l'espace admin.
+ */
+async function modifierExperienceAdmin(experienceId, donnees) {
+    const { technologie, code, ...rest } = donnees;
+    return base_1.prisma.experience.update({
+        where: { id: experienceId },
+        data: {
+            ...rest,
+            ...(technologie !== undefined ? { technologie: technologie ?? null } : {}),
+            ...(code !== undefined ? { code: code ?? null } : {}),
+        },
+    });
+}
 async function obtenirStatistiquesAdmin() {
     const [utilisateurs, experiences, experiencesPubliees, experiencesCachees, commentaires, reactions, signalements, signalementsEnAttente, exercices, conversations, notifications,] = await Promise.all([
         base_1.prisma.user.count(),
@@ -175,10 +210,9 @@ async function modifierRoleUtilisateurAdmin(userId, role) {
  * Modifier le statut d'activation / bannissement d'un utilisateur.
  */
 async function modifierStatutUtilisateurAdmin(userId, estActif) {
-    // Ajuste le champ selon ton schéma Prisma (ex: estActif, estBanni, etc.)
     return base_1.prisma.user.update({
         where: { id: userId },
-        data: { isBlocked: !estActif }, // Adapté si tu as un champ isBlocked ou similaire
+        data: { isBlocked: !estActif },
         select: {
             id: true,
             email: true,

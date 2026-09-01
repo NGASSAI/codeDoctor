@@ -78,7 +78,7 @@ async function lister(req, res) {
                 "PENDING",
                 "REVIEWED",
                 "RESOLVED",
-                "DISMISSED",
+                "REJECTED",
             ];
             if (!statutsAutorises.includes(statut)) {
                 return res.status(400).json({

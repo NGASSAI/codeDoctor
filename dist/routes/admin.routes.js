@@ -20,6 +20,8 @@ routeur.delete("/utilisateurs/:id", admin_controleur_1.supprimerUtilisateur);
 routeur.get("/experiences", admin_controleur_1.experiencesAdmin);
 routeur.patch("/experiences/:id/statut", admin_controleur_1.modifierStatutExperience);
 routeur.delete("/experiences/:id", admin_controleur_1.supprimerExperience);
+routeur.post("/experiences", admin_controleur_1.creerExperience);
+routeur.put("/experiences/:id", admin_controleur_1.modifierExperience);
 // --- NOTIFICATIONS ---
 routeur.get("/notifications", admin_controleur_1.notificationsAdmin);
 // --- SIGNALEMENTS ---

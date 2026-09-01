@@ -1,4 +1,3 @@
-
 import { Response } from "express";
 
 import { RequeteAuthentifiee } from "../middlewares/authentification.middleware";
@@ -12,12 +11,16 @@ import {
   supprimerUtilisateurAdmin,
   supprimerExperienceAdmin,
   obtenirNotificationsAdmin,
+  creerExperienceAdmin,
+  modifierExperienceAdmin,
 } from "../services/admin.service";
 
 import {
   obtenirSignalements,
   modifierStatutSignalement as modifierStatutSignalementService,
 } from "../services/report.service";
+
+import type { Category } from "../generated/prisma/client";
 
 /**
  * Dashboard administrateur
@@ -43,6 +46,7 @@ export async function dashboardAdmin(
     });
   }
 }
+
 /**
  * Modifier le rôle d'un utilisateur
  * PATCH /api/admin/utilisateurs/:id/role
@@ -76,6 +80,7 @@ export async function modifierRoleUtilisateur(
     return res.status(500).json({ erreur: "Erreur interne du serveur." });
   }
 }
+
 /**
  * Lister les utilisateurs pour l'administration
  */
@@ -97,10 +102,7 @@ export async function utilisateursAdmin(
       100
     );
 
-    const resultat = await listerUtilisateursAdmin(
-      page,
-      limite
-    );
+    const resultat = await listerUtilisateursAdmin(page, limite);
 
     return res.status(200).json(resultat);
   } catch (erreur) {
@@ -114,6 +116,7 @@ export async function utilisateursAdmin(
     });
   }
 }
+
 /**
  * Supprimer une expérience
  * DELETE /api/admin/experiences/:id
@@ -139,6 +142,7 @@ export async function supprimerExperience(
     return res.status(500).json({ erreur: "Erreur interne du serveur." });
   }
 }
+
 /**
  * Supprimer un utilisateur
  * DELETE /api/admin/utilisateurs/:id
@@ -221,10 +225,7 @@ export async function experiencesAdmin(
       100
     );
 
-    const resultat = await listerExperiencesAdmin(
-      page,
-      limite
-    );
+    const resultat = await listerExperiencesAdmin(page, limite);
 
     return res.status(200).json(resultat);
   } catch (erreur) {
@@ -303,12 +304,6 @@ export async function modifierStatutExperience(
 
 /**
  * Lister les signalements pour l'administration
- *
- * GET /api/admin/signalements
- *
- * Exemple :
- * /api/admin/signalements
- * /api/admin/signalements?statut=PENDING
  */
 export async function signalementsAdmin(
   req: RequeteAuthentifiee,
@@ -356,8 +351,6 @@ export async function signalementsAdmin(
 
 /**
  * Modifier le statut d'un signalement
- *
- * PATCH /api/admin/signalements/:id/statut
  */
 export async function modifierStatutSignalementAdmin(
   req: RequeteAuthentifiee,
@@ -384,11 +377,10 @@ export async function modifierStatutSignalementAdmin(
   }
 
   try {
-    const signalement =
-      await modifierStatutSignalementService(
-        id,
-        statut
-      );
+    const signalement = await modifierStatutSignalementService(
+      id,
+      statut
+    );
 
     return res.status(200).json({
       message: "Statut du signalement mis à jour.",
@@ -408,6 +400,148 @@ export async function modifierStatutSignalementAdmin(
 
     return res.status(500).json({
       erreur: "Erreur interne du serveur.",
+    });
+  }
+}
+
+const CATEGORIES_VALIDES = [
+  "JAVASCRIPT",
+  "TYPESCRIPT",
+  "REACT",
+  "HTTP",
+  "API",
+  "HTML_CSS",
+];
+
+function categorieValide(valeur: unknown): valeur is Category {
+  return (
+    typeof valeur === "string" && CATEGORIES_VALIDES.includes(valeur)
+  );
+}
+
+function validerDonneesExperience(body: unknown) {
+  const { titre, categorie, probleme, cause, solution, technologie, code } =
+    body as Record<string, unknown>;
+
+  if (typeof titre !== "string" || !titre.trim()) {
+    return { valide: false, erreur: "Le titre est requis." } as const;
+  }
+
+  if (!categorieValide(categorie)) {
+    return { valide: false, erreur: "Catégorie invalide." } as const;
+  }
+
+  if (typeof probleme !== "string" || !probleme.trim()) {
+    return { valide: false, erreur: "Le problème est requis." } as const;
+  }
+
+  if (typeof cause !== "string" || !cause.trim()) {
+    return { valide: false, erreur: "La cause est requise." } as const;
+  }
+
+  if (typeof solution !== "string" || !solution.trim()) {
+    return { valide: false, erreur: "La solution est requise." } as const;
+  }
+
+  const technologieNettoyee =
+    typeof technologie === "string" && technologie.trim()
+      ? technologie.trim()
+      : undefined;
+
+  const codeNettoye =
+    typeof code === "string" && code.trim() ? code.trim() : undefined;
+
+  return {
+    valide: true,
+    donnees: {
+      titre: titre.trim(),
+      categorie,
+      probleme: probleme.trim(),
+      cause: cause.trim(),
+      solution: solution.trim(),
+      technologie: technologieNettoyee as string | null | undefined,
+      code: codeNettoye as string | null | undefined,
+    },
+  } as const;
+}
+
+/**
+ * Créer une expérience
+ * POST /api/admin/experiences
+ */
+export async function creerExperience(
+  req: RequeteAuthentifiee,
+  res: Response
+) {
+  const adminId = req.utilisateurId;
+
+  if (!adminId) {
+    return res.status(401).json({ erreur: "Authentification requise." });
+  }
+
+  const validation = validerDonneesExperience(req.body);
+
+  if (!validation.valide) {
+    return res.status(400).json({ erreur: validation.erreur });
+  }
+
+  try {
+    const experience = await creerExperienceAdmin(
+      adminId,
+      {
+        ...validation.donnees,
+        userId: adminId,
+      }
+    );
+
+    return res.status(201).json(experience);
+  } catch (erreur) {
+    console.error("Erreur création expérience (admin) :", erreur);
+
+    return res.status(500).json({
+      erreur: "Impossible de créer l'expérience.",
+    });
+  }
+}
+
+/**
+ * Modifier une expérience
+ * PUT /api/admin/experiences/:id
+ */
+export async function modifierExperience(
+  req: RequeteAuthentifiee,
+  res: Response
+) {
+  const id = req.params.id;
+
+  if (!id || typeof id !== "string") {
+    return res.status(400).json({
+      erreur: "Identifiant d'expérience invalide.",
+    });
+  }
+
+  const validation = validerDonneesExperience(req.body);
+
+  if (!validation.valide) {
+    return res.status(400).json({ erreur: validation.erreur });
+  }
+
+  try {
+    const experience = await modifierExperienceAdmin(
+      id,
+      validation.donnees
+    );
+
+    return res.status(200).json(experience);
+  } catch (erreur: any) {
+    if (erreur?.code === "P2025") {
+      return res.status(404).json({ erreur: "Expérience introuvable." });
+    }
+
+    console.error("Erreur modification expérience (admin) :", erreur);
+
+    return res.status(500).json({
+      erreur: "Impossible de modifier l'expérience.",
     });
   }
 }

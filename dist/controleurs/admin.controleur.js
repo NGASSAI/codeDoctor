@@ -10,6 +10,8 @@ exports.experiencesAdmin = experiencesAdmin;
 exports.modifierStatutExperience = modifierStatutExperience;
 exports.signalementsAdmin = signalementsAdmin;
 exports.modifierStatutSignalementAdmin = modifierStatutSignalementAdmin;
+exports.creerExperience = creerExperience;
+exports.modifierExperience = modifierExperience;
 const admin_service_1 = require("../services/admin.service");
 const report_service_1 = require("../services/report.service");
 /**
@@ -202,12 +204,6 @@ async function modifierStatutExperience(req, res) {
 }
 /**
  * Lister les signalements pour l'administration
- *
- * GET /api/admin/signalements
- *
- * Exemple :
- * /api/admin/signalements
- * /api/admin/signalements?statut=PENDING
  */
 async function signalementsAdmin(req, res) {
     const statut = req.query.statut;
@@ -236,8 +232,6 @@ async function signalementsAdmin(req, res) {
 }
 /**
  * Modifier le statut d'un signalement
- *
- * PATCH /api/admin/signalements/:id/statut
  */
 async function modifierStatutSignalementAdmin(req, res) {
     const id = req.params.id;
@@ -271,6 +265,107 @@ async function modifierStatutSignalementAdmin(req, res) {
         console.error("Erreur lors de la modification du signalement :", erreur);
         return res.status(500).json({
             erreur: "Erreur interne du serveur.",
+        });
+    }
+}
+const CATEGORIES_VALIDES = [
+    "JAVASCRIPT",
+    "TYPESCRIPT",
+    "REACT",
+    "HTTP",
+    "API",
+    "HTML_CSS",
+];
+function categorieValide(valeur) {
+    return (typeof valeur === "string" && CATEGORIES_VALIDES.includes(valeur));
+}
+function validerDonneesExperience(body) {
+    const { titre, categorie, probleme, cause, solution, technologie, code } = body;
+    if (typeof titre !== "string" || !titre.trim()) {
+        return { valide: false, erreur: "Le titre est requis." };
+    }
+    if (!categorieValide(categorie)) {
+        return { valide: false, erreur: "Catégorie invalide." };
+    }
+    if (typeof probleme !== "string" || !probleme.trim()) {
+        return { valide: false, erreur: "Le problème est requis." };
+    }
+    if (typeof cause !== "string" || !cause.trim()) {
+        return { valide: false, erreur: "La cause est requise." };
+    }
+    if (typeof solution !== "string" || !solution.trim()) {
+        return { valide: false, erreur: "La solution est requise." };
+    }
+    const technologieNettoyee = typeof technologie === "string" && technologie.trim()
+        ? technologie.trim()
+        : undefined;
+    const codeNettoye = typeof code === "string" && code.trim() ? code.trim() : undefined;
+    return {
+        valide: true,
+        donnees: {
+            titre: titre.trim(),
+            categorie,
+            probleme: probleme.trim(),
+            cause: cause.trim(),
+            solution: solution.trim(),
+            technologie: technologieNettoyee,
+            code: codeNettoye,
+        },
+    };
+}
+/**
+ * Créer une expérience
+ * POST /api/admin/experiences
+ */
+async function creerExperience(req, res) {
+    const adminId = req.utilisateurId;
+    if (!adminId) {
+        return res.status(401).json({ erreur: "Authentification requise." });
+    }
+    const validation = validerDonneesExperience(req.body);
+    if (!validation.valide) {
+        return res.status(400).json({ erreur: validation.erreur });
+    }
+    try {
+        const experience = await (0, admin_service_1.creerExperienceAdmin)(adminId, {
+            ...validation.donnees,
+            userId: adminId,
+        });
+        return res.status(201).json(experience);
+    }
+    catch (erreur) {
+        console.error("Erreur création expérience (admin) :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de créer l'expérience.",
+        });
+    }
+}
+/**
+ * Modifier une expérience
+ * PUT /api/admin/experiences/:id
+ */
+async function modifierExperience(req, res) {
+    const id = req.params.id;
+    if (!id || typeof id !== "string") {
+        return res.status(400).json({
+            erreur: "Identifiant d'expérience invalide.",
+        });
+    }
+    const validation = validerDonneesExperience(req.body);
+    if (!validation.valide) {
+        return res.status(400).json({ erreur: validation.erreur });
+    }
+    try {
+        const experience = await (0, admin_service_1.modifierExperienceAdmin)(id, validation.donnees);
+        return res.status(200).json(experience);
+    }
+    catch (erreur) {
+        if (erreur?.code === "P2025") {
+            return res.status(404).json({ erreur: "Expérience introuvable." });
+        }
+        console.error("Erreur modification expérience (admin) :", erreur);
+        return res.status(500).json({
+            erreur: "Impossible de modifier l'expérience.",
         });
     }
 }

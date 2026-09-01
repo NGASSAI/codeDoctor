@@ -1,4 +1,61 @@
 import { ExperienceStatus } from "../generated/prisma/client";
+import { Category } from "../generated/prisma/client";
+/**
+ * Créer une expérience depuis l'espace admin.
+ * L'admin connecté devient l'auteur de l'expérience.
+ */
+export declare function creerExperienceAdmin(adminId: string, donnees: {
+    titre: string;
+    categorie: Category;
+    probleme: string;
+    cause: string;
+    solution: string;
+    technologie?: string | null | undefined;
+    code?: string | null | undefined;
+    userId: string;
+}): Promise<{
+    id: string;
+    userId: string;
+    titre: string;
+    probleme: string;
+    code: string | null;
+    cause: string;
+    solution: string;
+    technologie: string | null;
+    categorie: Category;
+    statut: ExperienceStatus;
+    createdAt: Date;
+    updatedAt: Date;
+    moderatedAt: Date | null;
+    moderatedBy: string | null;
+}>;
+/**
+ * Modifier une expérience depuis l'espace admin.
+ */
+export declare function modifierExperienceAdmin(experienceId: string, donnees: {
+    titre?: string;
+    categorie?: Category;
+    probleme?: string;
+    cause?: string;
+    solution?: string;
+    technologie?: string | null | undefined;
+    code?: string | null | undefined;
+}): Promise<{
+    id: string;
+    userId: string;
+    titre: string;
+    probleme: string;
+    code: string | null;
+    cause: string;
+    solution: string;
+    technologie: string | null;
+    categorie: Category;
+    statut: ExperienceStatus;
+    createdAt: Date;
+    updatedAt: Date;
+    moderatedAt: Date | null;
+    moderatedBy: string | null;
+}>;
 export declare function obtenirStatistiquesAdmin(): Promise<{
     utilisateurs: number;
     experiences: {
@@ -71,7 +128,7 @@ export declare function listerExperiencesAdmin(page: number, limite: number): Pr
         cause: string;
         solution: string;
         technologie: string | null;
-        categorie: import("../generated/prisma/enums").Category;
+        categorie: Category;
         statut: ExperienceStatus;
         createdAt: Date;
         updatedAt: Date;
@@ -103,7 +160,7 @@ export declare function modifierStatutExperienceAdmin(experienceId: string, stat
     cause: string;
     solution: string;
     technologie: string | null;
-    categorie: import("../generated/prisma/enums").Category;
+    categorie: Category;
     statut: ExperienceStatus;
     createdAt: Date;
     updatedAt: Date;
@@ -155,7 +212,7 @@ export declare function supprimerExperienceAdmin(experienceId: string): Promise<
     cause: string;
     solution: string;
     technologie: string | null;
-    categorie: import("../generated/prisma/enums").Category;
+    categorie: Category;
     statut: ExperienceStatus;
     createdAt: Date;
     updatedAt: Date;

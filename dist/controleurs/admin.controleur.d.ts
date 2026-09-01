@@ -38,18 +38,20 @@ export declare function experiencesAdmin(req: RequeteAuthentifiee, res: Response
 export declare function modifierStatutExperience(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
  * Lister les signalements pour l'administration
- *
- * GET /api/admin/signalements
- *
- * Exemple :
- * /api/admin/signalements
- * /api/admin/signalements?statut=PENDING
  */
 export declare function signalementsAdmin(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
 /**
  * Modifier le statut d'un signalement
- *
- * PATCH /api/admin/signalements/:id/statut
  */
 export declare function modifierStatutSignalementAdmin(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
+/**
+ * Créer une expérience
+ * POST /api/admin/experiences
+ */
+export declare function creerExperience(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
+/**
+ * Modifier une expérience
+ * PUT /api/admin/experiences/:id
+ */
+export declare function modifierExperience(req: RequeteAuthentifiee, res: Response): Promise<Response<any, Record<string, any>>>;
 //# sourceMappingURL=admin.controleur.d.ts.map
