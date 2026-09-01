@@ -122,7 +122,7 @@ async function supprimer(req, res) {
         }
         await (0, commentaire_service_1.supprimerCommentaire)(commentId, utilisateurId);
         return res.status(200).json({
-            message: "Commentaire supprimé avec succès.",
+            message: "Commentaire supprimé avec succès..",
         });
     }
     catch (erreur) {

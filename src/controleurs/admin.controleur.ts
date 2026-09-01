@@ -1,5 +1,5 @@
 import { Response } from "express";
-const { prisma } = require("../lib/prisma") as { prisma: any };
+import { prisma } from "../base";
 import { RequeteAuthentifiee } from "../middlewares/authentification.middleware";
 
 import {

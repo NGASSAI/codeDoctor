@@ -13,7 +13,7 @@ exports.modifierStatutSignalementAdmin = modifierStatutSignalementAdmin;
 exports.creerExperience = creerExperience;
 exports.modifierExperience = modifierExperience;
 exports.marquerNotificationLueAdmin = marquerNotificationLueAdmin;
-const { prisma } = require("../lib/prisma");
+const base_1 = require("../base");
 const admin_service_1 = require("../services/admin.service");
 const report_service_1 = require("../services/report.service");
 /**
@@ -187,7 +187,7 @@ async function modifierStatutExperience(req, res) {
         const messageNotif = statut === "PUBLISHED"
             ? `Votre expérience "${experience.titre}" a été approuvée.`
             : `Votre expérience "${experience.titre}" a été refusée ou masquée.`;
-        await prisma.notification.create({
+        await base_1.prisma.notification.create({
             data: {
                 userId: experience.userId,
                 type: typeNotif,
