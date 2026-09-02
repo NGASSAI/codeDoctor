@@ -104,6 +104,38 @@ export async function obtenirIndice(
  * Les mots-clés restent côté serveur.
  * Le frontend ne reçoit jamais la solution.
  */
+/**
+ * Normalise une réponse ou une solution avant comparaison,
+ * selon la catégorie de l'exercice.
+ *
+ * HTML_CSS : les espaces entre les balises sont insignifiants.
+ * Autres catégories (code) : l'indentation, les retours à la ligne
+ * et les espaces autour des tokens ne changent pas le sens du code,
+ * donc on les retire entièrement avant de comparer.
+ */
+function normaliserReponse(
+  texte: string,
+  categorie: Category
+): string {
+  const base = texte.trim().toLowerCase();
+
+  if (categorie === "HTML_CSS") {
+    return base
+      .replace(/>\s+</g, "><")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  // JAVASCRIPT, TYPESCRIPT, REACT, HTTP, API
+  return base.replace(/\s+/g, "");
+}
+
+/**
+ * Vérifie la réponse d'un utilisateur.
+ *
+ * Les mots-clés restent côté serveur.
+ * Le frontend ne reçoit jamais la solution.
+ */
 export async function soumettreTentative(
   utilisateurId: string,
   exerciceId: string,
@@ -126,95 +158,78 @@ export async function soumettreTentative(
     return null;
   }
 
-  const reponseNormalisee = reponse
-    .trim()
-    .toLowerCase();
+  const reponseNormalisee = normaliserReponse(
+    reponse,
+    exercice.category
+  );
 
-  /*
-   * Une réponse vide ne peut évidemment pas être correcte.
-   */
   let correcte = false;
 
   if (reponseNormalisee.length > 0) {
-    /*
-     * La réponse est considérée correcte si elle contient
-     * tous les mots-clés définis pour l'exercice.
-     *
-     * Si aucun mot-clé n'est défini, on compare alors
-     * directement avec la solution normalisée.
-     */
     if (exercice.keywords.length > 0) {
-      correcte = exercice.keywords.every(
-        (keyword) =>
-          reponseNormalisee.includes(
-            keyword.trim().toLowerCase()
-          )
+      correcte = exercice.keywords.every((keyword) =>
+        reponseNormalisee.includes(
+          normaliserReponse(keyword, exercice.category)
+        )
       );
     } else {
       correcte =
         reponseNormalisee ===
-        exercice.solution.trim().toLowerCase();
+        normaliserReponse(exercice.solution, exercice.category);
     }
   }
 
-  const resultat = await prisma.$transaction(
-    async (tx) => {
-      const tentative =
-        await tx.exerciseAttempt.create({
-          data: {
-            userId: utilisateurId,
-            exerciseId: exerciceId,
-            userAnswer: reponse,
-            correct: correcte,
-            hintsUsed: indicesUtilises,
-          },
-          select: {
-            id: true,
-            exerciseId: true,
-            correct: true,
-            hintsUsed: true,
-            createdAt: true,
-          },
-        });
+  const resultat = await prisma.$transaction(async (tx) => {
+    const tentative = await tx.exerciseAttempt.create({
+      data: {
+        userId: utilisateurId,
+        exerciseId: exerciceId,
+        userAnswer: reponse,
+        correct: correcte,
+        hintsUsed: indicesUtilises,
+      },
+      select: {
+        id: true,
+        exerciseId: true,
+        correct: true,
+        hintsUsed: true,
+        createdAt: true,
+      },
+    });
 
-      /*
-       * La progression est mise à jour uniquement
-       * lorsque l'exercice est réussi.
-       */
-      let progression = null;
+    let progression = null;
 
-      if (correcte) {
-        progression = await tx.progress.upsert({
-          where: {
-            userId_categorie: {
-              userId: utilisateurId,
-              categorie: exercice.category,
-            },
-          },
-          create: {
+    if (correcte) {
+      progression = await tx.progress.upsert({
+        where: {
+          userId_categorie: {
             userId: utilisateurId,
             categorie: exercice.category,
-            compteur: 1,
           },
-          update: {
-            compteur: {
-              increment: 1,
-            },
+        },
+        create: {
+          userId: utilisateurId,
+          categorie: exercice.category,
+          compteur: 1,
+        },
+        update: {
+          compteur: {
+            increment: 1,
           },
-          select: {
-            id: true,
-            categorie: true,
-            compteur: true,
-          },
-        });
-      }
-
-      return {
-        tentative,
-        progression,
-      };
+        },
+        select: {
+          id: true,
+          categorie: true,
+          compteur: true,
+        },
+      });
     }
-  );
+
+    return {
+      tentative,
+      progression,
+    };
+  });
 
   return resultat;
 }
