@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.analyserCodeControleur = analyserCodeControleur;
 const ia_service_1 = require("../services/ia.service");
 const quota_service_1 = require("../services/quota.service");
+const historique_service_1 = require("../services/historique.service");
 async function analyserCodeControleur(req, res) {
     try {
         const utilisateurId = req.utilisateurId;
@@ -43,6 +44,30 @@ async function analyserCodeControleur(req, res) {
             utilisateurId,
             dateJour: quota.dateJour,
         });
+        /*
+         * Enregistrement dans l'historique + création automatique
+         * d'une conversation contenant le code envoyé et la réponse
+         * de l'IA. On n'interrompt jamais la réponse principale si
+         * cette partie échoue.
+         */
+        try {
+            const categorieMappee = mapperLangageVersCategorie(langage);
+            const historique = await (0, historique_service_1.creerHistorique)(utilisateurId, {
+                categorie: categorieMappee,
+                titre: `Analyse IA — ${langage}`,
+                extrait: code.slice(0, 2000),
+            });
+            const conversation = await (0, historique_service_1.creerConversation)(historique.id, utilisateurId, `Analyse IA — ${langage}`);
+            if (conversation) {
+                await (0, historique_service_1.ajouterMessage)(conversation.id, utilisateurId, "USER", parametres.erreur
+                    ? `${code}\n\nMessage d'erreur :\n${parametres.erreur}`
+                    : code);
+                await (0, historique_service_1.ajouterMessage)(conversation.id, utilisateurId, "SYSTEM", analyse);
+            }
+        }
+        catch (erreurHistorique) {
+            console.error("Erreur enregistrement historique (IA) :", erreurHistorique);
+        }
         return res.status(200).json({
             succes: true,
             analyse,
@@ -81,5 +106,24 @@ async function analyserCodeControleur(req, res) {
             erreur: "Impossible d'effectuer l'analyse du code.",
         });
     }
+}
+/**
+ * Convertit le libellé de langage envoyé par le front
+ * (ex: "JavaScript", "TypeScript") vers une valeur de l'enum
+ * Category attendue par l'historique.
+ */
+function mapperLangageVersCategorie(langage) {
+    const normalise = langage.trim().toLowerCase();
+    if (normalise.includes("typescript"))
+        return "TYPESCRIPT";
+    if (normalise.includes("react"))
+        return "REACT";
+    if (normalise.includes("http"))
+        return "HTTP";
+    if (normalise.includes("api"))
+        return "API";
+    if (normalise.includes("html") || normalise.includes("css"))
+        return "HTML_CSS";
+    return "JAVASCRIPT";
 }
 //# sourceMappingURL=ia.controleur.js.map

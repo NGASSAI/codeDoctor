@@ -41,14 +41,7 @@ exports.HTML_CSS_EXERCISES = [
   <button type="submit">Connexion</button>
 </form>
 `,
-        keywords: [
-            "html",
-            "accessibility",
-            "form",
-            "label",
-            "input",
-            "aria",
-        ],
+        keywords: ["<label", "for=", "id=", "autocomplete"],
     },
     {
         title: "Navigation mobile qui déborde de l'écran",
@@ -121,14 +114,7 @@ exports.HTML_CSS_EXERCISES = [
 }
 </style>
 `,
-        keywords: [
-            "css",
-            "responsive",
-            "mobile",
-            "media-query",
-            "flexbox",
-            "navbar",
-        ],
+        keywords: ["@media", "flex-direction: column"],
     },
     {
         title: "Cartes de dashboard avec des hauteurs incohérentes",
@@ -204,14 +190,7 @@ exports.HTML_CSS_EXERCISES = [
 }
 </style>
 `,
-        keywords: [
-            "css",
-            "flexbox",
-            "dashboard",
-            "cards",
-            "layout",
-            "responsive",
-        ],
+        keywords: ["align-items: stretch", "flex: 1"],
     },
     {
         title: "Image de profil déformée",
@@ -264,14 +243,7 @@ exports.HTML_CSS_EXERCISES = [
 }
 </style>
 `,
-        keywords: [
-            "css",
-            "image",
-            "object-fit",
-            "responsive",
-            "profile",
-            "aspect-ratio",
-        ],
+        keywords: ["object-fit"],
     },
     {
         title: "Bouton impossible à cliquer sur mobile",
@@ -329,14 +301,7 @@ button {
 }
 </style>
 `,
-        keywords: [
-            "css",
-            "mobile",
-            "button",
-            "responsive",
-            "accessibility",
-            "ux",
-        ],
+        keywords: ["padding"],
     },
     {
         title: "Contenu masqué qui reste inaccessible",
@@ -392,14 +357,7 @@ summary {
 }
 </style>
 `,
-        keywords: [
-            "html",
-            "css",
-            "accessibility",
-            "details",
-            "summary",
-            "hover",
-        ],
+        keywords: ["<details", "<summary"],
     },
     {
         title: "Layout principal cassé par une largeur fixe",
@@ -465,14 +423,7 @@ summary {
 }
 </style>
 `,
-        keywords: [
-            "css",
-            "flexbox",
-            "layout",
-            "sidebar",
-            "overflow",
-            "responsive",
-        ],
+        keywords: ["flex: 1", "min-width: 0"],
     },
     {
         title: "Z-index inefficace sur une modal",
@@ -558,14 +509,7 @@ summary {
 }
 </style>
 `,
-        keywords: [
-            "css",
-            "z-index",
-            "modal",
-            "position",
-            "stacking-context",
-            "overlay",
-        ],
+        keywords: ["z-index: 1000"],
     },
     {
         title: "Formulaire qui déborde sur petit écran",
@@ -660,14 +604,7 @@ input {
 }
 </style>
 `,
-        keywords: [
-            "css",
-            "responsive",
-            "form",
-            "mobile",
-            "flexbox",
-            "box-sizing",
-        ],
+        keywords: ["max-width: 100%", "box-sizing"],
     },
     {
         title: "Hiérarchie HTML incorrecte pour une page de documentation",
@@ -716,14 +653,7 @@ input {
   </section>
 </main>
 `,
-        keywords: [
-            "html",
-            "semantic-html",
-            "headings",
-            "accessibility",
-            "seo",
-            "structure",
-        ],
+        keywords: ["<h2", "<h3"],
     },
 ];
 //# sourceMappingURL=htmlCss.js.map

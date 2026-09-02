@@ -95,10 +95,36 @@ async function obtenirIndice(exerciceId, numeroIndice) {
     };
 }
 /**
+ * Normalise une réponse ou une solution avant comparaison,
+ * selon la catégorie de l'exercice.
+ *
+ * HTML_CSS : les espaces entre les balises sont insignifiants.
+ * Autres catégories (code) : l'indentation, les retours à la ligne
+ * et les espaces autour des tokens ne changent pas le sens du code,
+ * donc on les retire entièrement avant de comparer.
+ */
+function normaliserReponse(texte, categorie) {
+    const base = texte.trim().toLowerCase();
+    if (categorie === "HTML_CSS") {
+        return base
+            .replace(/>\s+</g, "><")
+            .replace(/\s+/g, " ")
+            .trim();
+    }
+    // JAVASCRIPT, TYPESCRIPT, REACT, HTTP, API
+    return base.replace(/\s+/g, "");
+}
+/**
  * Vérifie la réponse d'un utilisateur.
  *
  * Les mots-clés restent côté serveur.
  * Le frontend ne reçoit jamais la solution.
+ *
+ * Règle de correction par mots-clés :
+ * on n'exige plus 100% des mots-clés (trop strict), mais au moins
+ * 60% d'entre eux, arrondi au-dessus. Cela tolère qu'un utilisateur
+ * écrive une réponse valide mais légèrement différente de la
+ * solution de référence.
  */
 async function soumettreTentative(utilisateurId, exerciceId, reponse, indicesUtilises) {
     const exercice = await base_1.prisma.exercise.findUnique({
@@ -115,28 +141,18 @@ async function soumettreTentative(utilisateurId, exerciceId, reponse, indicesUti
     if (!exercice) {
         return null;
     }
-    const reponseNormalisee = reponse
-        .trim()
-        .toLowerCase();
-    /*
-     * Une réponse vide ne peut évidemment pas être correcte.
-     */
+    const reponseNormalisee = normaliserReponse(reponse, exercice.category);
     let correcte = false;
     if (reponseNormalisee.length > 0) {
-        /*
-         * La réponse est considérée correcte si elle contient
-         * tous les mots-clés définis pour l'exercice.
-         *
-         * Si aucun mot-clé n'est défini, on compare alors
-         * directement avec la solution normalisée.
-         */
         if (exercice.keywords.length > 0) {
-            correcte = exercice.keywords.every((keyword) => reponseNormalisee.includes(keyword.trim().toLowerCase()));
+            const motsTrouves = exercice.keywords.filter((keyword) => reponseNormalisee.includes(normaliserReponse(keyword, exercice.category))).length;
+            const seuil = Math.ceil(exercice.keywords.length * 0.6);
+            correcte = motsTrouves >= seuil;
         }
         else {
             correcte =
                 reponseNormalisee ===
-                    exercice.solution.trim().toLowerCase();
+                    normaliserReponse(exercice.solution, exercice.category);
         }
     }
     const resultat = await base_1.prisma.$transaction(async (tx) => {
@@ -156,10 +172,6 @@ async function soumettreTentative(utilisateurId, exerciceId, reponse, indicesUti
                 createdAt: true,
             },
         });
-        /*
-         * La progression est mise à jour uniquement
-         * lorsque l'exercice est réussi.
-         */
         let progression = null;
         if (correcte) {
             progression = await tx.progress.upsert({

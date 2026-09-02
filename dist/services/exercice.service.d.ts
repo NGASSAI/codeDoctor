@@ -46,6 +46,12 @@ export declare function obtenirIndice(exerciceId: string, numeroIndice: number):
  *
  * Les mots-clés restent côté serveur.
  * Le frontend ne reçoit jamais la solution.
+ *
+ * Règle de correction par mots-clés :
+ * on n'exige plus 100% des mots-clés (trop strict), mais au moins
+ * 60% d'entre eux, arrondi au-dessus. Cela tolère qu'un utilisateur
+ * écrive une réponse valide mais légèrement différente de la
+ * solution de référence.
  */
 export declare function soumettreTentative(utilisateurId: string, exerciceId: string, reponse: string, indicesUtilises: number): Promise<{
     tentative: {

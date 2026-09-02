@@ -24,28 +24,20 @@ const utilisateur_service_1 = require("../services/utilisateur.service");
 async function inscription(req, res) {
     try {
         const { email, motDePasse, displayName, recoveryAnswer, recoveryHint, } = req.body;
-        if (!email || !motDePasse) {
+        if (!email || !motDePasse || !displayName) {
             return res.status(400).json({
-                erreur: "Email et mot de passe requis.",
+                erreur: "Email, mot de passe et nom sont requis.",
             });
         }
         if (typeof email !== "string" ||
-            typeof motDePasse !== "string") {
+            typeof motDePasse !== "string" ||
+            typeof displayName !== "string") {
             return res.status(400).json({
                 erreur: "Données invalides.",
             });
         }
-        if (typeof displayName !== "string" ||
-            typeof recoveryAnswer !== "string" ||
-            typeof recoveryHint !== "string") {
-            return res.status(400).json({
-                erreur: "Nom, phrase secrète et indice sont requis.",
-            });
-        }
         const emailNormalise = email.trim().toLowerCase();
         const nomNormalise = displayName.trim();
-        const phraseRecuperation = recoveryAnswer.trim();
-        const indiceRecuperation = recoveryHint.trim();
         if (!emailNormalise) {
             return res.status(400).json({
                 erreur: "Email requis.",
@@ -61,25 +53,43 @@ async function inscription(req, res) {
                 erreur: "Le mot de passe doit contenir au moins 8 caractères.",
             });
         }
-        if (phraseRecuperation.length < 8) {
-            return res.status(400).json({
-                erreur: "La phrase secrète doit contenir au moins 8 caractères.",
-            });
-        }
-        if (indiceRecuperation.length < 3) {
-            return res.status(400).json({
-                erreur: "L'indice de récupération doit contenir au moins 3 caractères.",
-            });
-        }
-        if (phraseRecuperation.toLowerCase() === motDePasse.toLowerCase()) {
-            return res.status(400).json({
-                erreur: "La phrase secrète doit être différente du mot de passe.",
-            });
-        }
-        if (indiceRecuperation.toLowerCase() === phraseRecuperation.toLowerCase()) {
-            return res.status(400).json({
-                erreur: "L'indice doit aider à retrouver la phrase sans la révéler.",
-            });
+        /*
+         * La phrase secrète de récupération est désormais optionnelle
+         * à l'inscription — l'utilisateur peut la configurer plus tard
+         * depuis son profil. Si elle est fournie ici quand même, on la
+         * valide normalement.
+         */
+        let phraseRecuperation;
+        let indiceRecuperation;
+        if (recoveryAnswer !== undefined || recoveryHint !== undefined) {
+            if (typeof recoveryAnswer !== "string" ||
+                typeof recoveryHint !== "string") {
+                return res.status(400).json({
+                    erreur: "La phrase secrète et l'indice doivent être fournis ensemble.",
+                });
+            }
+            phraseRecuperation = recoveryAnswer.trim();
+            indiceRecuperation = recoveryHint.trim();
+            if (phraseRecuperation.length < 8) {
+                return res.status(400).json({
+                    erreur: "La phrase secrète doit contenir au moins 8 caractères.",
+                });
+            }
+            if (indiceRecuperation.length < 3) {
+                return res.status(400).json({
+                    erreur: "L'indice de récupération doit contenir au moins 3 caractères.",
+                });
+            }
+            if (phraseRecuperation.toLowerCase() === motDePasse.toLowerCase()) {
+                return res.status(400).json({
+                    erreur: "La phrase secrète doit être différente du mot de passe.",
+                });
+            }
+            if (indiceRecuperation.toLowerCase() === phraseRecuperation.toLowerCase()) {
+                return res.status(400).json({
+                    erreur: "L'indice doit aider à retrouver la phrase sans la révéler.",
+                });
+            }
         }
         const utilisateurExistant = await (0, utilisateur_service_1.trouverUtilisateurParEmail)(emailNormalise);
         if (utilisateurExistant) {
@@ -89,7 +99,6 @@ async function inscription(req, res) {
         }
         const utilisateur = await (0, utilisateur_service_1.creerUtilisateur)(emailNormalise, motDePasse, nomNormalise, phraseRecuperation, indiceRecuperation);
         const tokenVerification = await (0, utilisateur_service_1.creerTokenVerificationEmail)(utilisateur.id);
-        // Notification aux administrateurs pour informer du nouvel utilisateur enregistré
         const admins = await base_1.prisma.user.findMany({
             where: { role: "ADMIN" },
             select: { id: true },

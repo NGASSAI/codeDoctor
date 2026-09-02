@@ -44,35 +44,24 @@ export async function inscription(
       recoveryHint,
     } = req.body;
 
-    if (!email || !motDePasse) {
+    if (!email || !motDePasse || !displayName) {
       return res.status(400).json({
-        erreur: "Email et mot de passe requis.",
+        erreur: "Email, mot de passe et nom sont requis.",
       });
     }
 
     if (
       typeof email !== "string" ||
-      typeof motDePasse !== "string"
+      typeof motDePasse !== "string" ||
+      typeof displayName !== "string"
     ) {
       return res.status(400).json({
         erreur: "Données invalides.",
       });
     }
 
-    if (
-      typeof displayName !== "string" ||
-      typeof recoveryAnswer !== "string" ||
-      typeof recoveryHint !== "string"
-    ) {
-      return res.status(400).json({
-        erreur: "Nom, phrase secrète et indice sont requis.",
-      });
-    }
-
     const emailNormalise = email.trim().toLowerCase();
     const nomNormalise = displayName.trim();
-    const phraseRecuperation = recoveryAnswer.trim();
-    const indiceRecuperation = recoveryHint.trim();
 
     if (!emailNormalise) {
       return res.status(400).json({
@@ -92,32 +81,56 @@ export async function inscription(
       });
     }
 
-    if (phraseRecuperation.length < 8) {
-      return res.status(400).json({
-        erreur: "La phrase secrète doit contenir au moins 8 caractères.",
-      });
-    }
+    /*
+     * La phrase secrète de récupération est désormais optionnelle
+     * à l'inscription — l'utilisateur peut la configurer plus tard
+     * depuis son profil. Si elle est fournie ici quand même, on la
+     * valide normalement.
+     */
+    let phraseRecuperation: string | undefined;
+    let indiceRecuperation: string | undefined;
 
-    if (indiceRecuperation.length < 3) {
-      return res.status(400).json({
-        erreur: "L'indice de récupération doit contenir au moins 3 caractères.",
-      });
-    }
+    if (recoveryAnswer !== undefined || recoveryHint !== undefined) {
+      if (
+        typeof recoveryAnswer !== "string" ||
+        typeof recoveryHint !== "string"
+      ) {
+        return res.status(400).json({
+          erreur:
+            "La phrase secrète et l'indice doivent être fournis ensemble.",
+        });
+      }
 
-    if (
-      phraseRecuperation.toLowerCase() === motDePasse.toLowerCase()
-    ) {
-      return res.status(400).json({
-        erreur: "La phrase secrète doit être différente du mot de passe.",
-      });
-    }
+      phraseRecuperation = recoveryAnswer.trim();
+      indiceRecuperation = recoveryHint.trim();
 
-    if (
-      indiceRecuperation.toLowerCase() === phraseRecuperation.toLowerCase()
-    ) {
-      return res.status(400).json({
-        erreur: "L'indice doit aider à retrouver la phrase sans la révéler.",
-      });
+      if (phraseRecuperation.length < 8) {
+        return res.status(400).json({
+          erreur: "La phrase secrète doit contenir au moins 8 caractères.",
+        });
+      }
+
+      if (indiceRecuperation.length < 3) {
+        return res.status(400).json({
+          erreur: "L'indice de récupération doit contenir au moins 3 caractères.",
+        });
+      }
+
+      if (
+        phraseRecuperation.toLowerCase() === motDePasse.toLowerCase()
+      ) {
+        return res.status(400).json({
+          erreur: "La phrase secrète doit être différente du mot de passe.",
+        });
+      }
+
+      if (
+        indiceRecuperation.toLowerCase() === phraseRecuperation.toLowerCase()
+      ) {
+        return res.status(400).json({
+          erreur: "L'indice doit aider à retrouver la phrase sans la révéler.",
+        });
+      }
     }
 
     const utilisateurExistant = await trouverUtilisateurParEmail(
@@ -142,7 +155,6 @@ export async function inscription(
       utilisateur.id
     );
 
-    // Notification aux administrateurs pour informer du nouvel utilisateur enregistré
     const admins = await prisma.user.findMany({
       where: { role: "ADMIN" },
       select: { id: true },
