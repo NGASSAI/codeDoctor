@@ -10,6 +10,12 @@ import {
   verifierEtConsommerQuotaIA,
 } from "../services/quota.service";
 
+import {
+  creerHistorique,
+  creerConversation,
+  ajouterMessage,
+} from "../services/historique.service";
+
 export async function analyserCodeControleur(
   req: RequeteAuthentifiee,
   res: Response
@@ -70,6 +76,51 @@ export async function analyserCodeControleur(
       dateJour: quota.dateJour,
     });
 
+    /*
+     * Enregistrement dans l'historique + création automatique
+     * d'une conversation contenant le code envoyé et la réponse
+     * de l'IA. On n'interrompt jamais la réponse principale si
+     * cette partie échoue.
+     */
+    try {
+      const categorieMappee = mapperLangageVersCategorie(langage);
+
+      const historique = await creerHistorique(utilisateurId, {
+        categorie: categorieMappee,
+        titre: `Analyse IA — ${langage}`,
+        extrait: code.slice(0, 2000),
+      });
+
+      const conversation = await creerConversation(
+        historique.id,
+        utilisateurId,
+        `Analyse IA — ${langage}`
+      );
+
+      if (conversation) {
+        await ajouterMessage(
+          conversation.id,
+          utilisateurId,
+          "USER",
+          parametres.erreur
+            ? `${code}\n\nMessage d'erreur :\n${parametres.erreur}`
+            : code
+        );
+
+        await ajouterMessage(
+          conversation.id,
+          utilisateurId,
+          "SYSTEM",
+          analyse
+        );
+      }
+    } catch (erreurHistorique) {
+      console.error(
+        "Erreur enregistrement historique (IA) :",
+        erreurHistorique
+      );
+    }
+
     return res.status(200).json({
       succes: true,
       analyse,
@@ -121,4 +172,30 @@ export async function analyserCodeControleur(
         "Impossible d'effectuer l'analyse du code.",
     });
   }
+}
+
+/**
+ * Convertit le libellé de langage envoyé par le front
+ * (ex: "JavaScript", "TypeScript") vers une valeur de l'enum
+ * Category attendue par l'historique.
+ */
+function mapperLangageVersCategorie(
+  langage: string
+):
+  | "JAVASCRIPT"
+  | "TYPESCRIPT"
+  | "REACT"
+  | "HTTP"
+  | "API"
+  | "HTML_CSS" {
+  const normalise = langage.trim().toLowerCase();
+
+  if (normalise.includes("typescript")) return "TYPESCRIPT";
+  if (normalise.includes("react")) return "REACT";
+  if (normalise.includes("http")) return "HTTP";
+  if (normalise.includes("api")) return "API";
+  if (normalise.includes("html") || normalise.includes("css"))
+    return "HTML_CSS";
+
+  return "JAVASCRIPT";
 }

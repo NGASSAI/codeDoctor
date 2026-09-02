@@ -1,7 +1,9 @@
 import type { Request, Response } from "express";
-import { listerReglesDiagnostic } from "../services/diagnostic.service";
+
 import type { Category } from "../generated/prisma/client";
-import { diagnostiquerCode } from "../services/diagnostic.service";
+import { diagnostiquerCode, listerReglesDiagnostic } from "../services/diagnostic.service";
+import { creerHistorique } from "../services/historique.service";
+import { RequeteAuthentifiee } from "../middlewares/authentification.middleware";
 
 const CATEGORIES_DIAGNOSTIC = [
   "JAVASCRIPT",
@@ -29,9 +31,12 @@ function estCategorieValide(
  * Analyse un code avec le moteur de règles local.
  *
  * L'IA n'intervient pas ici.
+ *
+ * Si l'utilisateur est connecté et qu'au moins un problème
+ * est détecté, une entrée est ajoutée à son historique.
  */
 export async function diagnostiquer(
-  req: Request,
+  req: RequeteAuthentifiee,
   res: Response
 ) {
   try {
@@ -63,6 +68,29 @@ export async function diagnostiquer(
       categorie as Category
     );
 
+    const utilisateurId = req.utilisateurId;
+
+    if (utilisateurId && resultats.length > 0) {
+      const premierResultat = resultats[0];
+
+      try {
+        await creerHistorique(utilisateurId, {
+          categorie: categorie as Category,
+          titre: `Analyse ${categorie} — ${resultats.length} problème${
+            resultats.length > 1 ? "s" : ""
+          } détecté${resultats.length > 1 ? "s" : ""}`,
+          severite: premierResultat?.severite as any,
+          extrait: code.slice(0, 2000),
+        });
+      } catch (erreurHistorique) {
+        console.error(
+          "Erreur enregistrement historique (diagnostic) :",
+          erreurHistorique
+        );
+        // On n'interrompt pas la réponse principale pour autant.
+      }
+    }
+
     return res.status(200).json({
       succes: true,
       categorie,
@@ -83,6 +111,9 @@ export async function diagnostiquer(
   }
 }
 
+/**
+ * GET /api/diagnostic/capacites
+ */
 export async function listerCapacites(
   req: Request,
   res: Response
