@@ -99,12 +99,6 @@ export async function obtenirIndice(
 }
 
 /**
- * Vérifie la réponse d'un utilisateur.
- *
- * Les mots-clés restent côté serveur.
- * Le frontend ne reçoit jamais la solution.
- */
-/**
  * Normalise une réponse ou une solution avant comparaison,
  * selon la catégorie de l'exercice.
  *
@@ -135,6 +129,12 @@ function normaliserReponse(
  *
  * Les mots-clés restent côté serveur.
  * Le frontend ne reçoit jamais la solution.
+ *
+ * Règle de correction par mots-clés :
+ * on n'exige plus 100% des mots-clés (trop strict), mais au moins
+ * 60% d'entre eux, arrondi au-dessus. Cela tolère qu'un utilisateur
+ * écrive une réponse valide mais légèrement différente de la
+ * solution de référence.
  */
 export async function soumettreTentative(
   utilisateurId: string,
@@ -167,11 +167,15 @@ export async function soumettreTentative(
 
   if (reponseNormalisee.length > 0) {
     if (exercice.keywords.length > 0) {
-      correcte = exercice.keywords.every((keyword) =>
+      const motsTrouves = exercice.keywords.filter((keyword) =>
         reponseNormalisee.includes(
           normaliserReponse(keyword, exercice.category)
         )
-      );
+      ).length;
+
+      const seuil = Math.ceil(exercice.keywords.length * 0.6);
+
+      correcte = motsTrouves >= seuil;
     } else {
       correcte =
         reponseNormalisee ===
@@ -246,8 +250,8 @@ export async function listerTentativesUtilisateur(
     where: {
       userId: utilisateurId,
       ...(exerciceId
-  ? { exerciseId: exerciceId }
-  : {}),
+        ? { exerciseId: exerciceId }
+        : {}),
     },
     select: {
       id: true,

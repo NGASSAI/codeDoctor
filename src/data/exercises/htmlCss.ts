@@ -40,14 +40,7 @@ export const HTML_CSS_EXERCISES: Exercise[] = [
   <button type="submit">Connexion</button>
 </form>
 `,
-    keywords: [
-      "html",
-      "accessibility",
-      "form",
-      "label",
-      "input",
-      "aria",
-    ],
+    keywords: ["<label", "for=", "id=", "autocomplete"],
   },
 
   {
@@ -121,14 +114,7 @@ export const HTML_CSS_EXERCISES: Exercise[] = [
 }
 </style>
 `,
-    keywords: [
-      "css",
-      "responsive",
-      "mobile",
-      "media-query",
-      "flexbox",
-      "navbar",
-    ],
+    keywords: ["@media", "flex-direction: column"],
   },
 
   {
@@ -205,14 +191,7 @@ export const HTML_CSS_EXERCISES: Exercise[] = [
 }
 </style>
 `,
-    keywords: [
-      "css",
-      "flexbox",
-      "dashboard",
-      "cards",
-      "layout",
-      "responsive",
-    ],
+    keywords: ["align-items: stretch", "flex: 1"],
   },
 
   {
@@ -266,14 +245,7 @@ export const HTML_CSS_EXERCISES: Exercise[] = [
 }
 </style>
 `,
-    keywords: [
-      "css",
-      "image",
-      "object-fit",
-      "responsive",
-      "profile",
-      "aspect-ratio",
-    ],
+    keywords: ["object-fit"],
   },
 
   {
@@ -332,14 +304,7 @@ button {
 }
 </style>
 `,
-    keywords: [
-      "css",
-      "mobile",
-      "button",
-      "responsive",
-      "accessibility",
-      "ux",
-    ],
+    keywords: ["padding"],
   },
 
   {
@@ -396,14 +361,7 @@ summary {
 }
 </style>
 `,
-    keywords: [
-      "html",
-      "css",
-      "accessibility",
-      "details",
-      "summary",
-      "hover",
-    ],
+    keywords: ["<details", "<summary"],
   },
 
   {
@@ -470,14 +428,7 @@ summary {
 }
 </style>
 `,
-    keywords: [
-      "css",
-      "flexbox",
-      "layout",
-      "sidebar",
-      "overflow",
-      "responsive",
-    ],
+    keywords: ["flex: 1", "min-width: 0"],
   },
 
   {
@@ -564,14 +515,7 @@ summary {
 }
 </style>
 `,
-    keywords: [
-      "css",
-      "z-index",
-      "modal",
-      "position",
-      "stacking-context",
-      "overlay",
-    ],
+    keywords: ["z-index: 1000"],
   },
 
   {
@@ -667,14 +611,7 @@ input {
 }
 </style>
 `,
-    keywords: [
-      "css",
-      "responsive",
-      "form",
-      "mobile",
-      "flexbox",
-      "box-sizing",
-    ],
+    keywords: ["max-width: 100%", "box-sizing"],
   },
 
   {
@@ -724,13 +661,6 @@ input {
   </section>
 </main>
 `,
-    keywords: [
-      "html",
-      "semantic-html",
-      "headings",
-      "accessibility",
-      "seo",
-      "structure",
-    ],
+    keywords: ["<h2", "<h3"],
   },
 ];
